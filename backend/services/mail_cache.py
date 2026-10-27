@@ -10,6 +10,7 @@
 """
 
 import asyncio
+import os
 import time
 
 from dataclasses import dataclass, field
@@ -170,7 +171,8 @@ from db import (
     upsert_folder_stats, get_folder_stats,
     purge_deleted_from_cache, get_cached_count, get_cached_uids,
     get_cached_messages_by_folder, batch_update_is_read,
-    make_cached_message_id,
+    make_cached_message_id, record_failed_message, get_failed_uids,
+    clear_failed_message, count_failed_messages,
 )
 from models import CachedMessage, Account
 from providers.base import Message
@@ -316,12 +318,81 @@ async def enrich_new_mail_body_previews(receiver, folder: str, items: list, max_
 
 
 # 全量同步：分页拉满，避免只取首页 500 封导致大邮箱缺信
-FULL_SYNC_PAGE_SIZE = 500
-FULL_SYNC_MAX_PAGES = 40  # 上限约 20000 封，防止极端邮箱拖垮
+FULL_SYNC_PAGE_SIZE = int(os.environ.get("FLYMAIL_FULL_SYNC_PAGE_SIZE", "500"))
+# 全量同步页数上限（默认 40×500≈2 万封，可用环境变量放大；
+# 超大邮箱建议配合增量/分段策略，避免一次拉取过久）
+FULL_SYNC_MAX_PAGES = int(os.environ.get("FLYMAIL_FULL_SYNC_MAX_PAGES", "40"))
+# 单封 FETCH 失败后重试次数上限，超过后本次同步跳过该 UID
+MAX_FETCH_ATTEMPTS = int(os.environ.get("FLYMAIL_MAX_FETCH_ATTEMPTS", "3"))
+# 每批 UID 之间主动让出事件循环的毫秒数（0=不让出，适合高速链路）
+FETCH_BATCH_PAUSE_MS = int(os.environ.get("FLYMAIL_FETCH_BATCH_PAUSE_MS", "0"))
 MISSING_BATCH_RETRIES = 2
 
 # 每个账号的同步锁，防止同一账号并发同步（IMAP 连接不能并发操作）
 _sync_locks: Dict[str, asyncio.Lock] = {}
+
+
+async def _fetch_messages_resilient(receiver, account: Account, folder: str, uids: list[int]) -> list:
+    """按 UID 拉取邮件摘要，单封解析失败不影响整批。
+
+    整批 FETCH 成功时直接返回；一旦整批异常（典型：某封邮件的 BODYSTRUCTURE
+    畸形导致解析器抛错），退化为逐封拉取：成功的写入缓存，失败的记录 UID
+    并继续，下次同步可重试（累计达 MAX_FETCH_ATTEMPTS 次后跳过）。
+    """
+    if not uids:
+        return []
+    uids = [int(u) for u in uids]
+    # 已达到重试上限的 UID 本次直接跳过，避免每次同步都卡在同一封
+    skip = await get_failed_uids(account.id, folder, min_attempts=MAX_FETCH_ATTEMPTS)
+    pending = [u for u in uids if u not in skip]
+    if len(pending) < len(uids):
+        logger.info(
+            "跳过 %d 封历史失败邮件: 账号=%s 文件夹=%s",
+            len(uids) - len(pending), account.email, folder,
+        )
+    if not pending:
+        return []
+
+    try:
+        batch = await receiver.fetch_messages_by_uids(folder, pending)
+        ok_uids = [m.uid for m in batch if m.uid > 0]
+        for uid in ok_uids:
+            await clear_failed_message(account.id, folder, uid)
+        if FETCH_BATCH_PAUSE_MS > 0:
+            await asyncio.sleep(FETCH_BATCH_PAUSE_MS / 1000)
+        return batch
+    except Exception as e:
+        logger.warning(
+            "批量 FETCH 失败，改为逐封拉取: 账号=%s 文件夹=%s 数量=%d 错误=%s",
+            account.email, folder, len(pending), e,
+        )
+
+    messages = []
+    failed = 0
+    for uid in pending:
+        try:
+            one = await receiver.fetch_messages_by_uids(folder, [uid])
+            good = [m for m in one if m.uid > 0]
+            if good:
+                messages.extend(good)
+                await clear_failed_message(account.id, folder, uid)
+            else:
+                await record_failed_message(account.id, folder, uid, "empty result")
+                failed += 1
+        except Exception as e:
+            attempts = await record_failed_message(account.id, folder, uid, str(e))
+            failed += 1
+            if attempts == 1:
+                logger.warning(
+                    "单封拉取失败(将重试): 账号=%s 文件夹=%s uid=%s 错误=%s",
+                    account.email, folder, uid, e,
+                )
+    if failed:
+        logger.warning(
+            "逐封兜底完成: 账号=%s 文件夹=%s 成功=%d 失败=%d（失败已记录，下次重试）",
+            account.email, folder, len(messages), failed,
+        )
+    return messages
 
 
 async def _fetch_all_message_pages(receiver, account: Account, folder: str):
@@ -337,9 +408,18 @@ async def _fetch_all_message_pages(receiver, account: Account, folder: str):
     total = 0
     unread = 0
     for page in range(1, FULL_SYNC_MAX_PAGES + 1):
-        result = await receiver.fetch_messages(
-            folder, page=page, page_size=FULL_SYNC_PAGE_SIZE
-        )
+        try:
+            result = await receiver.fetch_messages(
+                folder, page=page, page_size=FULL_SYNC_PAGE_SIZE
+            )
+        except Exception as e:
+            # 典型场景：某封邮件 BODYSTRUCTURE 畸形导致整页解析失败。
+            # 退化为 UID 分批 + 逐封兜底，坏邮件记录后跳过，不再卡死整个文件夹。
+            logger.warning(
+                "分页拉取失败（第 %d 页），改走 UID 分批兜底: 账号=%s 文件夹=%s 错误=%s",
+                page, account.email, folder, e,
+            )
+            return await _fetch_all_messages_by_uids(receiver, account, folder)
         total = result.total
         unread = result.unread_total
         batch = [m for m in result.messages if m.uid > 0]
@@ -384,7 +464,7 @@ async def _fetch_all_messages_by_uids(receiver, account: Account, folder: str):
     messages: List[Message] = []
     for i in range(0, len(all_uids), FULL_SYNC_PAGE_SIZE):
         chunk = all_uids[i:i + FULL_SYNC_PAGE_SIZE]
-        batch = await receiver.fetch_messages_by_uids(folder, chunk)
+        batch = await _fetch_messages_resilient(receiver, account, folder, chunk)
         messages.extend([m for m in batch if m.uid > 0])
     return messages, total, unread
 
@@ -503,7 +583,7 @@ async def _do_sync(receiver, account: Account, folder: str, force_full: bool = F
                     messages = []
                     all_uids = None  # 无新邮件时不做全量UID清理
                 else:
-                    messages = await receiver.fetch_messages_by_uids(folder, new_uids)
+                    messages = await _fetch_messages_resilient(receiver, account, folder, new_uids)
                     messages = [m for m in messages if m.uid > 0]
                     all_uids = None  # 增量同步不做全量UID清理
                 # -1 为哨兵值，表示尚未获取真实计数；后续通过 IMAP STATUS 命令获取实际值
@@ -520,7 +600,7 @@ async def _do_sync(receiver, account: Account, folder: str, force_full: bool = F
                 messages = []
                 all_uids = None  # 无新邮件时不做全量UID清理
             else:
-                messages = await receiver.fetch_messages_by_uids(folder, new_uids)
+                messages = await _fetch_messages_resilient(receiver, account, folder, new_uids)
                 # 过滤无效 UID（uid=0），避免写入后又被清理
                 messages = [m for m in messages if m.uid > 0]
                 all_uids = None  # 增量同步不做全量UID清理，减少IMAP开销

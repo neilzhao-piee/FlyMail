@@ -327,6 +327,22 @@ async def init_db():
     await db.execute("CREATE INDEX IF NOT EXISTS idx_archive_date ON message_archive(date)")
     await db.execute("CREATE INDEX IF NOT EXISTS idx_archive_deleted ON message_archive(user_uid, is_deleted_on_server)")
 
+    # 拉取失败的单封邮件：整批 FETCH 遇到畸形邮件时记录 UID 并跳过，
+    # 下次同步可重试（超过 MAX_FETCH_ATTEMPTS 次后跳过，避免反复卡在同一封）。
+    await db.execute("""
+        CREATE TABLE IF NOT EXISTS failed_messages (
+            account_id TEXT NOT NULL,
+            folder TEXT NOT NULL,
+            uid INTEGER NOT NULL,
+            error TEXT DEFAULT '',
+            attempts INTEGER DEFAULT 0,
+            created_at REAL DEFAULT 0,
+            updated_at REAL DEFAULT 0,
+            PRIMARY KEY (account_id, folder, uid)
+        )
+    """)
+    await db.execute("CREATE INDEX IF NOT EXISTS idx_failed_messages_account ON failed_messages(account_id, folder)")
+
     # 全文索引（FTS5 + trigram）：trigram 比 unicode61 更适合中文（中文没有空格分词），
     # 代价是最少 3 个字符才能命中；更短的查询在 search_cached_messages 里回退 LIKE。
     global _fts_enabled
@@ -1284,6 +1300,108 @@ async def get_cached_uids(account_id: str, folder: str) -> set:
     )
     rows = await cursor.fetchall()
     return {row[0] for row in rows}
+
+
+# 同一封邮件连续拉取失败达到该次数后跳过（可在 mail_cache 里调大/调小）
+MAX_FETCH_ATTEMPTS = 3
+
+
+async def record_failed_message(account_id: str, folder: str, uid: int, error: str) -> int:
+    """记录一封拉取失败的邮件（累加 attempts），返回累计失败次数。"""
+    db = await get_db()
+    now = time.time()
+    await db.execute(
+        """INSERT INTO failed_messages (account_id, folder, uid, error, attempts, created_at, updated_at)
+           VALUES (?, ?, ?, ?, 1, ?, ?)
+           ON CONFLICT(account_id, folder, uid) DO UPDATE SET
+             error = excluded.error,
+             attempts = failed_messages.attempts + 1,
+             updated_at = excluded.updated_at""",
+        (account_id, folder, int(uid), (error or "")[:500], now, now),
+    )
+    await db.commit()
+    cursor = await db.execute(
+        "SELECT attempts FROM failed_messages WHERE account_id = ? AND folder = ? AND uid = ?",
+        (account_id, folder, int(uid)),
+    )
+    row = await cursor.fetchone()
+    return int(row[0]) if row else 1
+
+
+async def get_failed_uids(account_id: str, folder: str, min_attempts: int = MAX_FETCH_ATTEMPTS) -> set:
+    """返回失败次数已达上限、本次同步应跳过的 UID 集合。"""
+    db = await get_db()
+    cursor = await db.execute(
+        "SELECT uid FROM failed_messages WHERE account_id = ? AND folder = ? AND attempts >= ?",
+        (account_id, folder, int(min_attempts)),
+    )
+    rows = await cursor.fetchall()
+    return {row[0] for row in rows}
+
+
+async def clear_failed_message(account_id: str, folder: str, uid: int) -> None:
+    """邮件拉取成功后清除失败记录。"""
+    db = await get_db()
+    await db.execute(
+        "DELETE FROM failed_messages WHERE account_id = ? AND folder = ? AND uid = ?",
+        (account_id, folder, int(uid)),
+    )
+    await db.commit()
+
+
+async def count_failed_messages(account_id: str, folder: str = "") -> int:
+    """统计失败邮件数量（folder 为空时统计整个账号）。"""
+    db = await get_db()
+    if folder:
+        cursor = await db.execute(
+            "SELECT COUNT(*) FROM failed_messages WHERE account_id = ? AND folder = ?",
+            (account_id, folder),
+        )
+    else:
+        cursor = await db.execute(
+            "SELECT COUNT(*) FROM failed_messages WHERE account_id = ?",
+            (account_id,),
+        )
+    row = await cursor.fetchone()
+    return int(row[0]) if row else 0
+
+
+async def list_failed_messages(
+    user_uid: str, account_id: str = "", folder: str = "", limit: int = 50
+) -> list[dict]:
+    """列出拉取失败的邮件（按最近失败时间倒序），供诊断/前端提示。"""
+    db = await get_db()
+    conditions = ["a.user_uid = ?"]
+    params: list = [user_uid]
+    if account_id:
+        conditions.append("f.account_id = ?")
+        params.append(account_id)
+    if folder:
+        conditions.append("f.folder = ?")
+        params.append(folder)
+    where = " AND ".join(conditions)
+    cursor = await db.execute(
+        f"""SELECT f.account_id, IFNULL(a.email, ''), f.folder, f.uid, f.error, f.attempts, f.updated_at
+            FROM failed_messages f
+            JOIN accounts a ON a.id = f.account_id
+            WHERE {where}
+            ORDER BY f.updated_at DESC
+            LIMIT ?""",
+        params + [max(1, min(int(limit), 500))],
+    )
+    rows = await cursor.fetchall()
+    return [
+        {
+            "account_id": row[0],
+            "account_email": row[1],
+            "folder": row[2],
+            "uid": row[3],
+            "error": row[4] or "",
+            "attempts": int(row[5] or 0),
+            "updated_at": float(row[6] or 0),
+        }
+        for row in rows
+    ]
 
 
 async def batch_update_cached_messages_read(account_id: str, uids: list[int], folder: str, is_read: bool) -> int:
