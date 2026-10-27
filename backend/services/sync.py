@@ -1127,6 +1127,12 @@ class MailSyncService:
 
             idle_folders = ["INBOX"]  # INBOX 始终监听
 
+            # 大邮箱 + 归档同时跑时，每个文件夹一条 IDLE 连接会逼近 Gmail 的 15 连接上限，
+            # 可用 FLYMAIL_IDLE_INBOX_ONLY=1 只监听 INBOX。
+            import os as _os
+            if _os.environ.get("FLYMAIL_IDLE_INBOX_ONLY", "") in ("1", "true", "yes"):
+                return ["INBOX"]
+
             for f in folders:
                 path_lower = f.path.lower().strip()
                 name = f.name or ""

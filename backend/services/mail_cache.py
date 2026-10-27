@@ -849,6 +849,14 @@ async def _sync_missing_messages_unlocked(account: Account, folder: str) -> int:
         if not missing_uids:
             return 0
 
+        fill_limit = int(os.environ.get("FLYMAIL_CACHE_FILL_MAX_MISSING", "20000"))
+        if fill_limit >= 0 and len(missing_uids) > fill_limit:
+            logger.info(
+                "跳过补全同步: 账号=%s, 文件夹=%s, 缺失 %d 封 > 上限 %d（避免与归档抢 Gmail 配额）",
+                account.email, folder, len(missing_uids), fill_limit,
+            )
+            return 0
+
         logger.info(
             "补全同步: 账号=%s, 文件夹=%s, IMAP=%d封, 缓存=%d封, 缺失=%d封",
             account.email, folder, len(imap_uids), len(cached_uids), len(missing_uids)

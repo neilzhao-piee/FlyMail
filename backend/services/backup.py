@@ -796,13 +796,23 @@ async def _archive_one_account(
         # 逐个文件夹归档
         folder_total = 0
         for f in folders:
-            try:
-                count = await archive_folder(account, f.path)
-                result[f.path] = count
-                folder_total += count
-            except Exception as e:
-                logger.error("归档文件夹失败: %s/%s, %s", account.email, f.path, e)
-                result[f.path] = 0
+            count = 0
+            last_err = None
+            # 连接被服务器断开（EOF / BYE）时重连重试一次；archive_folder 会跳过已归档 UID 续跑
+            for attempt in range(2):
+                try:
+                    count = await archive_folder(account, f.path)
+                    last_err = None
+                    break
+                except Exception as e:
+                    last_err = e
+                    if attempt == 0:
+                        logger.warning("归档文件夹失败，重连重试: %s/%s, %s", account.email, f.path, e)
+                        await asyncio.sleep(2)
+            if last_err is not None:
+                logger.error("归档文件夹失败: %s/%s, %s", account.email, f.path, last_err)
+            result[f.path] = count
+            folder_total += count
 
         # 手动触发时，备份完成后发送通知
         if notify:
