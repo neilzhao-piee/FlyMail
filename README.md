@@ -32,14 +32,13 @@ FlyMail（飞邮）是一个自托管邮件客户端：把 Gmail、Outlook、QQ/
 |---|---|---|
 | 版本 | 1.0.7 + 社区补丁 | 2.0.2 |
 | 实现 | Python / FastAPI / Vue 3 / SQLite | Go（闭源，仅通过 fnOS 应用中心分发） |
-| 维护 | 本 fork | 作者 `cliii_one` |
+| 维护 | 本仓库（neilzhao） | 第三方、闭源 |
 | 关系 | 独立代码线 | 与本仓库**没有代码继承关系** |
 
 商店版功能更多，但源码未公开；本仓库选择在开源的 1.0.7 上继续演进——所有改动可审计、可自行构建、
 可用 Docker 部署到任意 Linux/NAS。二者可以并存（不同端口、不同数据目录）。
 
-> 上游与商标：原项目版权归 **DinDing1**，GPL-3.0。`FlyMail` / `飞邮` 是原作者的未注册商标，
-> 本 fork 不暗示与原作者或商店版的关联，仅用于说明代码来源。
+> 上游：本项目fork自 FlyMail 1.0.7（GPL-3.0），原始版权与许可声明见 [LICENSE](LICENSE) 与文末「许可」。
 
 ### 相对上游 1.0.7 的改动
 
@@ -196,19 +195,16 @@ pytest -q          # 24 passed
 - [ ] fpk 打包与一键升级
 - [ ] 归档增量校验（.eml 与 DB 一致性巡检）
 
-### 许可与致谢
+### 许可
 
-- 许可证：**GPL-3.0**，沿用上游；派生作品需同样以 GPL-3.0 开源并保留原始版权声明。
-- 原项目与版权：**DinDing1**（1.0.7）。
-- 商店版「牛邮 2.0.2」由 `cliii_one` 发布，与本仓库无代码关系。
-- `FlyMail™` / `飞邮™` 是 DinDing1 的未注册商标，详见下方「商标声明」。
+- 许可证：**GPL-3.0**（沿用上游），派生作品需同样以 GPL-3.0 开源并保留原始版权声明。
+- 原始项目版权：**DinDing1**（FlyMail 1.0.7）。
+- 本 fork 的修改与维护：neilzhao。
 
-### 商标声明
+### 联系方式
 
-**FlyMail™ 和飞邮™ 是 DinDing1 的未注册商标。**
-
-未经授权，不得在派生项目或相关宣传中使用 "FlyMail"、"飞邮" 名称或其变体来暗示与本项目的关联或背书。
-本商标声明不限制 GPL-3.0 协议赋予你的代码使用、修改和分发权利，仅用于保护项目名称的识别性，防止混淆。
+- 邮箱：**neil@zhao.digital**
+- 仓库：https://github.com/neilzhao-piee/FlyMail
 
 ---
 
@@ -223,13 +219,12 @@ self-hosted deployment on top of upstream.
 
 ### Relationship to the fnOS store build ("牛邮 2.0.2")
 
-The "牛邮" app in the fnOS app store is a **separate closed-source Go implementation (2.0.2)** published
-by `cliii_one`. It shares no code with this repository. This fork continues the open Python 1.0.7 line so
+The "牛邮" app in the fnOS app store is a **separate closed-source Go implementation (2.0.2)**. It shares
+no code with this repository. This fork continues the open Python 1.0.7 line so
 that everything stays auditable, buildable and deployable anywhere via Docker. Both can coexist on one NAS
 (different ports and data directories).
 
-Trademark note: `FlyMail` / `飞邮` are unregistered trademarks of the original author (DinDing1), GPL-3.0.
-This fork does not imply endorsement by, or affiliation with, the original author or the store build.
+Upstream: forked from FlyMail 1.0.7 (GPL-3.0); original copyright and license text are kept in [LICENSE](LICENSE).
 
 ### Changes over upstream 1.0.7
 
@@ -278,5 +273,10 @@ This fork does not imply endorsement by, or affiliation with, the original autho
 
 ### License
 
-GPL-3.0, inherited from upstream. Original project and copyright: **DinDing1** (1.0.7). The fnOS store
-build "牛邮 2.0.2" is published by `cliii_one` and is unrelated to this repository.
+GPL-3.0, inherited from upstream. Original project copyright: **DinDing1** (FlyMail 1.0.7).
+Modifications in this fork are maintained by neilzhao.
+
+### Contact
+
+- Email: **neil@zhao.digital**
+- Repository: https://github.com/neilzhao-piee/FlyMail

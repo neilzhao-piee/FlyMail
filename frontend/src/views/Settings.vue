@@ -1078,7 +1078,7 @@ const notifyImgbedMsg = ref('');
 const notifyImgbedOk = ref(false);
 const notifyImgbedPreviewUrl = ref('');
 const notifyPurgeConfirmVisible = ref(false);
-const defaultImgbedDeployUrl = 'https://deploy.workers.cloudflare.com/?url=https://github.com/DinDing1/FlyMail/tree/main/flymail-imgbed';
+const defaultImgbedDeployUrl = 'https://deploy.workers.cloudflare.com/?url=https://github.com/neilzhao-piee/FlyMail/tree/main/flymail-imgbed';
 const notifySaving = ref(false);
 const notifySuccess = ref(false);
 const notifyError = ref('');

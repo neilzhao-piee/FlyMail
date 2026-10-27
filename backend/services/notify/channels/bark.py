@@ -22,7 +22,7 @@ logger = get_logger("notify.bark")
 
 # 飞邮项目 LOGO（公开直链，Bark 拉取后显示为通知图标）
 DEFAULT_BARK_ICON = (
-    "https://raw.githubusercontent.com/cliii-one/FnDepot/main/flymail/ICON.PNG"
+    "https://raw.githubusercontent.com/neilzhao-piee/FlyMail/main/frontend/public/icon.png"
 )
 
 

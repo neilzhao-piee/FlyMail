@@ -15,7 +15,7 @@ KEY_IMGBED = "ext_notify_imgbed"
 # Deploy 按钮默认模板（公开仓路径；推送到 GitHub 后生效）
 DEFAULT_DEPLOY_URL = (
     "https://deploy.workers.cloudflare.com/"
-    "?url=https://github.com/DinDing1/FlyMail/tree/main/flymail-imgbed"
+    "?url=https://github.com/neilzhao-piee/FlyMail/tree/main/flymail-imgbed"
 )
 
 DEFAULT_IMGBED: Dict[str, Any] = {

@@ -47,23 +47,17 @@
   </div>
   </div>
 
-  <!-- 支持与反馈 -->
+  <!-- 联系方式 -->
   <div class="about-card">
-  <div class="qr-row">
-  <div class="qr-item">
-  <img :src="base + 'afdian.jpg'" alt="爱发电" class="qr-img" />
-  <span class="qr-label">爱发电</span>
-  </div>
-  <div class="qr-item">
-  <img :src="base + 'feedback.jpg'" alt="意见反馈" class="qr-img" />
-  <span class="qr-label">意见反馈</span>
-  </div>
+  <div class="contact-row">
+  <span class="contact-label">联系 / Contact</span>
+  <a class="contact-link" href="mailto:neil@zhao.digital">neil@zhao.digital</a>
   </div>
   </div>
 
   <!-- 底部 -->
   <div class="footer">
-  <span>© 2026 cliii-one · GNU GPLv3</span>
+  <span>GNU GPL-3.0 · 基于 FlyMail 1.0.7</span>
   </div>
   </div>
 </template>
@@ -80,7 +74,7 @@ const uiStore = useUIStore();
 const checking = ref(false);
 
 // GitHub 仓库 VERSION 文件原始地址（raw.githubusercontent.com 支持 CORS）
-const GITHUB_VERSION_URL = 'https://raw.githubusercontent.com/DinDing1/FlyMail/main/VERSION';
+const GITHUB_VERSION_URL = 'https://raw.githubusercontent.com/neilzhao-piee/FlyMail/main/VERSION';
 
 function onLogoError(e: Event) {
   (e.target as HTMLImageElement).style.display = 'none';
@@ -287,6 +281,25 @@ async function checkUpdate() {
 }
 
 /* 二维码 */
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 2px;
+}
+.contact-label {
+  font-size: 13px;
+  opacity: 0.7;
+}
+.contact-link {
+  font-size: 14px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(127, 127, 127, 0.5);
+}
+.contact-link:hover {
+  border-bottom-color: currentColor;
+}
 .qr-row {
   display: flex;
   gap: var(--space-6);
