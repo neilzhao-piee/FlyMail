@@ -33,10 +33,13 @@ jobs:
           if [ -n "${{ inputs.dst }}" ]; then
             echo "src=${{ inputs.src }}" >> "$GITHUB_OUTPUT"
             echo "dst=${{ inputs.dst }}" >> "$GITHUB_OUTPUT"
-          else
+          elif [ -f .retag ]; then
             read -r SRC DST < .retag
             echo "src=$SRC" >> "$GITHUB_OUTPUT"
             echo "dst=$DST" >> "$GITHUB_OUTPUT"
+          else
+            echo "没有 .retag 也没有输入参数，跳过（删除 .retag 的提交会走到这里）"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: docker/login-action@v3
@@ -46,6 +49,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Retag and push
+        if: steps.tags.outputs.skip != 'true'
         run: |
           IMG=ghcr.io/${{ github.repository_owner }}/flymail
           docker pull "$IMG:${{ steps.tags.outputs.src }}"
