@@ -20,6 +20,7 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 COPY backend/requirements.txt ./backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY VERSION ./VERSION
 COPY backend/ ./backend
 COPY --from=ui /dist/ui ./backend/ui
 RUN mkdir -p /data
