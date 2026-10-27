@@ -6,8 +6,8 @@
   <!-- 下拉菜单按钮：字号/字体/颜色 -->
   <div v-if="btn.isDropdown" class="toolbar-dropdown">
   <button class="toolbar-btn" :title="btn.title" type="button">
-  <span v-if="btn.dropdownType === 'fontFamily'">{{ currentFontLabel }} <small>▼</small></span>
-  <span v-else-if="btn.dropdownType === 'fontSize'">{{ currentSizeLabel }} <small>▼</small></span>
+  <span v-if="btn.dropdownType === 'fontFamily'">{{  currentFontLabel  }} <small>▼</small></span>
+  <span v-else-if="btn.dropdownType === 'fontSize'">{{  currentSizeLabel  }} <small>▼</small></span>
   <span v-else-if="btn.dropdownType === 'lineHeight'" class="dropdown-icon-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><path d="M1 6h1M1 12h1M1 18h1" stroke-width="3"/></svg><small>▼</small></span>
   <span v-else-if="btn.dropdownType === 'table'" class="dropdown-icon-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg><small>▼</small></span>
   <span v-else-if="btn.dropdownType === 'color'" class="color-btn-inner">
@@ -19,45 +19,45 @@
   <!-- 字号下拉 -->
   <template v-if="btn.dropdownType === 'fontSize'">
   <button v-for="size in fontSizes" :key="size" class="dropdown-item" @click="applyFontSize(size)">
-  <span :style="{ fontSize: size }">{{ size }}</span>
+  <span :style="{ fontSize: size }">{{  size  }}</span>
   </button>
-  <button class="dropdown-item" @click="applyFontSize(null)">{{ $t("默认") }}</button>
+  <button class="dropdown-item" @click="applyFontSize(null)">{{  $t("默认")  }}</button>
   </template>
   <!-- 字体下拉 -->
   <template v-if="btn.dropdownType === 'fontFamily'">
   <button v-for="f in fontFamilies" :key="f.value" class="dropdown-item" :style="{ fontFamily: f.value || 'inherit' }" @click="applyFontFamily(f.value)">
-  {{ f.label }}
+  {{  f.label  }}
   </button>
   </template>
   <!-- 行间距下拉 -->
   <template v-if="btn.dropdownType === 'lineHeight'">
   <button v-for="h in lineHeightOptions" :key="h.value" class="dropdown-item" @click="applyLineHeight(h.value)">
-  {{ h.label }}
+  {{  h.label  }}
   </button>
-  <button class="dropdown-item" @click="applyLineHeight(null)">{{ $t("默认") }}</button>
+  <button class="dropdown-item" @click="applyLineHeight(null)">{{  $t("默认")  }}</button>
   </template>
   <!-- 颜色下拉 -->
   <template v-if="btn.dropdownType === 'color'">
   <div class="color-grid">
   <button v-for="c in presetColors" :key="c" class="color-swatch" :style="{ background: c }" @click="applyColor(c)"></button>
   </div>
-  <button class="dropdown-item" @click="applyColor(null)">{{ $t("默认颜色") }}</button>
+  <button class="dropdown-item" @click="applyColor(null)">{{  $t("默认颜色")  }}</button>
   </template>
   <!-- 表格操作下拉 -->
   <template v-if="btn.dropdownType === 'table'">
-  <button class="dropdown-item" @click="editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">{{ $t("插入表格") }}</button>
+  <button class="dropdown-item" @click="editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">{{  $t("插入表格")  }}</button>
   <div class="dropdown-divider"></div>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowBefore().run()">{{ $t("上方插入行") }}</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowAfter().run()">{{ $t("下方插入行") }}</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnBefore().run()">{{ $t("左侧插入列") }}</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnAfter().run()">{{ $t("右侧插入列") }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowBefore().run()">{{  $t("上方插入行")  }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowAfter().run()">{{  $t("下方插入行")  }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnBefore().run()">{{  $t("左侧插入列")  }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnAfter().run()">{{  $t("右侧插入列")  }}</button>
   <div class="dropdown-divider"></div>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().mergeCells().run()">{{ $t("合并单元格") }}</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().splitCell().run()">{{ $t("拆分单元格") }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().mergeCells().run()">{{  $t("合并单元格")  }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().splitCell().run()">{{  $t("拆分单元格")  }}</button>
   <div class="dropdown-divider"></div>
-  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteRow().run()">{{ $t("删除行") }}</button>
-  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteColumn().run()">{{ $t("删除列") }}</button>
-  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteTable().run()">{{ $t("删除表格") }}</button>
+  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteRow().run()">{{  $t("删除行")  }}</button>
+  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteColumn().run()">{{  $t("删除列")  }}</button>
+  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteTable().run()">{{  $t("删除表格")  }}</button>
   </template>
   </div>
   </div>
@@ -89,7 +89,7 @@
   :class="{ active: activeEmojiCategory === i }"
   @click="activeEmojiCategory = i"
   type="button"
-  >{{ cat.name }}</button>
+  >{{  cat.name  }}</button>
   </div>
   <!-- Emoji 网格 -->
   <div class="emoji-grid">
@@ -99,7 +99,7 @@
   class="emoji-btn"
   @click="insertEmoji(emoji)"
   type="button"
-  >{{ emoji }}</button>
+  >{{  emoji  }}</button>
   </div>
   </div>
   </div>

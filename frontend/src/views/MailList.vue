@@ -21,7 +21,7 @@
   @click="switchAccount(acc.id)"
   >
   <span class="account-icon" :class="acc.provider" v-html="providerIcon(acc.provider)"></span>
-  <span class="account-email">{{ acc.email }}</span>
+  <span class="account-email">{{  acc.email  }}</span>
   </button>
   <button v-if="mailStore.reauthAccountIds.has(acc.id)" class="btn-reauth" @click.stop="reauthorize(acc.id)" :title='$t("重新授权")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -32,8 +32,8 @@
 
   <!-- 单账号重新授权提示（多账号时 Tab 栏已有按钮，此处仅单账号显示） -->
   <div v-if="mailStore.accounts.length === 1 && mailStore.reauthAccountIds.has(mailStore.currentAccountId)" class="reauth-banner">
-  <span>{{ $t("账号授权已过期") }}</span>
-  <button class="btn btn-primary btn-sm" @click="reauthorize(mailStore.currentAccountId)">{{ $t("重新授权") }}</button>
+  <span>{{  $t("账号授权已过期")  }}</span>
+  <button class="btn btn-primary btn-sm" @click="reauthorize(mailStore.currentAccountId)">{{  $t("重新授权")  }}</button>
   </div>
 
   <!-- 邮件列表视图 -->
@@ -49,17 +49,17 @@
   </button>
   <!-- 移动端：iOS风格文件夹选择器 -->
   <button v-if="isMobile" class="folder-picker" @click="showFolderSheet = true">
-  <span class="picker-label">{{ mailStore.currentFolderName }}</span>
+  <span class="picker-label">{{  mailStore.currentFolderName  }}</span>
   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
   </button>
   <!-- 桌面端：文件夹名+数量 -->
-  <span v-else class="list-count">{{ searchQuery ? ("搜索 · " + totalMessages + "封") : (mailStore.currentFolderName + " · " + totalMessages + "封") }}</span>
+  <span v-else class="list-count">{{  searchQuery ? ($t("搜索 · ") + totalMessages + $t("封")) : (mailStore.currentFolderName + " · " + totalMessages + $t("封"))  }}</span>
   <!-- 筛选按钮 -->
   <span class="toolbar-divider"></span>
-  <button class="filter-btn" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter('')">{{ $t("全部") }}{{ filterCounts.all }}</button>
-  <button class="filter-btn" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread')">{{ $t("未读") }}{{ filterCounts.unread }}</button>
-  <button class="filter-btn" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read')">{{ $t("已读") }}{{ filterCounts.read }}</button>
-  <button class="filter-btn" :class="{ active: attachmentFilter }" @click="setAttachmentFilter()">{{ $t("附件") }}{{ filterCounts.attachments }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter('')">{{  $t("全部")  }}{{  filterCounts.all  }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread')">{{  $t("未读")  }}{{  filterCounts.unread  }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read')">{{  $t("已读")  }}{{  filterCounts.read  }}</button>
+  <button class="filter-btn" :class="{ active: attachmentFilter }" @click="setAttachmentFilter()">{{  $t("附件")  }}{{  filterCounts.attachments  }}</button>
   </div>
   <div class="toolbar-right">
   <!-- 移动端：筛选展开/收起按钮 -->
@@ -67,7 +67,7 @@
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
   </button>
   <!-- 一键全部已读：直接操作 IMAP 服务器，不受分页/缓存限制 -->
-  <button class="btn-icon mark-all-read-btn" :class="{ confirming: markAllReadConfirm }" @click="markAllRead" :title="markAllReadConfirm ? '再次点击确认全部已读' : '全部已读'">
+  <button class="btn-icon mark-all-read-btn" :class="{ confirming: markAllReadConfirm }" @click="markAllRead" :title="markAllReadConfirm ? $t('再次点击确认全部已读') : $t('全部已读')">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
   </svg>
@@ -77,8 +77,8 @@
   <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
   </svg>
   </button>
-  <span v-if="rebuilding" class="sync-badge">{{ syncProgress || '同步中' }}</span>
-  <span class="sync-status" :class="{ connected: wsConnected }" :title="wsConnected ? '实时同步已连接' : '实时同步未连接'">
+  <span v-if="rebuilding" class="sync-badge">{{  syncProgress || $t('同步中')  }}</span>
+  <span class="sync-status" :class="{ connected: wsConnected }" :title="wsConnected ? $t('实时同步已连接') : $t('实时同步未连接')">
   <span class="status-dot"></span>
   </span>
   </div>
@@ -87,10 +87,10 @@
   <div v-if="showMobileFilters" class="mobile-filter-dropdown">
   <div class="filter-backdrop" @click="showMobileFilters = false"></div>
   <div class="filter-dropdown-menu filter-dropdown-compact">
-  <button class="filter-dropdown-item" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter(''); showMobileFilters = false">{{ $t("全部") }}{{ filterCounts.all }}</button>
-  <button class="filter-dropdown-item" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread'); showMobileFilters = false">{{ $t("未读") }}{{ filterCounts.unread }}</button>
-  <button class="filter-dropdown-item" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read'); showMobileFilters = false">{{ $t("已读") }}{{ filterCounts.read }}</button>
-  <button class="filter-dropdown-item" :class="{ active: attachmentFilter }" @click="setAttachmentFilter(); showMobileFilters = false">{{ $t("附件") }}{{ filterCounts.attachments }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter(''); showMobileFilters = false">{{  $t("全部")  }}{{  filterCounts.all  }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread'); showMobileFilters = false">{{  $t("未读")  }}{{  filterCounts.unread  }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read'); showMobileFilters = false">{{  $t("已读")  }}{{  filterCounts.read  }}</button>
+  <button class="filter-dropdown-item" :class="{ active: attachmentFilter }" @click="setAttachmentFilter(); showMobileFilters = false">{{  $t("附件")  }}{{  filterCounts.attachments  }}</button>
   </div>
   </div>
   </transition>
@@ -104,9 +104,9 @@
   <button class="select-btn" @click="exitSelectMode">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
-  <span class="select-info">{{ $t("已选") }}{{ selectedIds.size }}{{ $t("封") }}</span>
+  <span class="select-info">{{  $t("已选")  }}{{  selectedIds.size  }}{{  $t("封")  }}</span>
   <div class="select-actions">
-  <button class="select-btn" @click="toggleSelectAll" :title="isAllSelected ? '取消全选' : '全选'">
+  <button class="select-btn" @click="toggleSelectAll" :title="isAllSelected ? $t('取消全选') : $t('全选')">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
   </svg>
@@ -130,7 +130,7 @@
   <div v-if="showFolderSheet" class="sheet-backdrop" @click.self="showFolderSheet = false">
   <div class="sheet-content">
   <div class="sheet-handle"></div>
-  <div class="sheet-title">{{ $t("文件夹") }}</div>
+  <div class="sheet-title">{{  $t("文件夹")  }}</div>
   <div class="sheet-list">
   <button
   v-for="folder in mailStore.folders"
@@ -139,8 +139,8 @@
   :class="{ active: mailStore.currentFolder === folder.path }"
   @click="mailStore.setFolder(folder.path); showFolderSheet = false"
   >
-  <span class="sheet-folder-name">{{ mailStore.folderDisplayName(folder.name) }}</span>
-  <span class="sheet-folder-count" v-if="getFolderCount(folder)">{{ getFolderCount(folder) }}</span>
+  <span class="sheet-folder-name">{{  mailStore.folderDisplayName(folder.name)  }}</span>
+  <span class="sheet-folder-count" v-if="getFolderCount(folder)">{{  getFolderCount(folder)  }}</span>
   <svg v-if="mailStore.currentFolder === folder.path" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
   </button>
   </div>
@@ -151,7 +151,7 @@
   <!-- 加载中（首次加载无缓存数据时显示） -->
   <div v-if="loading && messages.length === 0" class="list-loading">
   <div class="spinner"></div>
-  <span>{{ $t("加载中...") }}</span>
+  <span>{{  $t("加载中...")  }}</span>
   </div>
 
   <!-- 空状态 -->
@@ -159,8 +159,8 @@
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
   <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/>
   </svg>
-  <span>{{ searchQuery ? '未找到匹配的邮件' : '暂无邮件' }}</span>
-  <span v-if="searchQuery" class="list-empty-hint">{{ $t("试试其他关键词，或切换文件夹") }}</span>
+  <span>{{  searchQuery ? $t('未找到匹配的邮件') : $t('暂无邮件')  }}</span>
+  <span v-if="searchQuery" class="list-empty-hint">{{  $t("试试其他关键词，或切换文件夹")  }}</span>
   </div>
 
   <!-- 邮件列表 -->
@@ -181,9 +181,9 @@
   <!-- 左列：头像 + 发件人 -->
   <div class="mail-sender">
   <div class="mail-avatar" :style="{ background: getAvatarColor(msg.from_addr) }">
-  {{ getInitial(msg.from_addr) }}
+  {{  getInitial(msg.from_addr)  }}
   </div>
-  <span class="mail-from">{{ displayName(msg.from_addr) }}</span>
+  <span class="mail-from">{{  displayName(msg.from_addr)  }}</span>
   </div>
   <!-- 中列：状态图标 + 主题 + 附件 + 日期 -->
   <div class="mail-info">
@@ -191,17 +191,17 @@
   <!-- 中列：已读/未读图标 + 主题 + 附件 -->
   <svg v-if="!msg.is_read" class="mail-status-icon unread-icon" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
   <svg v-else class="mail-status-icon read-icon" width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor"><path d="M461.816 79.279c30.333-20.364 69.97-20.373 100.311-0.021l384.19 257.69c9.256 6.208 13.947 16.672 13.216 27.044 0.108 1.548 0.096 3.1-0.034 4.64 0.33 1.778 0.501 3.61 0.501 5.483v495.903C960 919.714 919.706 960 870 960H154c-49.706 0-90-40.286-90-89.982V374.115c0-2.663 0.347-5.245 0.999-7.704-0.004-0.803 0.025-1.608 0.086-2.412-0.804-10.432 3.883-20.985 13.191-27.234z m70.259 519.057c-11.417-10.283-28.76-10.278-40.171 0.012L157.358 900.01h709.674zM124 425.237v424.071L381.796 616.85 124 425.237z m776 0.224L642.268 616.842 900 848.964V425.461zM528.7 129.074a30.005 30.005 0 0 0-33.437 0.007L143.678 365.114l283.558 210.762 24.483-22.075c33.891-30.56 85.223-30.88 119.48-0.952l1.034 0.916 24.56 22.121 283.833-210.763z"/></svg>
-  <span class="mail-subject">{{ msg.subject || '(无主题)' }}</span>
+  <span class="mail-subject">{{  msg.subject || $t('(无主题)')  }}</span>
   <!-- 附件图标 -->
   <svg v-if="msg.has_attachments" class="att-badge" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
   </div>
   </div>
   <!-- 已读/未读标签 -->
   <span class="mail-status-tag" :class="msg.is_read ? 'read' : 'unread'">
-  {{ msg.is_read ? '已读' : '未读' }}
+  {{  msg.is_read ? $t('已读') : $t('未读')  }}
   </span>
   <!-- 右列：日期（独立固定宽度列，保证最右侧对齐） -->
-  <span class="mail-date">{{ formatDate(msg.date) }}</span>
+  <span class="mail-date">{{  formatDate(msg.date)  }}</span>
   </button>
   </div>
 
@@ -211,7 +211,7 @@
   </button>
   <template v-for="p in pageNumbers" :key="p">
   <span v-if="p === '...'" class="page-ellipsis">...</span>
-  <button v-else class="page-btn" :class="{ active: p === currentPage }" @click="goPage(p as number)">{{ p }}</button>
+  <button v-else class="page-btn" :class="{ active: p === currentPage }" @click="goPage(p as number)">{{  p  }}</button>
   </template>
   <button class="page-btn" :disabled="currentPage >= totalPages" @click="goPage(currentPage + 1)">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -229,32 +229,32 @@
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 18 9 12 15 6"/>
   </svg>
-  <span>{{ $t("返回") }}</span>
+  <span>{{  $t("返回")  }}</span>
   </button>
   <div class="detail-actions">
   <button class="btn-action" @click="replyMessage" :title='$t("回复邮件")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
   </svg>
-  <span>{{ $t("回复") }}</span>
+  <span>{{  $t("回复")  }}</span>
   </button>
   <button class="btn-action" @click="forwardMessage" :title='$t("转发邮件")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
   </svg>
-  <span>{{ $t("转发") }}</span>
+  <span>{{  $t("转发")  }}</span>
   </button>
   <button class="btn-action" @click="printMail" :disabled="printing" :title='$t("打印")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
   </svg>
-  <span>{{ printing ? '打印中...' : '打印' }}</span>
+  <span>{{  printing ? $t('打印中...') : $t('打印')  }}</span>
   </button>
-  <button class="btn-action" :class="{ confirm: deleteConfirm }" @click="onDeleteMessage" :title="deleteConfirm ? '再次点击确认删除' : '删除邮件'">
+  <button class="btn-action" :class="{ confirm: deleteConfirm }" @click="onDeleteMessage" :title="deleteConfirm ? $t('再次点击确认删除') : $t('删除邮件')">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
   </svg>
-  <span>{{ deleteConfirm ? '确认删除' : '删除' }}</span>
+  <span>{{  deleteConfirm ? $t('确认删除') : $t('删除')  }}</span>
   </button>
   </div>
   </div>
@@ -263,16 +263,16 @@
   <div class="detail-body">
   <div class="detail-header">
   <!-- 主题 -->
-  <h2 class="detail-subject">{{ selectedMessage.subject || '(无主题)' }}</h2>
+  <h2 class="detail-subject">{{  selectedMessage.subject || $t('(无主题)')  }}</h2>
 
   <!-- 第一行：头像 + 发件人姓名/邮箱 + 加入联系人 -->
   <div class="detail-sender-row">
   <div class="meta-avatar" :style="{ background: getAvatarColor(selectedMessage.from_addr) }">
-  {{ getInitial(selectedMessage.from_addr) }}
+  {{  getInitial(selectedMessage.from_addr)  }}
   </div>
   <div class="meta-from">
-  <span class="from-name">{{ displayName(selectedMessage.from_addr) }}</span>
-  <span class="from-email" v-if="displayName(selectedMessage.from_addr) !== selectedMessage.from_addr">&lt;{{ selectedMessage.from_addr }}&gt;</span>
+  <span class="from-name">{{  displayName(selectedMessage.from_addr)  }}</span>
+  <span class="from-email" v-if="displayName(selectedMessage.from_addr) !== selectedMessage.from_addr">&lt;{{  selectedMessage.from_addr  }}&gt;</span>
   <button class="btn-add-contact" @click="addToContacts" :title='$t("加入联系人")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
@@ -287,20 +287,20 @@
   <!-- 灰色信息卡：发件人 / 收件人 / 抄送 / 时间（全宽） -->
   <div class="meta-card">
   <div class="meta-row">
-  <span class="meta-row-label">{{ $t("发件人") }}</span>
-  <span class="meta-row-value" :title="selectedMessage.from_addr">{{ formatAddressList(selectedMessage.from_addr) }}</span>
+  <span class="meta-row-label">{{  $t("发件人")  }}</span>
+  <span class="meta-row-value" :title="selectedMessage.from_addr">{{  formatAddressList(selectedMessage.from_addr)  }}</span>
   </div>
   <div class="meta-row" v-if="selectedMessage.to_addr">
-  <span class="meta-row-label">{{ $t("收件人") }}</span>
-  <span class="meta-row-value" :title="selectedMessage.to_addr">{{ formatAddressList(selectedMessage.to_addr) }}</span>
+  <span class="meta-row-label">{{  $t("收件人")  }}</span>
+  <span class="meta-row-value" :title="selectedMessage.to_addr">{{  formatAddressList(selectedMessage.to_addr)  }}</span>
   </div>
   <div class="meta-row" v-if="selectedMessage.cc">
-  <span class="meta-row-label">{{ $t("抄送") }}</span>
-  <span class="meta-row-value" :title="selectedMessage.cc">{{ formatAddressList(selectedMessage.cc) }}</span>
+  <span class="meta-row-label">{{  $t("抄送")  }}</span>
+  <span class="meta-row-value" :title="selectedMessage.cc">{{  formatAddressList(selectedMessage.cc)  }}</span>
   </div>
   <div class="meta-row">
-  <span class="meta-row-label">{{ $t("时间") }}</span>
-  <span class="meta-row-value">{{ formatDetailDate(selectedMessage.date) }}</span>
+  <span class="meta-row-label">{{  $t("时间")  }}</span>
+  <span class="meta-row-value">{{  formatDetailDate(selectedMessage.date)  }}</span>
   </div>
   </div>
 
@@ -325,15 +325,15 @@
   <div class="attachment-list" v-if="selectedMessage.attachments && selectedMessage.attachments.length > 0">
   <div class="attachment-header">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-  <span>{{ $t("附件 (") }}{{ selectedMessage.attachments.length }})</span>
+  <span>{{  $t("附件 (")  }}{{  selectedMessage.attachments.length  }})</span>
   </div>
   <div class="attachment-item" v-for="att in selectedMessage.attachments" :key="att.part_number" @click="openAttachmentMenu(att, $event)">
   <div class="att-icon">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
   </div>
   <div class="att-info">
-  <div class="att-name">{{ att.filename || '未命名附件' }}</div>
-  <div class="att-meta">{{ formatFileSize(att.size) }}</div>
+  <div class="att-name">{{  att.filename || $t('未命名附件')  }}</div>
+  <div class="att-meta">{{  formatFileSize(att.size)  }}</div>
   </div>
   <div class="att-download">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -347,8 +347,8 @@
   <!-- 附件下载菜单：本机 / NAS（必须在根级，不能塞进 draggable #item） -->
   <div v-if="attMenuVisible" class="att-menu-overlay" @click="attMenuVisible = false">
   <div class="att-menu" :style="attMenuStyle" @click.stop>
-  <button type="button" class="att-menu-item" @click="downloadAttachmentLocal">{{ $t("下载到本机") }}</button>
-  <button type="button" class="att-menu-item" @click="downloadAttachmentNas">{{ $t("下载到NAS") }}</button>
+  <button type="button" class="att-menu-item" @click="downloadAttachmentLocal">{{  $t("下载到本机")  }}</button>
+  <button type="button" class="att-menu-item" @click="downloadAttachmentNas">{{  $t("下载到NAS")  }}</button>
   </div>
   </div>
   <NasPathPicker

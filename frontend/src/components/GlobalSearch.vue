@@ -24,17 +24,17 @@
             @keydown.esc.prevent="closePanel"
           />
           <select v-model="sort" class="gs-sort" :title='$t("排序方式")' @change="doSearch">
-            <option value="date">{{ $t("按时间") }}</option>
-            <option value="relevance">{{ $t("按相关度") }}</option>
+            <option value="date">{{  $t("按时间")  }}</option>
+            <option value="relevance">{{  $t("按相关度")  }}</option>
           </select>
           <button class="gs-btn" type="button" :disabled="loading || !keyword.trim()" @click="doSearch">
-            {{ loading ? '搜索中…' : '搜索' }}
+            {{  loading ? $t('搜索中…') : $t('搜索')  }}
           </button>
         </div>
 
-        <div v-if="error" class="gs-error">{{ error }}</div>
+        <div v-if="error" class="gs-error">{{  error  }}</div>
 
-        <div v-if="result" class="gs-meta">{{ $t("共") }}{{ result.total }}{{ $t("条 ·") }}{{ result.took_ms }} ms · {{ result.mode === 'fts' ? '全文索引' : '模糊匹配（短词/索引不可用）' }}
+        <div v-if="result" class="gs-meta">{{  $t("共")  }}{{  result.total  }}{{  $t("条 ·")  }}{{  result.took_ms  }} ms · {{  result.mode === 'fts' ? $t('全文索引') : $t('模糊匹配（短词/索引不可用）')  }}
         </div>
 
         <div class="gs-list">
@@ -46,18 +46,18 @@
             @click="pick(item)"
           >
             <div class="gs-item-head">
-              <span class="gs-account">{{ item.account_email || item.account_id }}</span>
-              <span class="gs-folder">{{ item.folder }}</span>
+              <span class="gs-account">{{  item.account_email || item.account_id  }}</span>
+              <span class="gs-folder">{{  item.folder  }}</span>
               <span v-if="item.has_attachments" class="gs-attach" :title='$t("含附件")'>📎</span>
-              <span class="gs-date">{{ formatDate(item.date) }}</span>
+              <span class="gs-date">{{  formatDate(item.date)  }}</span>
             </div>
             <div class="gs-subject" v-html="renderSnippet(item)"></div>
-            <div class="gs-from">{{ item.from_addr }}</div>
+            <div class="gs-from">{{  item.from_addr  }}</div>
           </button>
         </div>
 
-        <div v-if="!loading && result && result.messages.length === 0" class="gs-empty">{{ $t("没有匹配的邮件") }}</div>
-        <div v-if="!result && !loading && !error" class="gs-empty">{{ $t("输入关键词后回车；结果覆盖所有已同步的邮箱与文件夹") }}</div>
+        <div v-if="!loading && result && result.messages.length === 0" class="gs-empty">{{  $t("没有匹配的邮件")  }}</div>
+        <div v-if="!result && !loading && !error" class="gs-empty">{{  $t("输入关键词后回车；结果覆盖所有已同步的邮箱与文件夹")  }}</div>
       </div>
     </div>
   </Teleport>

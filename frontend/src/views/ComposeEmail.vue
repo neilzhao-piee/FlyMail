@@ -4,7 +4,7 @@
   <div v-if="isDragging" class="drop-overlay">
   <div class="drop-hint">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-  <span>{{ $t("释放以添加附件") }}</span>
+  <span>{{  $t("释放以添加附件")  }}</span>
   </div>
   </div>
 
@@ -12,27 +12,27 @@
   <div class="compose-toolbar">
   <button class="toolbar-btn primary" @click="sendMail" :disabled="sending">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-  <span>{{ sending ? '发送中...' : '发送' }}</span>
+  <span>{{  sending ? $t('发送中...') : $t('发送')  }}</span>
   </button>
   <button class="toolbar-btn" @click="showScheduleModal = true; initScheduleTime()" :title='$t("定时发送")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-  <span>{{ $t("定时") }}</span>
+  <span>{{  $t("定时")  }}</span>
   </button>
   <button class="toolbar-btn" @click="saveDraft" :disabled="savingDraft">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-  <span>{{ savingDraft ? '保存中...' : '草稿' }}</span>
+  <span>{{  savingDraft ? $t('保存中...') : $t('草稿')  }}</span>
   </button>
 
   <!-- 签名模板选择器 -->
   <div class="toolbar-dropdown sig-dropdown">
   <button class="toolbar-btn" :title='$t("签名")' type="button" @click="showSignaturePanel = !showSignaturePanel">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-  <span>{{ $t("签名") }}</span>
+  <span>{{  $t("签名")  }}</span>
   </button>
   <div v-if="showSignaturePanel" class="sig-panel">
   <!-- 内置预设模板 -->
   <div class="sig-section">
-  <div class="sig-section-label">{{ $t("内置模板") }}</div>
+  <div class="sig-section-label">{{  $t("内置模板")  }}</div>
   <div class="sig-preset-grid">
   <div
   v-for="preset in builtinSignatures"
@@ -42,7 +42,7 @@
   <!-- 点击预览区域直接插入 -->
   <div class="sig-preset-click-area" @click="insertSigToEditor(preset.content_html)">
   <div class="sig-preset-preview" v-html="sanitizeHtml(preset.preview)"></div>
-  <span class="sig-preset-name">{{ preset.name }}</span>
+  <span class="sig-preset-name">{{  preset.name  }}</span>
   </div>
   <!-- 自定义按钮：点击打开编辑对话框 -->
   <button
@@ -60,11 +60,11 @@
   <!-- 自定义编辑对话框（内嵌） -->
   <div v-if="showCustomizeDialog && showSignaturePanel" class="modal-overlay" @click.self="showCustomizeDialog = false">
   <div class="modal-content sig-customize-modal">
-  <h3>{{ $t("自定义签名：") }}{{ customizingPreset?.name }}</h3>
+  <h3>{{  $t("自定义签名：")  }}{{  customizingPreset?.name  }}</h3>
   <textarea v-model="editingSigHtml" class="sig-customize-textarea" spellcheck="false"></textarea>
   <div class="modal-actions">
-  <button class="toolbar-btn" @click="showCustomizeDialog = false">{{ $t("取消") }}</button>
-  <button class="toolbar-btn primary" @click="saveCustomizedSig">{{ $t("保存签名") }}</button>
+  <button class="toolbar-btn" @click="showCustomizeDialog = false">{{  $t("取消")  }}</button>
+  <button class="toolbar-btn primary" @click="saveCustomizedSig">{{  $t("保存签名")  }}</button>
   </div>
   </div>
   </div>
@@ -72,13 +72,13 @@
   <!-- 编辑用户签名对话框（内嵌） -->
   <div v-if="showEditUserSigDialog && showSignaturePanel" class="modal-overlay" @click.self="showEditUserSigDialog = false">
   <div class="modal-content sig-customize-modal">
-  <h3>{{ $t("编辑签名：") }}{{ editingUserSig?.name }}</h3>
+  <h3>{{  $t("编辑签名：")  }}{{  editingUserSig?.name  }}</h3>
   <input v-model="editingUserSigName" :placeholder='$t("签名名称")' class="sig-save-input" />
   <textarea v-model="editingUserSigHtml" class="sig-customize-textarea" spellcheck="false"></textarea>
   <div class="modal-actions">
-  <button class="toolbar-btn" @click="showEditUserSigDialog = false">{{ $t("取消") }}</button>
-  <button class="toolbar-btn danger" @click="deleteEditingUserSig">{{ $t("删除") }}</button>
-  <button class="toolbar-btn primary" @click="saveEditedUserSig">{{ $t("保存") }}</button>
+  <button class="toolbar-btn" @click="showEditUserSigDialog = false">{{  $t("取消")  }}</button>
+  <button class="toolbar-btn danger" @click="deleteEditingUserSig">{{  $t("删除")  }}</button>
+  <button class="toolbar-btn primary" @click="saveEditedUserSig">{{  $t("保存")  }}</button>
   </div>
   </div>
   </div>
@@ -86,7 +86,7 @@
   <div class="sig-panel-divider"></div>
   <!-- 我的签名 -->
   <div class="sig-section">
-  <div class="sig-section-label">{{ $t("我的签名") }}</div>
+  <div class="sig-section-label">{{  $t("我的签名")  }}</div>
   <template v-if="userSigs.length > 0">
   <div class="sig-preset-grid">
   <div
@@ -95,7 +95,7 @@
   class="sig-preset-card sig-user-card"
   >
   <!-- 标记：默认 / 操作按钮 -->
-  <span v-if="sig.is_default" class="sig-default-badge-inline">{{ $t("默认") }}</span>
+  <span v-if="sig.is_default" class="sig-default-badge-inline">{{  $t("默认")  }}</span>
   <button class="sig-delete-btn" type="button" @click.stop="deleteUserSig(sig.id)" :title='$t("删除")'>×</button>
   <button
   class="sig-customize-btn"
@@ -108,15 +108,15 @@
   <!-- 点击区域：插入签名 -->
   <div class="sig-preset-click-area" @click="insertSigToEditor(sig.content_html)">
   <div class="sig-preset-preview sig-user-preview" v-html="sanitizeHtml(sig.content_html)"></div>
-  <span class="sig-preset-name">{{ sig.name }}</span>
+  <span class="sig-preset-name">{{  sig.name  }}</span>
   </div>
   </div>
   </div>
   </template>
-  <div v-else class="sig-empty-hint">{{ $t("暂无自定义签名") }}</div>
+  <div v-else class="sig-empty-hint">{{  $t("暂无自定义签名")  }}</div>
   </div>
   <div class="sig-panel-divider"></div>
-  <button class="sig-save-current-btn" type="button" @click="showSaveSigDialog = true">{{ $t("+ 保存签名") }}</button>
+  <button class="sig-save-current-btn" type="button" @click="showSaveSigDialog = true">{{  $t("+ 保存签名")  }}</button>
   </div>
   </div>
 
@@ -125,8 +125,8 @@
   <div class="modal-content sig-save-dialog">
   <input v-model="newSigName" :placeholder='$t("输入签名名称")' class="sig-save-input" @keyup.enter="saveCurrentAsSig" />
   <div class="modal-actions">
-  <button class="toolbar-btn" @click="showSaveSigDialog = false">{{ $t("取消") }}</button>
-  <button class="toolbar-btn primary" @click="saveCurrentAsSig" :disabled="!newSigName.trim()">{{ $t("保存") }}</button>
+  <button class="toolbar-btn" @click="showSaveSigDialog = false">{{  $t("取消")  }}</button>
+  <button class="toolbar-btn primary" @click="saveCurrentAsSig" :disabled="!newSigName.trim()">{{  $t("保存")  }}</button>
   </div>
   </div>
   </div>
@@ -141,22 +141,22 @@
   <div class="compose-form">
   <!-- 发件人 -->
   <div class="form-row">
-  <label>{{ $t("发件人") }}</label>
+  <label>{{  $t("发件人")  }}</label>
   <select v-model="fromAccountId" class="form-select">
-  <option v-for="acc in accounts" :key="acc.id" :value="acc.id">{{ acc.email }}</option>
+  <option v-for="acc in accounts" :key="acc.id" :value="acc.id">{{  acc.email  }}</option>
   </select>
   <span class="cc-links">
-  <button v-if="!showCc" class="text-btn" @click="showCc = true">{{ $t("抄送") }}</button>
-  <button v-if="!showBcc" class="text-btn" @click="showBcc = true">{{ $t("密送") }}</button>
+  <button v-if="!showCc" class="text-btn" @click="showCc = true">{{  $t("抄送")  }}</button>
+  <button v-if="!showBcc" class="text-btn" @click="showBcc = true">{{  $t("密送")  }}</button>
   </span>
   </div>
 
   <!-- 收件人 -->
   <div class="form-row">
-  <label>{{ $t("收件人") }}</label>
+  <label>{{  $t("收件人")  }}</label>
   <div class="tag-input tag-input-with-suggest">
   <span v-for="(addr, i) in toList" :key="'to'+i" class="tag">
-  {{ addr }}
+  {{  addr  }}
   <button class="tag-remove" @click="toList.splice(i, 1)">&times;</button>
   </span>
   <input
@@ -179,7 +179,7 @@
   class="recipient-confirm-btn"
   @mousedown.prevent="commitRecipient('to')"
   :aria-label='$t("确认收件人")'
-  >{{ $t("确认") }}</button>
+  >{{  $t("确认")  }}</button>
   <!-- 联系人建议下拉 -->
   <div v-if="toField.showSuggestions.value" class="suggest-dropdown">
   <div
@@ -189,8 +189,8 @@
   :class="{ active: idx === toField.activeIndex.value }"
   @mousedown.prevent="clickSuggestion('to', item.email)"
   >
-  <span class="suggest-name">{{ item.name || '(未命名)' }}</span>
-  <span class="suggest-email">{{ item.email }}</span>
+  <span class="suggest-name">{{  item.name || $t('(未命名)')  }}</span>
+  <span class="suggest-email">{{  item.email  }}</span>
   </div>
   </div>
   </div>
@@ -198,10 +198,10 @@
 
   <!-- 抄送（点击后显示） -->
   <div v-if="showCc" class="form-row">
-  <label>{{ $t("抄送") }}</label>
+  <label>{{  $t("抄送")  }}</label>
   <div class="tag-input tag-input-with-suggest">
   <span v-for="(addr, i) in ccList" :key="'cc'+i" class="tag">
-  {{ addr }}
+  {{  addr  }}
   <button class="tag-remove" @click="ccList.splice(i, 1)">&times;</button>
   </span>
   <input
@@ -223,7 +223,7 @@
   class="recipient-confirm-btn"
   @mousedown.prevent="commitRecipient('cc')"
   :aria-label='$t("确认抄送人")'
-  >{{ $t("确认") }}</button>
+  >{{  $t("确认")  }}</button>
   <!-- 联系人建议下拉 -->
   <div v-if="ccField.showSuggestions.value" class="suggest-dropdown">
   <div
@@ -233,8 +233,8 @@
   :class="{ active: idx === ccField.activeIndex.value }"
   @mousedown.prevent="clickSuggestion('cc', item.email)"
   >
-  <span class="suggest-name">{{ item.name || '(未命名)' }}</span>
-  <span class="suggest-email">{{ item.email }}</span>
+  <span class="suggest-name">{{  item.name || $t('(未命名)')  }}</span>
+  <span class="suggest-email">{{  item.email  }}</span>
   </div>
   </div>
   </div>
@@ -242,10 +242,10 @@
 
   <!-- 密送（点击后显示） -->
   <div v-if="showBcc" class="form-row">
-  <label>{{ $t("密送") }}</label>
+  <label>{{  $t("密送")  }}</label>
   <div class="tag-input tag-input-with-suggest">
   <span v-for="(addr, i) in bccList" :key="'bcc'+i" class="tag">
-  {{ addr }}
+  {{  addr  }}
   <button class="tag-remove" @click="bccList.splice(i, 1)">&times;</button>
   </span>
   <input
@@ -267,7 +267,7 @@
   class="recipient-confirm-btn"
   @mousedown.prevent="commitRecipient('bcc')"
   :aria-label='$t("确认密送人")'
-  >{{ $t("确认") }}</button>
+  >{{  $t("确认")  }}</button>
   <!-- 联系人建议下拉 -->
   <div v-if="bccField.showSuggestions.value" class="suggest-dropdown">
   <div
@@ -277,8 +277,8 @@
   :class="{ active: idx === bccField.activeIndex.value }"
   @mousedown.prevent="clickSuggestion('bcc', item.email)"
   >
-  <span class="suggest-name">{{ item.name || '(未命名)' }}</span>
-  <span class="suggest-email">{{ item.email }}</span>
+  <span class="suggest-name">{{  item.name || $t('(未命名)')  }}</span>
+  <span class="suggest-email">{{  item.email  }}</span>
   </div>
   </div>
   </div>
@@ -286,7 +286,7 @@
 
   <!-- 主题 -->
   <div class="form-row">
-  <label>{{ $t("主题") }}</label>
+  <label>{{  $t("主题")  }}</label>
   <input v-model="subject" :placeholder='$t("邮件主题")' class="form-input" />
   </div>
 
@@ -306,36 +306,36 @@
   ref="uploadBtnRef"
   @click="toggleUploadMenu"
   >
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>{{ $t("附件") }}</button>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>{{  $t("附件")  }}</button>
   <!-- Teleport 到 body，避免父级 overflow 裁切菜单 -->
   <Teleport to="body">
   <div v-if="showUploadMenu" class="upload-menu-overlay" @click="showUploadMenu = false">
   <div class="upload-menu" :style="uploadMenuStyle" @click.stop>
   <button type="button" class="upload-menu-item" @click="pickLocalFiles">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>{{ $t("从本机上传") }}</button>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>{{  $t("从本机上传")  }}</button>
   <button type="button" class="upload-menu-item" @click="pickNasFiles">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>{{ $t("从NAS添加") }}</button>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>{{  $t("从NAS添加")  }}</button>
   </div>
   </div>
   </Teleport>
   <input ref="localFileInput" type="file" multiple @change="handleFileSelect" class="hidden-input" />
   </div>
   <span v-if="attachments.length" class="attachments-count">
-  {{ attachments.length }}{{ $t("个 ·") }}{{ formatSize(totalAttachmentSize) }} / {{ attachmentLimitMb }}MB
-  <span v-if="isAttachmentOverLimit" class="att-warning">{{ $t("超限") }}</span>
+  {{  attachments.length  }}{{  $t("个 ·")  }}{{  formatSize(totalAttachmentSize)  }} / {{  attachmentLimitMb  }}MB
+  <span v-if="isAttachmentOverLimit" class="att-warning">{{  $t("超限")  }}</span>
   </span>
   </div>
   <div v-if="attachments.length" class="attachments-list">
   <div v-for="(att, i) in attachments" :key="i" class="attachment-item">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-  <span class="att-name">{{ att.filename }}</span>
+  <span class="att-name">{{  att.filename  }}</span>
   <span v-if="att.source === 'nas'" class="att-source-tag">NAS</span>
-  <span class="att-size">{{ formatSize(att.size) }}</span>
+  <span class="att-size">{{  formatSize(att.size)  }}</span>
   <button class="att-remove" @click="removeAttachment(i)">&times;</button>
   </div>
   </div>
   <!-- 超限提示 -->
-  <div v-if="isAttachmentOverLimit" class="att-over-limit-tip">{{ $t("附件总大小超过当前邮箱限制（") }}{{ attachmentLimitMb }}{{ $t("MB），发送将被拒绝，请减少附件或使用更小的文件") }}</div>
+  <div v-if="isAttachmentOverLimit" class="att-over-limit-tip">{{  $t("附件总大小超过当前邮箱限制（")  }}{{  attachmentLimitMb  }}{{  $t("MB），发送将被拒绝，请减少附件或使用更小的文件")  }}</div>
   </div>
   </div>
 
@@ -352,31 +352,31 @@
   <div class="modal-content schedule-modal">
   <div class="schedule-header">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-  <h3>{{ $t("定时发送") }}</h3>
+  <h3>{{  $t("定时发送")  }}</h3>
   </div>
-  <p class="modal-desc">{{ $t("选择发送时间，邮件将在指定时间自动发送") }}</p>
+  <p class="modal-desc">{{  $t("选择发送时间，邮件将在指定时间自动发送")  }}</p>
 
   <!-- 日期时间选择卡片 -->
   <div class="schedule-card">
   <div class="schedule-card-row">
   <select v-model="scheduleYear" class="sc-select sc-select-wide">
-  <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}</option>
+  <option v-for="y in yearOptions" :key="y" :value="y">{{  y  }}</option>
   </select>
   <span class="sc-sep">/</span>
   <select v-model="scheduleMonth" class="sc-select">
-  <option v-for="m in 12" :key="m" :value="m">{{ String(m).padStart(2, '0') }}</option>
+  <option v-for="m in 12" :key="m" :value="m">{{  String(m).padStart(2, '0')  }}</option>
   </select>
   <span class="sc-sep">/</span>
   <select v-model="scheduleDay" class="sc-select">
-  <option v-for="d in dayOptions" :key="d" :value="d">{{ String(d).padStart(2, '0') }}</option>
+  <option v-for="d in dayOptions" :key="d" :value="d">{{  String(d).padStart(2, '0')  }}</option>
   </select>
   <span class="sc-gap"></span>
   <select v-model="scheduleHour" class="sc-select">
-  <option v-for="h in 24" :key="h" :value="h - 1">{{ String(h - 1).padStart(2, '0') }}</option>
+  <option v-for="h in 24" :key="h" :value="h - 1">{{  String(h - 1).padStart(2, '0')  }}</option>
   </select>
   <span class="sc-sep">:</span>
   <select v-model="scheduleMinute" class="sc-select">
-  <option v-for="m in 60" :key="m" :value="m - 1">{{ String(m - 1).padStart(2, '0') }}</option>
+  <option v-for="m in 60" :key="m" :value="m - 1">{{  String(m - 1).padStart(2, '0')  }}</option>
   </select>
   </div>
   </div>
@@ -384,16 +384,16 @@
   <!-- 预览条 -->
   <div class="schedule-preview-bar">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-  <span>{{ $t("将于") }}<strong>{{ schedulePreview }}</strong>{{ $t("自动发送") }}</span>
+  <span>{{  $t("将于")  }}<strong>{{  schedulePreview  }}</strong>{{  $t("自动发送")  }}</span>
   </div>
 
   <!-- 待发邮件列表（有待发任务时才显示） -->
   <div v-if="scheduledJobs.length > 0" class="scheduled-list">
-  <div class="scheduled-list-title">{{ $t("待发邮件") }}</div>
+  <div class="scheduled-list-title">{{  $t("待发邮件")  }}</div>
   <div v-for="job in scheduledJobs" :key="job.id" class="scheduled-item">
   <div class="scheduled-item-info">
-  <span class="scheduled-item-subject">{{ job.kwargs?.subject || '(无主题)' }}</span>
-  <span class="scheduled-item-time">{{ formatScheduleTime(job.next_run_time) }}</span>
+  <span class="scheduled-item-subject">{{  job.kwargs?.subject || $t('(无主题)')  }}</span>
+  <span class="scheduled-item-time">{{  formatScheduleTime(job.next_run_time)  }}</span>
   </div>
   <button class="scheduled-item-cancel" @click="cancelSchedule(job.id)" :title='$t("取消发送")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -401,8 +401,8 @@
   </div>
   </div>
   <div class="modal-actions">
-  <button class="toolbar-btn" @click="showScheduleModal = false">{{ $t("取消") }}</button>
-  <button class="toolbar-btn primary" @click="scheduleMail" :disabled="!isScheduleValid">{{ $t("定时发送") }}</button>
+  <button class="toolbar-btn" @click="showScheduleModal = false">{{  $t("取消")  }}</button>
+  <button class="toolbar-btn primary" @click="scheduleMail" :disabled="!isScheduleValid">{{  $t("定时发送")  }}</button>
   </div>
   </div>
   </div>
@@ -413,10 +413,10 @@
   <div class="success-icon">
   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
   </div>
-  <h3>{{ $t("定时任务已创建") }}</h3>
-  <p class="success-desc">{{ $t("邮件将在") }}<strong>{{ scheduleSuccessTime }}</strong>{{ $t("自动发送") }}</p>
+  <h3>{{  $t("定时任务已创建")  }}</h3>
+  <p class="success-desc">{{  $t("邮件将在")  }}<strong>{{  scheduleSuccessTime  }}</strong>{{  $t("自动发送")  }}</p>
   <div class="modal-actions" style="justify-content: center;">
-  <button class="toolbar-btn primary" @click="showScheduleSuccessModal = false">{{ $t("知道了") }}</button>
+  <button class="toolbar-btn primary" @click="showScheduleSuccessModal = false">{{  $t("知道了")  }}</button>
   </div>
   </div>
   </div>
@@ -427,10 +427,10 @@
   <div class="confirm-icon">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
   </div>
-  <p class="confirm-text">{{ confirmMessage }}</p>
+  <p class="confirm-text">{{  confirmMessage  }}</p>
   <div class="modal-actions">
-  <button class="toolbar-btn" @click="showConfirmDialog = false">{{ $t("取消") }}</button>
-  <button class="toolbar-btn danger" @click="confirmCallback(); showConfirmDialog = false">{{ $t("确认") }}</button>
+  <button class="toolbar-btn" @click="showConfirmDialog = false">{{  $t("取消")  }}</button>
+  <button class="toolbar-btn danger" @click="confirmCallback(); showConfirmDialog = false">{{  $t("确认")  }}</button>
   </div>
   </div>
   </div>
@@ -441,7 +441,7 @@
   <svg v-if="toast.type === 'success'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
   <svg v-else-if="toast.type === 'error'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
   <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-  <span>{{ toast.message }}</span>
+  <span>{{  toast.message  }}</span>
   </div>
   </Transition>
   </div>

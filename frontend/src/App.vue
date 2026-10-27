@@ -7,7 +7,7 @@
   <div class="brand-text">
   <span class="brand-name">Fly<span class="brand-accent">Mail</span></span>
   </div>
-  <span class="brand-version">v{{ version }}</span>
+  <span class="brand-version">v{{  version  }}</span>
   </div>
 
   <nav class="sidebar-nav">
@@ -16,7 +16,7 @@
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
   </svg>
-  <span>{{ $t("写邮件") }}</span>
+  <span>{{  $t("写邮件")  }}</span>
   </button>
 
   <template v-for="item in navItems" :key="item.key">
@@ -30,7 +30,7 @@
   @click="toggleMailMenu"
   >
   <span class="nav-icon" v-html="item.icon"></span>
-  <span class="nav-label">{{ item.label }}</span>
+  <span class="nav-label">{{  item.label  }}</span>
   <svg class="nav-chevron" :class="{ expanded: mailMenuOpen }" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 12 15 18 9"/>
   </svg>
@@ -46,8 +46,8 @@
   @click="selectFolder(folder.path)"
   >
   <span class="folder-dot" :class="getFolderClass(folder.name)"></span>
-  <span class="folder-label">{{ mailStore.folderDisplayName(folder.name) }}</span>
-  <span v-if="getFolderCount(folder)" class="folder-count">{{ getFolderCount(folder) }}</span>
+  <span class="folder-label">{{  mailStore.folderDisplayName(folder.name)  }}</span>
+  <span v-if="getFolderCount(folder)" class="folder-count">{{  getFolderCount(folder)  }}</span>
   </button>
   </div>
   </transition>
@@ -61,7 +61,7 @@
   @click="toggleBackupMenu"
   >
   <span class="nav-icon" v-html="item.icon"></span>
-  <span class="nav-label">{{ item.label }}</span>
+  <span class="nav-label">{{  item.label  }}</span>
   <svg class="nav-chevron" :class="{ expanded: backupMenuOpen }" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 12 15 18 9"/>
   </svg>
@@ -77,11 +77,11 @@
   @click="selectBackupFolder(f.folder)"
   >
   <span class="folder-dot" :class="backupStore.getFolderClass(f.folder)"></span>
-  <span class="folder-label">{{ backupStore.folderDisplayName(f.folder) }}</span>
-  <span v-if="f.count" class="folder-count">{{ f.count }}</span>
+  <span class="folder-label">{{  backupStore.folderDisplayName(f.folder)  }}</span>
+  <span v-if="f.count" class="folder-count">{{  f.count  }}</span>
   </button>
   <!-- 无文件夹时的占位提示 -->
-  <div v-if="backupStore.folders.length === 0" class="nav-sub-empty">{{ $t("暂无备份邮件") }}</div>
+  <div v-if="backupStore.folders.length === 0" class="nav-sub-empty">{{  $t("暂无备份邮件")  }}</div>
   </div>
   </transition>
   </div>
@@ -94,7 +94,7 @@
   @click="currentView = item.key"
   >
   <span class="nav-icon" v-html="item.icon"></span>
-  <span class="nav-label">{{ item.label }}</span>
+  <span class="nav-label">{{  item.label  }}</span>
   </button>
   </template>
   </template>
@@ -104,7 +104,7 @@
   <div class="user-avatar" :style="userAvatarStyle">
   <span class="avatar-emoji">👊</span>
   </div>
-  <span class="user-name">{{ user?.username || '用户' }}</span>
+  <span class="user-name">{{  user?.username || $t('用户')  }}</span>
   </div>
   </aside>
 
@@ -116,7 +116,7 @@
   <img class="mobile-logo" src="/icon.png" alt="FlyMail" />
   <span>FlyMail</span>
   </div>
-  <h1 class="topbar-title">{{ currentTitle }}</h1>
+  <h1 class="topbar-title">{{  currentTitle  }}</h1>
   </div>
   <div class="topbar-right">
   <GlobalSearch @open="onGlobalOpen" />
@@ -144,7 +144,7 @@
   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
   <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
   </svg>
-  <span v-if="mailStore.unreadNotificationCount > 0" class="notification-badge">{{ mailStore.unreadNotificationCount > 99 ? '99+' : mailStore.unreadNotificationCount }}</span>
+  <span v-if="mailStore.unreadNotificationCount > 0" class="notification-badge">{{  mailStore.unreadNotificationCount > 99 ? '99+' : mailStore.unreadNotificationCount  }}</span>
   </button>
   </div>
   </header>
@@ -172,22 +172,22 @@
   <!-- 聚合 -->
   <button class="tab-item" :class="{ active: currentView === 'unified' }" @click="currentView = 'unified'">
   <span class="tab-icon" v-html="mobileNavIcons.unified"></span>
-  <span class="tab-label">{{ $t("聚合") }}</span>
+  <span class="tab-label">{{  $t("聚合")  }}</span>
   </button>
   <!-- 邮件 -->
   <button class="tab-item" :class="{ active: currentView === 'mail' }" @click="currentView = 'mail'">
   <span class="tab-icon" v-html="mobileNavIcons.mail"></span>
-  <span class="tab-label">{{ $t("邮件") }}</span>
+  <span class="tab-label">{{  $t("邮件")  }}</span>
   </button>
   <!-- 账号 -->
   <button class="tab-item" :class="{ active: currentView === 'accounts' }" @click="currentView = 'accounts'">
   <span class="tab-icon" v-html="mobileNavIcons.accounts"></span>
-  <span class="tab-label">{{ $t("账号") }}</span>
+  <span class="tab-label">{{  $t("账号")  }}</span>
   </button>
   <!-- 其他：点击弹出写信/设置/关于 -->
   <button class="tab-item" :class="{ active: isOtherActive }" @click="showOtherMenu = !showOtherMenu">
   <span class="tab-icon" v-html="mobileNavIcons.other"></span>
-  <span class="tab-label">{{ $t("其他") }}</span>
+  <span class="tab-label">{{  $t("其他")  }}</span>
   </button>
   </nav>
 
@@ -197,23 +197,23 @@
   <div class="other-menu">
   <button class="other-menu-item" @click="currentView = 'compose'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.compose"></span>
-  <span>{{ $t("写信") }}</span>
+  <span>{{  $t("写信")  }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'contacts'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.contacts"></span>
-  <span>{{ $t("联系人") }}</span>
+  <span>{{  $t("联系人")  }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'backup'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.backup"></span>
-  <span>{{ $t("备份") }}</span>
+  <span>{{  $t("备份")  }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'settings'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.settings"></span>
-  <span>{{ $t("设置") }}</span>
+  <span>{{  $t("设置")  }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'about'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.about"></span>
-  <span>{{ $t("关于") }}</span>
+  <span>{{  $t("关于")  }}</span>
   </button>
   </div>
   </div>
@@ -229,12 +229,12 @@
   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
   <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
   </svg>
-  <span class="drawer-title">{{ $t("通知") }}</span>
-  <span v-if="mailStore.unreadNotificationCount > 0" class="drawer-badge">{{ mailStore.unreadNotificationCount }}</span>
+  <span class="drawer-title">{{  $t("通知")  }}</span>
+  <span v-if="mailStore.unreadNotificationCount > 0" class="drawer-badge">{{  mailStore.unreadNotificationCount  }}</span>
   </div>
   <div class="drawer-actions">
-  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn" @click="mailStore.markAllNotificationsRead()">{{ $t("全读") }}</button>
-  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn danger" @click="mailStore.clearNotifications()">{{ $t("清空") }}</button>
+  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn" @click="mailStore.markAllNotificationsRead()">{{  $t("全读")  }}</button>
+  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn danger" @click="mailStore.clearNotifications()">{{  $t("清空")  }}</button>
   <button class="drawer-close-btn" @click="showNotificationPanel = false">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
@@ -271,16 +271,16 @@
   </div>
   <div class="notif-body">
   <div class="notif-title-row">
-  <span class="notif-provider-name">{{ n.type === 'new_mail' ? providerName(n.provider) : (n.type === 'schedule_success' ? '发送成功' : n.type === 'schedule_failed' ? '发送失败' : n.type === 'backup_success' ? '备份成功' : '备份失败') }}</span>
+  <span class="notif-provider-name">{{  n.type === 'new_mail' ? providerName(n.provider) : (n.type === 'schedule_success' ? $t('发送成功') : n.type === 'schedule_failed' ? $t('发送失败') : n.type === 'backup_success' ? $t('备份成功') : $t('备份失败'))  }}</span>
   <span class="notif-dot" v-if="!n.read"></span>
-  <span class="notif-time">{{ formatNotifTime(n.time) }}</span>
+  <span class="notif-time">{{  formatNotifTime(n.time)  }}</span>
   </div>
-  <div class="notif-desc"><span class="notif-desc-text">{{ n.type === 'new_mail' ? (n.subject || n.message || '(无主题)') : n.message }}</span></div>
+  <div class="notif-desc"><span class="notif-desc-text">{{  n.type === 'new_mail' ? (n.subject || n.message || $t('(无主题)')) : n.message  }}</span></div>
   </div>
   </div>
   </div>
   <div v-else class="drawer-empty">
-  <span>{{ $t("暂无通知") }}</span>
+  <span>{{  $t("暂无通知")  }}</span>
   </div>
   </div>
   </div>
@@ -299,7 +299,7 @@
   <svg v-else-if="t.type === 'error'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
   <svg v-else-if="t.type === 'warning'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
   <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-  <span>{{ t.message }}</span>
+  <span>{{  t.message  }}</span>
   </div>
   </transition-group>
   </div>
@@ -308,18 +308,18 @@
   <Teleport to="body">
   <div v-if="uiStore.confirmVisible" class="dialog-overlay confirm-overlay" @click.self="uiStore.confirmCancel()">
   <div class="confirm-dialog">
-  <h3 class="confirm-title">{{ uiStore.confirmOptions.title }}</h3>
-  <p class="confirm-message">{{ uiStore.confirmOptions.message }}</p>
+  <h3 class="confirm-title">{{  uiStore.confirmOptions.title  }}</h3>
+  <p class="confirm-message">{{  uiStore.confirmOptions.message  }}</p>
   <div class="confirm-actions">
   <button class="btn btn-secondary" @click="uiStore.confirmCancel()">
-  {{ uiStore.confirmOptions.cancelText }}
+  {{  uiStore.confirmOptions.cancelText  }}
   </button>
   <button
   class="btn"
   :class="uiStore.confirmOptions.danger ? 'btn-danger' : 'btn-primary'"
   @click="uiStore.confirmOk()"
   >
-  {{ uiStore.confirmOptions.confirmText }}
+  {{  uiStore.confirmOptions.confirmText  }}
   </button>
   </div>
   </div>

@@ -3,6 +3,7 @@
 # ---------- 前端构建 ----------
 FROM node:22-alpine AS ui
 WORKDIR /build
+COPY VERSION /VERSION
 COPY frontend/package.json ./
 RUN npm install --no-audit --no-fund
 COPY frontend/ ./

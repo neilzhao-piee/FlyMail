@@ -7,16 +7,16 @@
   <div class="brand-meta">
   <div class="brand-name-line">
   <span class="brand-name">Fly<span class="accent">Mail</span></span>
-  <span class="ver">v{{ version }}</span>
+  <span class="ver">v{{  version  }}</span>
   </div>
-  <p class="brand-slogan">{{ $t("专为多邮箱用户打造的自托管邮件客户端") }}</p>
+  <p class="brand-slogan">{{  $t("专为多邮箱用户打造的自托管邮件客户端")  }}</p>
   </div>
   <!-- 检测更新按钮：点击后从 GitHub 拉取最新 VERSION 比对 -->
   <button
   class="check-update-btn"
   :disabled="checking"
   @click="checkUpdate"
-  :title="checking ? '正在检测...' : '检测是否有新版本'"
+  :title="checking ? $t('正在检测...') : $t('检测是否有新版本')"
   >
   <svg v-if="!checking" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 12a9 9 0 11-6.219-8.56"/><polyline points="21 4 21 10 15 10"/>
@@ -24,36 +24,36 @@
   <svg v-else class="spin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 12a9 9 0 11-6.219-8.56"/>
   </svg>
-  <span>{{ checking ? '检测中' : '检测更新' }}</span>
+  <span>{{  checking ? $t('检测中') : $t('检测更新')  }}</span>
   </button>
   </div>
-  <p class="brand-desc">{{ $t("统一管理 Gmail、Outlook、QQ 邮箱、网易邮箱、iCloud、新浪邮箱等主流平台的邮件数据。 聚合收件箱让您在一个界面查看所有邮箱的重要邮件，告别频繁切换账号的烦恼。 支持多账号管理、邮件收发、富文本编辑、附件上传下载、定时发送、草稿箱、个性签名、本地备份及实时同步等丰富功能，满足日常办公与个人使用需求。") }}</p>
+  <p class="brand-desc">{{  $t("统一管理 Gmail、Outlook、QQ 邮箱、网易邮箱、iCloud、新浪邮箱等主流平台的邮件数据。 聚合收件箱让您在一个界面查看所有邮箱的重要邮件，告别频繁切换账号的烦恼。 支持多账号管理、邮件收发、富文本编辑、附件上传下载、定时发送、草稿箱、个性签名、本地备份及实时同步等丰富功能，满足日常办公与个人使用需求。")  }}</p>
   </div>
 
   <!-- 功能 + 技术栈 -->
   <div class="about-card">
   <div class="pill-row">
   <span class="pill" v-for="f in features" :key="f">
-  <span class="pill-dot"></span>{{ f }}
+  <span class="pill-dot"></span>{{  f  }}
   </span>
   </div>
   <div class="divider"></div>
   <div class="pill-row">
-  <span class="pill tech" v-for="t in techs" :key="t">{{ t }}</span>
+  <span class="pill tech" v-for="t in techs" :key="t">{{  t  }}</span>
   </div>
   </div>
 
   <!-- 联系方式 -->
   <div class="about-card">
   <div class="contact-row">
-  <span class="contact-label">{{ $t("联系 / Contact") }}</span>
+  <span class="contact-label">{{  $t("联系 / Contact")  }}</span>
   <a class="contact-link" href="mailto:neil@zhao.digital">neil@zhao.digital</a>
   </div>
   </div>
 
   <!-- 底部 -->
   <div class="footer">
-  <span>{{ $t("GNU GPL-3.0 · 基于 FlyMail 1.0.7") }}</span>
+  <span>{{  $t("GNU GPL-3.0 · 基于 FlyMail 1.0.7")  }}</span>
   </div>
   </div>
 </template>

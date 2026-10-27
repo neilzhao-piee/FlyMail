@@ -13,13 +13,13 @@
   <button class="btn-add" @click="openAddDialog()">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>{{ $t("新增") }}</button>
+  </svg>{{  $t("新增")  }}</button>
   </div>
 
   <!-- 加载状态 -->
   <div v-if="loading" class="state-box">
   <div class="spinner"></div>
-  <span>{{ $t("加载中...") }}</span>
+  <span>{{  $t("加载中...")  }}</span>
   </div>
 
   <!-- 空状态 -->
@@ -30,8 +30,8 @@
   <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
   </svg>
   </div>
-  <p class="state-title">{{ searchKeyword ? '未找到匹配的联系人' : '还没有联系人' }}</p>
-  <p class="state-desc">{{ searchKeyword ? '试试其他关键词' : '点击「新增」按钮添加联系人' }}</p>
+  <p class="state-title">{{  searchKeyword ? $t('未找到匹配的联系人') : $t('还没有联系人')  }}</p>
+  <p class="state-desc">{{  searchKeyword ? $t('试试其他关键词') : $t('点击「新增」按钮添加联系人')  }}</p>
   </div>
 
   <!-- 联系人列表 -->
@@ -44,14 +44,14 @@
   @click="selectContact(contact.id)"
   >
   <div class="avatar-sm" :style="{ background: getAvatarColor(contact.name || primaryEmail(contact)) }">
-  {{ avatarLetter(contact) }}
+  {{  avatarLetter(contact)  }}
   </div>
   <div class="item-info">
-  <div class="item-name">{{ contact.name || '(未命名)' }}</div>
-  <div class="item-email">{{ primaryEmail(contact) }}</div>
+  <div class="item-name">{{  contact.name || $t('(未命名)')  }}</div>
+  <div class="item-email">{{  primaryEmail(contact)  }}</div>
   </div>
   <span v-if="contact.emails.length > 1" class="email-count" :title="`共 ${contact.emails.length} 个邮箱`">
-  {{ contact.emails.length }}
+  {{  contact.emails.length  }}
   </span>
   </div>
   </div>
@@ -66,8 +66,8 @@
   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
   </svg>
   </div>
-  <p class="detail-empty-text">{{ $t("选择左侧联系人查看详情") }}</p>
-  <p class="detail-empty-hint">{{ $t("或点击「新增」添加新联系人") }}</p>
+  <p class="detail-empty-text">{{  $t("选择左侧联系人查看详情")  }}</p>
+  <p class="detail-empty-hint">{{  $t("或点击「新增」添加新联系人")  }}</p>
   </div>
 
   <!-- 联系人详情 -->
@@ -76,17 +76,17 @@
   <button class="btn-back-mobile" @click="selectedId = null">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 18 9 12 15 6"/>
-  </svg>{{ $t("返回") }}</button>
+  </svg>{{  $t("返回")  }}</button>
   <!-- 头部：渐变背景 + 头像 + 姓名 + 操作按钮 -->
   <div class="detail-header">
   <div class="header-banner" :style="{ background: `linear-gradient(135deg, ${getAvatarColor(selectedContact.name || primaryEmail(selectedContact))}22, transparent)` }"></div>
   <div class="header-inner">
   <div class="avatar-lg" :style="{ background: getAvatarColor(selectedContact.name || primaryEmail(selectedContact)) }">
-  {{ avatarLetter(selectedContact) }}
+  {{  avatarLetter(selectedContact)  }}
   </div>
   <div class="header-info">
   <h2 class="detail-name">
-  {{ selectedContact.name || '(未命名)' }}
+  {{  selectedContact.name || $t('(未命名)')  }}
   <button class="btn-icon-edit" @click="openEditDialog(selectedContact)" :title='$t("编辑联系人")'>
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
@@ -94,9 +94,9 @@
   </button>
   </h2>
   <div class="detail-meta">
-  <span v-if="selectedContact.company" class="meta-tag meta-company">{{ selectedContact.company }}</span>
-  <span v-if="selectedContact.group_name" class="meta-tag">{{ selectedContact.group_name }}</span>
-  <span class="meta-email-count">{{ selectedContact.emails.length }}{{ $t("个邮箱") }}</span>
+  <span v-if="selectedContact.company" class="meta-tag meta-company">{{  selectedContact.company  }}</span>
+  <span v-if="selectedContact.group_name" class="meta-tag">{{  selectedContact.group_name  }}</span>
+  <span class="meta-email-count">{{  selectedContact.emails.length  }}{{  $t("个邮箱")  }}</span>
   </div>
   </div>
   <div class="header-actions">
@@ -104,7 +104,7 @@
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
   </svg>
-  <span class="btn-text">{{ $t("删除") }}</span>
+  <span class="btn-text">{{  $t("删除")  }}</span>
   </button>
   </div>
   </div>
@@ -118,11 +118,11 @@
   <div class="section-title">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-  </svg>{{ $t("邮箱地址") }}</div>
+  </svg>{{  $t("邮箱地址")  }}</div>
   <div class="email-list">
   <div v-for="emailObj in selectedContact.emails" :key="emailObj.id" class="email-row">
-  <span class="email-text">{{ emailObj.email }}</span>
-  <span v-if="emailObj.is_primary" class="badge-primary">{{ $t("主") }}</span>
+  <span class="email-text">{{  emailObj.email  }}</span>
+  <span v-if="emailObj.is_primary" class="badge-primary">{{  $t("主")  }}</span>
   </div>
   </div>
   </div>
@@ -132,19 +132,19 @@
   <div class="section-title">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-  </svg>{{ $t("联系方式") }}</div>
+  </svg>{{  $t("联系方式")  }}</div>
   <div class="info-list">
   <div class="info-item">
-  <span class="info-label">{{ $t("电话") }}</span>
-  <span class="info-value">{{ selectedContact.phone || '—' }}</span>
+  <span class="info-label">{{  $t("电话")  }}</span>
+  <span class="info-value">{{  selectedContact.phone || '—'  }}</span>
   </div>
   <div class="info-item">
-  <span class="info-label">{{ $t("工作单位") }}</span>
-  <span class="info-value">{{ selectedContact.company || '—' }}</span>
+  <span class="info-label">{{  $t("工作单位")  }}</span>
+  <span class="info-value">{{  selectedContact.company || '—'  }}</span>
   </div>
   <div class="info-item">
-  <span class="info-label">{{ $t("分组") }}</span>
-  <span class="info-value">{{ selectedContact.group_name || '—' }}</span>
+  <span class="info-label">{{  $t("分组")  }}</span>
+  <span class="info-value">{{  selectedContact.group_name || '—'  }}</span>
   </div>
   </div>
   </div>
@@ -155,21 +155,21 @@
   <div class="section-title">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-  </svg>{{ $t("往来邮件") }}</div>
+  </svg>{{  $t("往来邮件")  }}</div>
   <div class="stats-grid">
   <!-- 统计加载中 -->
   <div v-if="statsLoading" class="stats-loading">
   <div class="spinner-sm"></div>
-  <span>{{ $t("统计中...") }}</span>
+  <span>{{  $t("统计中...")  }}</span>
   </div>
   <template v-else>
   <div class="stats-card">
-  <div class="stats-value">{{ statsData.count }}</div>
-  <div class="stats-label">{{ $t("往来邮件总数") }}</div>
+  <div class="stats-value">{{  statsData.count  }}</div>
+  <div class="stats-label">{{  $t("往来邮件总数")  }}</div>
   </div>
   <div class="stats-card">
-  <div class="stats-value">{{ statsData.last_date ? formatRelativeDate(statsData.last_date) : '—' }}</div>
-  <div class="stats-label">{{ $t("最近一次联系") }}</div>
+  <div class="stats-value">{{  statsData.last_date ? formatRelativeDate(statsData.last_date) : '—'  }}</div>
+  <div class="stats-label">{{  $t("最近一次联系")  }}</div>
   </div>
   </template>
   </div>
@@ -180,8 +180,8 @@
   <div class="section-title">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-  </svg>{{ $t("备注") }}</div>
-  <div class="remark-box">{{ selectedContact.remark }}</div>
+  </svg>{{  $t("备注")  }}</div>
+  <div class="remark-box">{{  selectedContact.remark  }}</div>
   </div>
   </div>
   </div>
@@ -191,16 +191,16 @@
   <transition name="fade">
   <div v-if="showDialog" class="dialog-backdrop" @click.self="closeDialog">
   <div class="dialog">
-  <h3 class="dialog-title">{{ editingContact ? '编辑联系人' : '新增联系人' }}</h3>
+  <h3 class="dialog-title">{{  editingContact ? $t('编辑联系人') : $t('新增联系人')  }}</h3>
   <div class="dialog-body">
   <!-- 姓名 -->
   <div class="form-row">
-  <label>{{ $t("姓名") }}</label>
+  <label>{{  $t("姓名")  }}</label>
   <input v-model="formData.name" :placeholder='$t("联系人姓名（允许同名）")' class="form-input" />
   </div>
   <!-- 多邮箱输入 -->
   <div class="form-row">
-  <label>{{ $t("邮箱 *") }}</label>
+  <label>{{  $t("邮箱 *")  }}</label>
   <div class="email-input-list">
   <div v-for="(emailItem, idx) in formData.emails" :key="idx" class="email-input-row">
   <input
@@ -215,38 +215,38 @@
   <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
   </button>
-  <span v-if="emailErrors[idx]" class="form-error">{{ emailErrors[idx] }}</span>
+  <span v-if="emailErrors[idx]" class="form-error">{{  emailErrors[idx]  }}</span>
   </div>
   </div>
   <button class="btn-add-email" @click="addEmailField">
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>{{ $t("添加邮箱") }}</button>
+  </svg>{{  $t("添加邮箱")  }}</button>
   </div>
   <!-- 电话 -->
   <div class="form-row">
-  <label>{{ $t("电话") }}</label>
+  <label>{{  $t("电话")  }}</label>
   <input v-model="formData.phone" :placeholder='$t("联系电话（选填）")' class="form-input" />
   </div>
   <!-- 工作单位 -->
   <div class="form-row">
-  <label>{{ $t("工作单位") }}</label>
+  <label>{{  $t("工作单位")  }}</label>
   <input v-model="formData.company" :placeholder='$t("工作单位（选填）")' class="form-input" />
   </div>
   <!-- 分组 -->
   <div class="form-row">
-  <label>{{ $t("分组") }}</label>
+  <label>{{  $t("分组")  }}</label>
   <input v-model="formData.group_name" :placeholder='$t("分组名（选填）")' class="form-input" />
   </div>
   <!-- 备注 -->
   <div class="form-row">
-  <label>{{ $t("备注") }}</label>
+  <label>{{  $t("备注")  }}</label>
   <textarea v-model="formData.remark" :placeholder='$t("备注信息（选填）")' class="form-textarea" rows="3"></textarea>
   </div>
   </div>
   <div class="dialog-footer">
-  <button class="btn btn-cancel" @click="closeDialog">{{ $t("取消") }}</button>
-  <button class="btn btn-save" @click="handleSave" :disabled="saving">{{ saving ? '保存中...' : '保存' }}</button>
+  <button class="btn btn-cancel" @click="closeDialog">{{  $t("取消")  }}</button>
+  <button class="btn btn-save" @click="handleSave" :disabled="saving">{{  saving ? $t('保存中...') : $t('保存')  }}</button>
   </div>
   </div>
   </div>

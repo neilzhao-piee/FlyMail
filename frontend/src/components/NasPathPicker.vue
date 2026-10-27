@@ -3,7 +3,7 @@
   <div v-if="modelValue" class="nas-overlay" @click.self="onCancel">
     <div class="nas-modal">
       <div class="nas-head">
-        <h4>{{ $t(title) }}</h4>
+        <h4>{{  $t(title)  }}</h4>
         <button type="button" class="nas-close" @click="onCancel" :aria-label='$t("关闭")'>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -15,20 +15,20 @@
           class="nav-item"
           :class="{ clickable: breadcrumbs.length > 0 }"
           @click="navigateToRoot"
-        >{{ $t("授权目录") }}</span>
+        >{{  $t("授权目录")  }}</span>
         <template v-for="(b, i) in breadcrumbs" :key="i">
           <span class="nav-sep">/</span>
-          <span class="nav-item clickable" @click="navigateTo(i)">{{ b.name }}</span>
+          <span class="nav-item clickable" @click="navigateTo(i)">{{  b.name  }}</span>
         </template>
       </div>
 
       <!-- 列表 -->
       <div class="nas-list">
-        <div v-if="loading" class="nas-empty">{{ $t("加载中...") }}</div>
+        <div v-if="loading" class="nas-empty">{{  $t("加载中...")  }}</div>
         <div v-else-if="dirs.length === 0 && files.length === 0" class="nas-empty">
-          {{ breadcrumbs.length === 0
-            ? '暂无可用授权目录，请先在飞牛应用设置中授权目录后重试'
-            : (mode === 'file' ? '此目录下无子目录或文件' : '此目录下无子目录') }}
+          {{  breadcrumbs.length === 0
+            ? $t('暂无可用授权目录，请先在飞牛应用设置中授权目录后重试')
+            : (mode === 'file' ? $t('此目录下无子目录或文件') : $t('此目录下无子目录'))  }}
         </div>
         <template v-else>
           <!-- 子目录 -->
@@ -39,7 +39,7 @@
             @click="enterDir(dir)"
           >
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-            <span>{{ pathBasename(dir) }}</span>
+            <span>{{  pathBasename(dir)  }}</span>
           </div>
           <!-- 文件（仅 file 模式） -->
           <div
@@ -51,22 +51,22 @@
             @dblclick="confirmFile(f.path)"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span class="file-name">{{ f.name }}</span>
-            <span class="file-size">{{ formatSize(f.size) }}</span>
+            <span class="file-name">{{  f.name  }}</span>
+            <span class="file-size">{{  formatSize(f.size)  }}</span>
           </div>
         </template>
       </div>
 
       <div class="nas-foot">
-        <span class="nas-path" :title="displayPath">{{ displayPath || $t('请选择') }}</span>
+        <span class="nas-path" :title="displayPath">{{  displayPath || $t('请选择')  }}</span>
         <div class="nas-btns">
-          <button type="button" class="btn-cancel" @click="onCancel">{{ $t("取消") }}</button>
+          <button type="button" class="btn-cancel" @click="onCancel">{{  $t("取消")  }}</button>
           <button
             type="button"
             class="btn-ok"
             :disabled="!canConfirm"
             @click="onConfirm"
-          >{{ $t("确定") }}</button>
+          >{{  $t("确定")  }}</button>
         </div>
       </div>
     </div>

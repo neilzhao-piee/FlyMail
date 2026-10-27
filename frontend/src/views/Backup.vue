@@ -14,8 +14,8 @@
   @click="switchAccount(acc.account_id)"
   >
   <span class="account-icon" v-html="providerIcon(acc.provider)"></span>
-  <span class="account-email">{{ acc.email }}</span>
-  <span class="account-count">{{ acc.count }}</span>
+  <span class="account-email">{{  acc.email  }}</span>
+  <span class="account-count">{{  acc.count  }}</span>
   </button>
   </div>
   </div>
@@ -26,11 +26,11 @@
   <div v-if="progress.running || progress.paused" class="archive-progress">
   <div class="ap-row">
   <span class="ap-text">
-  <template v-if="progress.paused">{{ $t("已暂停 ·") }}</template>
-  {{ progress.account_email }} / {{ progress.folder }} · {{ progress.done }} / {{ progress.total }}（{{ progress.percent }}%）
-  · {{ progress.per_minute }}{{ $t("封/分") }}<template v-if="progress.eta_seconds">{{ $t("· 剩余") }}{{ formatEta(progress.eta_seconds) }}</template>
+  <template v-if="progress.paused">{{  $t("已暂停 ·")  }}</template>
+  {{  progress.account_email  }} / {{  progress.folder  }} · {{  progress.done  }} / {{  progress.total  }}（{{  progress.percent  }}%）
+  · {{  progress.per_minute  }}{{  $t("封/分")  }}<template v-if="progress.eta_seconds">{{  $t("· 剩余")  }}{{  formatEta(progress.eta_seconds)  }}</template>
   </span>
-  <button class="ap-btn" type="button" @click="togglePause">{{ progress.paused ? '继续' : '暂停' }}</button>
+  <button class="ap-btn" type="button" @click="togglePause">{{  progress.paused ? $t('继续') : $t('暂停')  }}</button>
   </div>
   <div class="ap-bar"><span :style="{ width: Math.min(progress.percent, 100) + '%' }"></span></div>
   </div>
@@ -39,17 +39,17 @@
   <div class="toolbar-left">
   <!-- 移动端：iOS风格文件夹选择器 -->
   <button v-if="isMobile" class="folder-picker" @click="showFolderSheet = true">
-  <span class="picker-label">{{ currentFolderName }}</span>
+  <span class="picker-label">{{  currentFolderName  }}</span>
   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
   </button>
   <!-- 桌面端：文件夹名+数量 -->
-  <span v-else class="list-count">{{ searchQuery ? ("搜索 · " + total + "封") : (currentFolderName + " · " + total + "封") }}</span>
+  <span v-else class="list-count">{{  searchQuery ? ($t("搜索 · ") + total + $t("封")) : (currentFolderName + " · " + total + $t("封"))  }}</span>
   <span class="toolbar-divider"></span>
   <!-- 桌面端：内联筛选按钮 -->
   <template v-if="!isMobile">
-  <button class="filter-btn" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted('')">{{ $t("全部") }}{{ currentFolderStats.count }}</button>
-  <button class="filter-btn" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive')">{{ $t("存活") }}{{ currentFolderStats.alive }}</button>
-  <button class="filter-btn" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted')">{{ $t("已删除") }}{{ currentFolderStats.deleted }}</button>
+  <button class="filter-btn" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted('')">{{  $t("全部")  }}{{  currentFolderStats.count  }}</button>
+  <button class="filter-btn" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive')">{{  $t("存活")  }}{{  currentFolderStats.alive  }}</button>
+  <button class="filter-btn" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted')">{{  $t("已删除")  }}{{  currentFolderStats.deleted  }}</button>
   </template>
   </div>
   <div class="toolbar-right">
@@ -58,7 +58,7 @@
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
   </button>
   <!-- 立即备份：图标按钮风格，与 MailList 的 rebuild-btn 一致 -->
-  <button class="btn-icon backup-icon-btn" @click="triggerBackup" :disabled="backingUp || !selectedAccount" :title="selectedAccount ? '备份当前邮箱' : '请先选择邮箱'">
+  <button class="btn-icon backup-icon-btn" @click="triggerBackup" :disabled="backingUp || !selectedAccount" :title="selectedAccount ? $t('备份当前邮箱') : $t('请先选择邮箱')">
   <svg v-if="!backingUp" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
@@ -72,9 +72,9 @@
   <div v-if="showMobileFilters" class="mobile-filter-dropdown">
   <div class="filter-backdrop" @click="showMobileFilters = false"></div>
   <div class="filter-dropdown-menu filter-dropdown-compact">
-  <button class="filter-dropdown-item" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted(''); showMobileFilters = false">{{ $t("全部") }}{{ currentFolderStats.count }}</button>
-  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive'); showMobileFilters = false">{{ $t("存活") }}{{ currentFolderStats.alive }}</button>
-  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted'); showMobileFilters = false">{{ $t("已删除") }}{{ currentFolderStats.deleted }}</button>
+  <button class="filter-dropdown-item" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted(''); showMobileFilters = false">{{  $t("全部")  }}{{  currentFolderStats.count  }}</button>
+  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive'); showMobileFilters = false">{{  $t("存活")  }}{{  currentFolderStats.alive  }}</button>
+  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted'); showMobileFilters = false">{{  $t("已删除")  }}{{  currentFolderStats.deleted  }}</button>
   </div>
   </div>
   </transition>
@@ -86,7 +86,7 @@
   <div v-if="showFolderSheet" class="sheet-backdrop" @click.self="showFolderSheet = false">
   <div class="sheet-content">
   <div class="sheet-handle"></div>
-  <div class="sheet-title">{{ $t("文件夹") }}</div>
+  <div class="sheet-title">{{  $t("文件夹")  }}</div>
   <div class="sheet-list">
   <button
   v-for="f in backupStore.folders"
@@ -95,8 +95,8 @@
   :class="{ active: backupStore.currentFolder === f.folder }"
   @click="selectBackupFolder(f.folder); showFolderSheet = false"
   >
-  <span class="sheet-folder-name">{{ backupStore.folderDisplayName(f.folder) }}</span>
-  <span class="sheet-folder-count" v-if="f.count">{{ f.count }}</span>
+  <span class="sheet-folder-name">{{  backupStore.folderDisplayName(f.folder)  }}</span>
+  <span class="sheet-folder-count" v-if="f.count">{{  f.count  }}</span>
   </button>
   </div>
   </div>
@@ -108,16 +108,16 @@
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
-  <p>{{ $t("暂无备份邮箱") }}</p>
-  <p class="empty-hint">{{ $t("请在设置中开启备份并选择需要备份的邮箱") }}</p>
+  <p>{{  $t("暂无备份邮箱")  }}</p>
+  <p class="empty-hint">{{  $t("请在设置中开启备份并选择需要备份的邮箱")  }}</p>
   </div>
-  <div v-else-if="loading" class="loading-state">{{ $t("加载中...") }}</div>
+  <div v-else-if="loading" class="loading-state">{{  $t("加载中...")  }}</div>
   <div v-else-if="messages.length === 0" class="empty-state">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
-  <p>{{ searchQuery ? '未找到匹配的备份邮件' : '暂无备份邮件' }}</p>
-  <p class="empty-hint">{{ searchQuery ? '搜索归档邮件（主题/收发件人/正文；中文 ≥3 字走全文索引）' : '点击右上角"立即备份"，将当前邮箱邮件归档到本地' }}</p>
+  <p>{{  searchQuery ? $t('未找到匹配的备份邮件') : $t('暂无备份邮件')  }}</p>
+  <p class="empty-hint">{{  searchQuery ? $t('搜索归档邮件（主题/收发件人/正文；中文 ≥3 字走全文索引）') : $t('点击右上角"立即备份"，将当前邮箱邮件归档到本地')  }}</p>
   </div>
 
   <!-- 列表项：单行水平布局，与 MailList 视觉一致 -->
@@ -130,27 +130,27 @@
   <!-- 左列：头像 + 发件人 -->
   <div class="mail-sender">
   <div class="mail-avatar" :style="{ background: getAvatarColor(msg.from_addr) }">
-  {{ getInitial(msg.from_addr) }}
+  {{  getInitial(msg.from_addr)  }}
   </div>
-  <span class="mail-from">{{ displayName(msg.from_addr) }}</span>
+  <span class="mail-from">{{  displayName(msg.from_addr)  }}</span>
   </div>
   <!-- 中列：主题 + 附件图标 + 服务器已删除标记 -->
   <div class="mail-info">
   <div class="mail-main-row">
-  <span class="mail-subject">{{ msg.subject || '(无主题)' }}</span>
+  <span class="mail-subject">{{  msg.subject || $t('(无主题)')  }}</span>
   <svg v-if="msg.has_attachments" class="att-badge" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-  <span v-if="msg.is_deleted_on_server" class="deleted-tag">{{ $t("服务器已删除") }}</span>
+  <span v-if="msg.is_deleted_on_server" class="deleted-tag">{{  $t("服务器已删除")  }}</span>
   </div>
   </div>
   <!-- 右列：日期 -->
-  <span class="mail-date">{{ formatDate(msg.date) }}</span>
+  <span class="mail-date">{{  formatDate(msg.date)  }}</span>
   </button>
 
   <!-- 分页 -->
   <div v-if="total > pageSize" class="pagination">
-  <button :disabled="page <= 1" @click="changePage(page - 1)">{{ $t("上一页") }}</button>
-  <span class="page-info">{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-  <button :disabled="page * pageSize >= total" @click="changePage(page + 1)">{{ $t("下一页") }}</button>
+  <button :disabled="page <= 1" @click="changePage(page - 1)">{{  $t("上一页")  }}</button>
+  <span class="page-info">{{  page  }} / {{  Math.ceil(total / pageSize)  }}</span>
+  <button :disabled="page * pageSize >= total" @click="changePage(page + 1)">{{  $t("下一页")  }}</button>
   </div>
   </div>
 
@@ -162,14 +162,14 @@
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 18 9 12 15 6"/>
   </svg>
-  <span>{{ $t("返回") }}</span>
+  <span>{{  $t("返回")  }}</span>
   </button>
   <div class="detail-actions">
   <button class="btn-action" @click="printMail" :disabled="printing" :title='$t("打印")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
   </svg>
-  <span>{{ printing ? '打印中...' : '打印' }}</span>
+  <span>{{  printing ? $t('打印中...') : $t('打印')  }}</span>
   </button>
   </div>
   </div>
@@ -179,16 +179,16 @@
   <!-- 标题 + 发件人信息 -->
   <div class="detail-header">
   <!-- 主题 -->
-  <h2 class="detail-subject">{{ selectedMessage.subject || '(无主题)' }}</h2>
+  <h2 class="detail-subject">{{  selectedMessage.subject || $t('(无主题)')  }}</h2>
 
   <!-- 第一行：头像 + 发件人姓名/邮箱 -->
   <div class="detail-sender-row">
   <div class="meta-avatar" :style="{ background: getAvatarColor(selectedMessage.from_addr) }">
-  {{ getInitial(selectedMessage.from_addr) }}
+  {{  getInitial(selectedMessage.from_addr)  }}
   </div>
   <div class="meta-from">
-  <span class="from-name">{{ displayName(selectedMessage.from_addr) }}</span>
-  <span class="from-email" v-if="displayName(selectedMessage.from_addr) !== selectedMessage.from_addr">&lt;{{ selectedMessage.from_addr }}&gt;</span>
+  <span class="from-name">{{  displayName(selectedMessage.from_addr)  }}</span>
+  <span class="from-email" v-if="displayName(selectedMessage.from_addr) !== selectedMessage.from_addr">&lt;{{  selectedMessage.from_addr  }}&gt;</span>
   </div>
   </div>
 
@@ -198,20 +198,20 @@
   <!-- 灰色信息卡：发件人 / 收件人 / 抄送 / 时间（全宽，优先用详情数据） -->
   <div class="meta-card">
   <div class="meta-row">
-  <span class="meta-row-label">{{ $t("发件人") }}</span>
-  <span class="meta-row-value" :title="metaFrom">{{ formatAddressList(metaFrom) }}</span>
+  <span class="meta-row-label">{{  $t("发件人")  }}</span>
+  <span class="meta-row-value" :title="metaFrom">{{  formatAddressList(metaFrom)  }}</span>
   </div>
   <div class="meta-row" v-if="metaTo">
-  <span class="meta-row-label">{{ $t("收件人") }}</span>
-  <span class="meta-row-value" :title="metaTo">{{ formatAddressList(metaTo) }}</span>
+  <span class="meta-row-label">{{  $t("收件人")  }}</span>
+  <span class="meta-row-value" :title="metaTo">{{  formatAddressList(metaTo)  }}</span>
   </div>
   <div class="meta-row" v-if="metaCc">
-  <span class="meta-row-label">{{ $t("抄送") }}</span>
-  <span class="meta-row-value" :title="metaCc">{{ formatAddressList(metaCc) }}</span>
+  <span class="meta-row-label">{{  $t("抄送")  }}</span>
+  <span class="meta-row-value" :title="metaCc">{{  formatAddressList(metaCc)  }}</span>
   </div>
   <div class="meta-row">
-  <span class="meta-row-label">{{ $t("时间") }}</span>
-  <span class="meta-row-value">{{ formatDetailDate(selectedMessage.date) }}</span>
+  <span class="meta-row-label">{{  $t("时间")  }}</span>
+  <span class="meta-row-value">{{  formatDetailDate(selectedMessage.date)  }}</span>
   </div>
   </div>
 
@@ -221,12 +221,12 @@
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
   </svg>
-  <span>{{ $t("您正在查看本地备份") }}</span>
-  <span v-if="detailData?.is_deleted_on_server" class="deleted-notice">{{ $t("· 此邮件已从服务器删除") }}</span>
+  <span>{{  $t("您正在查看本地备份")  }}</span>
+  <span v-if="detailData?.is_deleted_on_server" class="deleted-notice">{{  $t("· 此邮件已从服务器删除")  }}</span>
   </div>
   <div class="archive-meta">
-  <span v-if="selectedMessage.size">{{ $t("大小") }}{{ formatSize(selectedMessage.size) }}</span>
-  <span>{{ $t("归档于") }}{{ formatTimestamp(selectedMessage.archived_at) }}</span>
+  <span v-if="selectedMessage.size">{{  $t("大小")  }}{{  formatSize(selectedMessage.size)  }}</span>
+  <span>{{  $t("归档于")  }}{{  formatTimestamp(selectedMessage.archived_at)  }}</span>
   </div>
   </div>
 
@@ -250,21 +250,21 @@
   v-html="renderMailBody(detailData.body_html, detailData.body_text)"
   @click="handleMailLinkClick"
   ></div>
-  <div v-else class="body-empty">{{ $t("（无正文内容）") }}</div>
+  <div v-else class="body-empty">{{  $t("（无正文内容）")  }}</div>
 
   <!-- 附件列表 -->
   <div v-if="detailData.attachments && detailData.attachments.length > 0" class="attachment-list">
   <div class="attachment-header">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-  <span>{{ $t("附件 (") }}{{ detailData.attachments.length }})</span>
+  <span>{{  $t("附件 (")  }}{{  detailData.attachments.length  }})</span>
   </div>
   <div v-for="(att, i) in detailData.attachments" :key="i" class="attachment-item" @click="downloadAttachment(att)">
   <div class="att-icon">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
   </div>
   <div class="att-info">
-  <div class="att-name">{{ att.filename || '(未命名)' }}</div>
-  <div class="att-meta">{{ formatSize(att.size) }}</div>
+  <div class="att-name">{{  att.filename || $t('(未命名)')  }}</div>
+  <div class="att-meta">{{  formatSize(att.size)  }}</div>
   </div>
   <div class="att-download">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

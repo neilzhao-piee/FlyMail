@@ -3,19 +3,19 @@
   <!-- 操作栏 -->
   <div class="toolbar">
   <div class="sort-toggle">
-  <button class="toggle-btn" :class="{ active: sortBy === 'group' }" @click="sortBy = 'group'">{{ $t("按分组") }}</button>
-  <button class="toggle-btn" :class="{ active: sortBy === 'platform' }" @click="sortBy = 'platform'">{{ $t("按平台") }}</button>
+  <button class="toggle-btn" :class="{ active: sortBy === 'group' }" @click="sortBy = 'group'">{{  $t("按分组")  }}</button>
+  <button class="toggle-btn" :class="{ active: sortBy === 'platform' }" @click="sortBy = 'platform'">{{  $t("按平台")  }}</button>
   </div>
   <button class="btn btn-primary" @click="showAddDialog = true">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>{{ $t("添加账号") }}</button>
+  </svg>{{  $t("添加账号")  }}</button>
   </div>
 
   <!-- 加载状态 -->
   <div v-if="loading" class="loading-state">
   <div class="loading-dot"></div>
-  <span>{{ $t("加载中...") }}</span>
+  <span>{{  $t("加载中...")  }}</span>
   </div>
 
   <!-- 空状态 -->
@@ -26,8 +26,8 @@
   <path d="M22 4L12 13L2 4"/>
   </svg>
   </div>
-  <p class="empty-title">{{ $t("还没有添加邮箱账号") }}</p>
-  <p class="empty-desc">{{ $t("点击上方「添加账号」按钮，添加你的邮箱即可开始使用") }}</p>
+  <p class="empty-title">{{  $t("还没有添加邮箱账号")  }}</p>
+  <p class="empty-desc">{{  $t("点击上方「添加账号」按钮，添加你的邮箱即可开始使用")  }}</p>
   </div>
 
   <!-- 账号列表 -->
@@ -36,8 +36,8 @@
   <!-- 分组标题 -->
   <div class="section-header">
   <span class="section-icon" v-html="section.icon"></span>
-  <h3 class="section-title">{{ section.title }}</h3>
-  <span class="section-count">{{ section.accounts.length }}</span>
+  <h3 class="section-title">{{  section.title  }}</h3>
+  <span class="section-count">{{  section.accounts.length  }}</span>
   </div>
   <!-- 账号卡片 -->
   <div class="account-list">
@@ -48,25 +48,25 @@
   <div class="account-info">
   <div class="info-main">
   <span class="account-name">
-  <span v-if="account.remark" class="name-remark">{{ account.remark }}</span>
-  <span v-if="!account.remark" class="name-email">{{ account.email }}</span>
+  <span v-if="account.remark" class="name-remark">{{  account.remark  }}</span>
+  <span v-if="!account.remark" class="name-email">{{  account.email  }}</span>
   </span>
-  <span v-if="account.remark && !account.hide_email" class="account-email-sub">{{ account.email }}</span>
+  <span v-if="account.remark && !account.hide_email" class="account-email-sub">{{  account.email  }}</span>
   </div>
   <div class="info-meta">
-  <span class="meta-provider">{{ providerName(account.provider) }}</span>
+  <span class="meta-provider">{{  providerName(account.provider)  }}</span>
   <span class="meta-sep">·</span>
   <div class="account-status" :class="account.status">
   <span class="status-dot"></span>
-  {{ statusText(account.status) }}
+  {{  statusText(account.status)  }}
   </div>
   </div>
   </div>
   <!-- 操作按钮 -->
   <div class="card-actions">
   <button v-if="mailStore.reauthAccountIds.has(account.id)" class="btn-reauth-card" @click.stop="reauthorizeAccount(account)" :title='$t("重新授权")'>
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>{{ $t("重新授权") }}</button>
-  <button class="mark-read-btn" @click.stop="markAccountAllRead(account)" :title='$t("把该邮箱所有文件夹的未读邮件标记为已读")'>{{ $t("全部已读") }}</button>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>{{  $t("重新授权")  }}</button>
+  <button class="mark-read-btn" @click.stop="markAccountAllRead(account)" :title='$t("把该邮箱所有文件夹的未读邮件标记为已读")'>{{  $t("全部已读")  }}</button>
   <button class="edit-btn" @click.stop="openEditDialog(account)" :title='$t("编辑")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -82,18 +82,18 @@
   <!-- 添加账号对话框 -->
   <div v-if="showAddDialog" class="dialog-overlay" @click.self="showAddDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">{{ $t("添加邮箱账号") }}</h3>
-  <p class="dialog-desc">{{ $t("选择邮箱服务商，授权后即可使用") }}</p>
+  <h3 class="dialog-title">{{  $t("添加邮箱账号")  }}</h3>
+  <p class="dialog-desc">{{  $t("选择邮箱服务商，授权后即可使用")  }}</p>
   <div class="provider-grid">
   <button v-for="p in providers" :key="p.type" class="provider-card" :class="{ active: selectedProvider === p.type }" @click="selectedProvider = p.type">
   <div class="provider-icon" v-html="p.icon"></div>
-  <span class="provider-name">{{ p.name }}</span>
+  <span class="provider-name">{{  p.name  }}</span>
   </button>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showAddDialog = false">{{ $t("取消") }}</button>
+  <button class="btn btn-secondary" @click="showAddDialog = false">{{  $t("取消")  }}</button>
   <button class="btn btn-primary" @click="startAuth" :disabled="!selectedProvider">
-  {{ (selectedProvider === 'qq' || selectedProvider === 'netease' || selectedProvider === 'sina' || selectedProvider === 'custom') ? '下一步' : '授权登录' }}
+  {{  (selectedProvider === 'qq' || selectedProvider === 'netease' || selectedProvider === 'sina' || selectedProvider === 'custom') ? $t('下一步') : $t('授权登录')  }}
   </button>
   </div>
   </div>
@@ -102,30 +102,30 @@
   <!-- 腾讯邮箱授权码对话框 -->
   <div v-if="showQQDialog" class="dialog-overlay" @click.self="showQQDialog = false">
   <div class="dialog" style="width: 360px;">
-  <h3 class="dialog-title">{{ qqForm.is_exmail ? '添加腾讯企业邮箱' : '添加腾讯邮箱' }}</h3>
+  <h3 class="dialog-title">{{  qqForm.is_exmail ? $t('添加腾讯企业邮箱') : $t('添加腾讯邮箱')  }}</h3>
   <div style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-5);">
   <button class="toggle-switch" :class="{ active: qqForm.is_exmail }" @click="qqForm.is_exmail = !qqForm.is_exmail" type="button">
   <span class="toggle-knob"></span>
   </button>
-  <span style="font-size: var(--text-sm); color: var(--text-secondary);">{{ $t("腾讯企业邮箱") }}</span>
+  <span style="font-size: var(--text-sm); color: var(--text-secondary);">{{  $t("腾讯企业邮箱")  }}</span>
   </div>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">{{ $t("邮箱地址") }}</label>
+  <label class="field-label">{{  $t("邮箱地址")  }}</label>
   <input v-model="qqForm.email" class="input" type="email" :placeholder="qqForm.is_exmail ? 'yourname@yourcompany.com' : 'example@qq.com'" />
   </div>
   <div class="form-field">
-  <label class="field-label">{{ qqForm.is_exmail ? '客户端专用密码' : '授权码' }}</label>
-  <input v-model="qqForm.auth_code" class="input" type="password" :placeholder="qqForm.is_exmail ? '腾讯企业邮箱客户端专用密码' : 'QQ邮箱授权码'" />
-  <p class="field-hint" v-if="!qqForm.is_exmail">{{ $t("授权码需要在QQ邮箱设置中开启IMAP/SMTP服务后获取") }}<a href="https://service.mail.qq.com/detail?search=SMTP/IMAP" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
+  <label class="field-label">{{  qqForm.is_exmail ? $t('客户端专用密码') : $t('授权码')  }}</label>
+  <input v-model="qqForm.auth_code" class="input" type="password" :placeholder="qqForm.is_exmail ? $t('腾讯企业邮箱客户端专用密码') : $t('QQ邮箱授权码')" />
+  <p class="field-hint" v-if="!qqForm.is_exmail">{{  $t("授权码需要在QQ邮箱设置中开启IMAP/SMTP服务后获取")  }}<a href="https://service.mail.qq.com/detail?search=SMTP/IMAP" target="_blank" class="hint-link">{{  $t("查看教程")  }}</a>
   </p>
-  <p class="field-hint" v-else>{{ $t("需管理员开启IMAP/SMTP服务，用户开启安全登录后生成客户端专用密码") }}<a href="https://open.work.weixin.qq.com/help/wap/detail?docid=19886" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
+  <p class="field-hint" v-else>{{  $t("需管理员开启IMAP/SMTP服务，用户开启安全登录后生成客户端专用密码")  }}<a href="https://open.work.weixin.qq.com/help/wap/detail?docid=19886" target="_blank" class="hint-link">{{  $t("查看教程")  }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showQQDialog = false">{{ $t("取消") }}</button>
-  <button class="btn btn-primary" @click="addQQAccount" :disabled="!qqForm.email || !qqForm.auth_code">{{ $t("添加账号") }}</button>
+  <button class="btn btn-secondary" @click="showQQDialog = false">{{  $t("取消")  }}</button>
+  <button class="btn btn-primary" @click="addQQAccount" :disabled="!qqForm.email || !qqForm.auth_code">{{  $t("添加账号")  }}</button>
   </div>
   </div>
   </div>
@@ -133,23 +133,23 @@
   <!-- 网易邮箱授权码对话框 -->
   <div v-if="showNeteaseDialog" class="dialog-overlay" @click.self="showNeteaseDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">{{ $t("添加网易邮箱") }}</h3>
-  <p class="dialog-desc">{{ $t("请输入网易邮箱地址（163/126/188/yeah.net）和授权码") }}</p>
+  <h3 class="dialog-title">{{  $t("添加网易邮箱")  }}</h3>
+  <p class="dialog-desc">{{  $t("请输入网易邮箱地址（163/126/188/yeah.net）和授权码")  }}</p>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">{{ $t("邮箱地址") }}</label>
+  <label class="field-label">{{  $t("邮箱地址")  }}</label>
   <input v-model="neteaseForm.email" class="input" type="email" placeholder="example@163.com / @126.com / @188.com" />
   </div>
   <div class="form-field">
-  <label class="field-label">{{ $t("授权码") }}</label>
+  <label class="field-label">{{  $t("授权码")  }}</label>
   <input v-model="neteaseForm.auth_code" class="input" type="password" :placeholder='$t("网易邮箱授权码")' />
-  <p class="field-hint">{{ $t("授权码需要在网易邮箱设置中开启IMAP/SMTP服务后获取") }}<a href="https://help.mail.163.com/searchFAQ.do?m=search&word=POP3/SMTP/IMAP" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
+  <p class="field-hint">{{  $t("授权码需要在网易邮箱设置中开启IMAP/SMTP服务后获取")  }}<a href="https://help.mail.163.com/searchFAQ.do?m=search&word=POP3/SMTP/IMAP" target="_blank" class="hint-link">{{  $t("查看教程")  }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showNeteaseDialog = false">{{ $t("取消") }}</button>
-  <button class="btn btn-primary" @click="addNeteaseAccount" :disabled="!neteaseForm.email || !neteaseForm.auth_code">{{ $t("添加账号") }}</button>
+  <button class="btn btn-secondary" @click="showNeteaseDialog = false">{{  $t("取消")  }}</button>
+  <button class="btn btn-primary" @click="addNeteaseAccount" :disabled="!neteaseForm.email || !neteaseForm.auth_code">{{  $t("添加账号")  }}</button>
   </div>
   </div>
   </div>
@@ -157,23 +157,23 @@
   <!-- 新浪邮箱授权码对话框 -->
   <div v-if="showSinaDialog" class="dialog-overlay" @click.self="showSinaDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">{{ $t("添加新浪邮箱") }}</h3>
-  <p class="dialog-desc">{{ $t("请输入新浪邮箱地址和授权码") }}</p>
+  <h3 class="dialog-title">{{  $t("添加新浪邮箱")  }}</h3>
+  <p class="dialog-desc">{{  $t("请输入新浪邮箱地址和授权码")  }}</p>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">{{ $t("邮箱地址") }}</label>
+  <label class="field-label">{{  $t("邮箱地址")  }}</label>
   <input v-model="sinaForm.email" class="input" type="email" placeholder="example@sina.com / @sina.cn / @vip.sina.com" />
   </div>
   <div class="form-field">
-  <label class="field-label">{{ $t("授权码") }}</label>
+  <label class="field-label">{{  $t("授权码")  }}</label>
   <input v-model="sinaForm.auth_code" class="input" type="password" :placeholder='$t("新浪邮箱授权码")' />
-  <p class="field-hint">{{ $t("授权码需要在新浪邮箱设置中开启IMAP/SMTP服务后获取") }}<a href="https://mail.sina.com.cn/help2.html" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
+  <p class="field-hint">{{  $t("授权码需要在新浪邮箱设置中开启IMAP/SMTP服务后获取")  }}<a href="https://mail.sina.com.cn/help2.html" target="_blank" class="hint-link">{{  $t("查看教程")  }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showSinaDialog = false">{{ $t("取消") }}</button>
-  <button class="btn btn-primary" @click="addSinaAccount" :disabled="!sinaForm.email || !sinaForm.auth_code">{{ $t("添加账号") }}</button>
+  <button class="btn btn-secondary" @click="showSinaDialog = false">{{  $t("取消")  }}</button>
+  <button class="btn btn-primary" @click="addSinaAccount" :disabled="!sinaForm.email || !sinaForm.auth_code">{{  $t("添加账号")  }}</button>
   </div>
   </div>
   </div>
@@ -181,23 +181,23 @@
   <!-- iCloud邮箱应用专用密码对话框 -->
   <div v-if="showICloudDialog" class="dialog-overlay" @click.self="showICloudDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">{{ $t("添加iCloud邮箱") }}</h3>
-  <p class="dialog-desc">{{ $t("请输入iCloud邮箱地址和应用专用密码") }}</p>
+  <h3 class="dialog-title">{{  $t("添加iCloud邮箱")  }}</h3>
+  <p class="dialog-desc">{{  $t("请输入iCloud邮箱地址和应用专用密码")  }}</p>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">{{ $t("iCloud邮箱地址") }}</label>
+  <label class="field-label">{{  $t("iCloud邮箱地址")  }}</label>
   <input v-model="icloudForm.email" class="input" type="email" placeholder="example@icloud.com" />
   </div>
   <div class="form-field">
-  <label class="field-label">{{ $t("应用专用密码") }}</label>
+  <label class="field-label">{{  $t("应用专用密码")  }}</label>
   <input v-model="icloudForm.auth_code" class="input" type="password" :placeholder='$t("Apple ID 应用专用密码")' />
-  <p class="field-hint">{{ $t("应用专用密码需要在 Apple ID 账户页面生成") }}<a href="https://appleid.apple.com/account/manage" target="_blank" class="hint-link">{{ $t("前往生成") }}</a>
+  <p class="field-hint">{{  $t("应用专用密码需要在 Apple ID 账户页面生成")  }}<a href="https://appleid.apple.com/account/manage" target="_blank" class="hint-link">{{  $t("前往生成")  }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showICloudDialog = false">{{ $t("取消") }}</button>
-  <button class="btn btn-primary" @click="addICloudAccount" :disabled="!icloudForm.email || !icloudForm.auth_code">{{ $t("添加账号") }}</button>
+  <button class="btn btn-secondary" @click="showICloudDialog = false">{{  $t("取消")  }}</button>
+  <button class="btn btn-primary" @click="addICloudAccount" :disabled="!icloudForm.email || !icloudForm.auth_code">{{  $t("添加账号")  }}</button>
   </div>
   </div>
   </div>
@@ -205,42 +205,42 @@
   <!-- 自定义邮箱（标准 IMAP/SMTP）对话框 -->
   <div v-if="showCustomDialog" class="dialog-overlay" @click.self="showCustomDialog = false">
   <div class="dialog" style="width: 420px;">
-  <h3 class="dialog-title">{{ $t("添加自定义邮箱") }}</h3>
-  <p class="dialog-desc">{{ $t("支持所有标准 IMAP/SMTP 协议的邮箱服务") }}</p>
+  <h3 class="dialog-title">{{  $t("添加自定义邮箱")  }}</h3>
+  <p class="dialog-desc">{{  $t("支持所有标准 IMAP/SMTP 协议的邮箱服务")  }}</p>
   <div class="qq-form">
   <!-- 邮箱地址 -->
   <div class="form-field">
-  <label class="field-label">{{ $t("邮箱地址") }}</label>
+  <label class="field-label">{{  $t("邮箱地址")  }}</label>
   <input v-model="customForm.email" class="input" type="email" placeholder="example@example.com" />
   </div>
   <!-- 授权码/密码 -->
   <div class="form-field">
-  <label class="field-label">{{ $t("授权码 / 密码") }}</label>
+  <label class="field-label">{{  $t("授权码 / 密码")  }}</label>
   <input v-model="customForm.auth_code" class="input" type="password" :placeholder='$t("邮箱授权码或登录密码")' />
-  <p class="field-hint">{{ $t("部分邮箱需要在设置中开启 IMAP/SMTP 服务并生成授权码") }}</p>
+  <p class="field-hint">{{  $t("部分邮箱需要在设置中开启 IMAP/SMTP 服务并生成授权码")  }}</p>
   </div>
   <!-- IMAP 服务器配置 -->
   <div class="form-field">
-  <label class="field-label">{{ $t("IMAP 服务器") }}</label>
+  <label class="field-label">{{  $t("IMAP 服务器")  }}</label>
   <div class="form-row">
   <input v-model="customForm.imap_host" class="input" type="text" placeholder="imap.example.com" />
   <input v-model.number="customForm.imap_port" class="input port-input" type="number" placeholder="993" />
   </div>
-  <p class="field-hint">{{ $t("用于收信。139 邮箱这类服务通常使用 143 + 不加密") }}</p>
+  <p class="field-hint">{{  $t("用于收信。139 邮箱这类服务通常使用 143 + 不加密")  }}</p>
   </div>
   <!-- IMAP 加密方式 -->
   <div class="form-field">
-  <label class="field-label">{{ $t("IMAP 加密方式") }}</label>
+  <label class="field-label">{{  $t("IMAP 加密方式")  }}</label>
   <select class="input ssl-select" :value="customForm.imap_ssl" @change="onImapSslChange(($event.target as HTMLSelectElement).value as 'ssl' | 'starttls' | 'none')">
-  <option value="ssl">{{ $t("SSL 直连（默认 993）") }}</option>
-  <option value="starttls">{{ $t("STARTTLS（默认 143）") }}</option>
-  <option value="none">{{ $t("不加密（默认 143）") }}</option>
+  <option value="ssl">{{  $t("SSL 直连（默认 993）")  }}</option>
+  <option value="starttls">{{  $t("STARTTLS（默认 143）")  }}</option>
+  <option value="none">{{  $t("不加密（默认 143）")  }}</option>
   </select>
-  <p class="field-hint">{{ $t("切换加密方式时端口会自动联动，可手动修改") }}</p>
+  <p class="field-hint">{{  $t("切换加密方式时端口会自动联动，可手动修改")  }}</p>
   </div>
   <!-- SMTP 服务器配置 -->
   <div class="form-field">
-  <label class="field-label">{{ $t("SMTP 服务器") }}</label>
+  <label class="field-label">{{  $t("SMTP 服务器")  }}</label>
   <div class="form-row">
   <input v-model="customForm.smtp_host" class="input" type="text" placeholder="smtp.example.com" />
   <input v-model.number="customForm.smtp_port" class="input port-input" type="number" placeholder="465" />
@@ -248,17 +248,17 @@
   </div>
   <!-- SMTP 加密方式 -->
   <div class="form-field">
-  <label class="field-label">{{ $t("SMTP 加密方式") }}</label>
+  <label class="field-label">{{  $t("SMTP 加密方式")  }}</label>
   <select class="input ssl-select" :value="customForm.smtp_ssl" @change="onSmtpSslChange(($event.target as HTMLSelectElement).value as 'ssl' | 'starttls')">
-  <option value="ssl">{{ $t("SSL 直连（默认 465）") }}</option>
-  <option value="starttls">{{ $t("STARTTLS（默认 587）") }}</option>
+  <option value="ssl">{{  $t("SSL 直连（默认 465）")  }}</option>
+  <option value="starttls">{{  $t("STARTTLS（默认 587）")  }}</option>
   </select>
-  <p class="field-hint">{{ $t("切换加密方式时端口会自动联动，可手动修改") }}</p>
+  <p class="field-hint">{{  $t("切换加密方式时端口会自动联动，可手动修改")  }}</p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showCustomDialog = false">{{ $t("取消") }}</button>
-  <button class="btn btn-primary" @click="addCustomAccount" :disabled="!customForm.email || !customForm.auth_code || !customForm.imap_host || !customForm.smtp_host">{{ $t("添加账号") }}</button>
+  <button class="btn btn-secondary" @click="showCustomDialog = false">{{  $t("取消")  }}</button>
+  <button class="btn btn-primary" @click="addCustomAccount" :disabled="!customForm.email || !customForm.auth_code || !customForm.imap_host || !customForm.smtp_host">{{  $t("添加账号")  }}</button>
   </div>
   </div>
   </div>
@@ -266,31 +266,31 @@
   <!-- 编辑账号对话框 -->
   <div v-if="showEditDialog" class="dialog-overlay" @click.self="showEditDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">{{ $t("编辑账号") }}</h3>
-  <p class="dialog-desc">{{ editingAccount?.email }}</p>
+  <h3 class="dialog-title">{{  $t("编辑账号")  }}</h3>
+  <p class="dialog-desc">{{  editingAccount?.email  }}</p>
   <div class="edit-form">
   <div class="form-field">
-  <label class="field-label">{{ $t("备注名") }}</label>
+  <label class="field-label">{{  $t("备注名")  }}</label>
   <input v-model="editForm.remark" class="input" type="text" :placeholder='$t("如：工作邮箱")' />
   </div>
   <div class="form-field">
-  <label class="field-label">{{ $t("分组") }}</label>
+  <label class="field-label">{{  $t("分组")  }}</label>
   <input v-model="editForm.group_name" class="input" type="text" :placeholder='$t("如：工作、个人")' />
   <div v-if="existingGroups.length" class="group-tags">
-  <button v-for="g in existingGroups" :key="g" class="group-tag" :class="{ active: editForm.group_name === g }" @click="editForm.group_name = g">{{ g }}</button>
+  <button v-for="g in existingGroups" :key="g" class="group-tag" :class="{ active: editForm.group_name === g }" @click="editForm.group_name = g">{{  g  }}</button>
   </div>
   </div>
   <div class="form-field toggle-field">
-  <span class="toggle-label">{{ $t("隐藏邮箱地址") }}</span>
+  <span class="toggle-label">{{  $t("隐藏邮箱地址")  }}</span>
   <button class="toggle-switch" :class="{ active: editForm.hide_email }" @click="editForm.hide_email = !editForm.hide_email" type="button">
   <span class="toggle-knob"></span>
   </button>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showEditDialog = false">{{ $t("取消") }}</button>
-  <button class="btn btn-danger-text" @click="confirmDelete(editingAccount!)">{{ $t("删除账号") }}</button>
-  <button class="btn btn-primary" @click="saveEdit">{{ $t("保存") }}</button>
+  <button class="btn btn-secondary" @click="showEditDialog = false">{{  $t("取消")  }}</button>
+  <button class="btn btn-danger-text" @click="confirmDelete(editingAccount!)">{{  $t("删除账号")  }}</button>
+  <button class="btn btn-primary" @click="saveEdit">{{  $t("保存")  }}</button>
   </div>
   </div>
   </div>
