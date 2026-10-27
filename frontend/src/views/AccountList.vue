@@ -70,6 +70,9 @@
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
   重新授权
   </button>
+  <button class="mark-read-btn" @click.stop="markAccountAllRead(account)" title="把该邮箱所有文件夹的未读邮件标记为已读">
+  全部已读
+  </button>
   <button class="edit-btn" @click.stop="openEditDialog(account)" title="编辑">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -765,6 +768,30 @@ async function reauthorizeAccount(account: any) {
   }
 }
 
+/** 整个邮箱全部已读：遍历该账号所有文件夹，服务端 SEARCH UNSEEN + STORE \Seen */
+async function markAccountAllRead(account: any) {
+  const ok = await ui.showConfirm({
+    title: '整个邮箱全部已读',
+    message: `将把 ${account.email} 下所有文件夹的未读邮件标记为已读，并同步到邮件服务器。确定吗？`,
+    confirmText: '全部标为已读',
+    danger: true,
+  });
+  if (!ok) return;
+  try {
+    const data = await api.post('/messages/mark-all-read-account', { account_id: account.id }) as any;
+    const n = Number(data?.total_marked || 0);
+    const failed = (data?.folders || []).filter((f: any) => f.error);
+    if (n > 0) ui.success(`已标记 ${n} 封邮件为已读`);
+    else ui.success('没有未读邮件');
+    if (failed.length > 0) {
+      ui.error(`${failed.length} 个文件夹处理失败：${failed[0].folder} ${failed[0].error || ''}`.slice(0, 200));
+    }
+    mailStore.loadFolderCounts();
+  } catch (e: any) {
+    ui.error(e?.response?.data?.detail || e?.message || '操作失败');
+  }
+}
+
 </script>
 
 <style scoped>
@@ -1064,6 +1091,22 @@ async function reauthorizeAccount(account: any) {
 }
 
 /* 操作按钮区 */
+.mark-read-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  background: transparent;
+  color: inherit;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mark-read-btn:hover {
+  background: rgba(127, 127, 127, 0.12);
+}
 .card-actions {
   display: flex;
   align-items: center;

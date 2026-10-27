@@ -68,6 +68,8 @@ from schemas import (
     DeleteResponse,
     MarkAllReadRequest,
     MarkAllReadResponse,
+    MarkAccountAllReadRequest,
+    MarkAccountAllReadResponse,
     MessageItem,
     MessageListResponse,
     MessageResponse,
@@ -742,6 +744,102 @@ async def refresh_messages(
             return {"messages": [], "total": 0, "page": page, "page_size": page_size,
                     "error": _OUTLOOK_RECONNECTING_MSG, "reconnecting": True}
         return {"messages": [], "total": 0, "page": page, "page_size": page_size, "error": error_msg}
+
+
+
+# 账号级「全部已读」：覆盖该邮箱下所有文件夹（不只当前页/当前文件夹）
+_VIRTUAL_ALL_FOLDER_HINTS = ("all mail", "所有邮件", "全部邮件", "all")
+
+
+def _is_virtual_all_folder(folder) -> bool:
+    """识别 Gmail「所有邮件」这类虚拟聚合文件夹，避免重复处理。"""
+    text = f"{getattr(folder, 'path', '')} {getattr(folder, 'name', '')}".lower()
+    if "all mail" in text or "所有邮件" in text or "全部邮件" in text:
+        return True
+    # [Gmail]/All Mail 的 path 通常是 "[Gmail]/All Mail"，上面已覆盖；其余不扩展
+    return False
+
+
+async def _mark_account_all_read(account, user_uid: str) -> dict:
+    """把某个邮箱账号下**所有文件夹**的未读邮件在服务端标记为已读。
+
+    与单文件夹版本一样走 IMAP UID SEARCH UNSEEN + STORE \\Seen（不依赖缓存/分页），
+    区别是会遍历该账号的全部文件夹，并把每个文件夹的缓存与未读计数同步更新。
+    """
+    result = {
+        "account_id": account.id,
+        "email": account.email,
+        "folders": [],
+        "total_marked": 0,
+    }
+
+    credentials = await _ensure_gmail_token(account)
+    receiver = await _get_cached_receiver(account, credentials)
+    try:
+        folders = await receiver.fetch_folders()
+    except Exception as e:
+        logger.warning("账号级全部已读：获取文件夹失败 %s, %s", account.email, e)
+        _conn_cache.pop(account.id, None)
+        await _safe_disconnect(receiver)
+        raise
+
+    try:
+        for f in folders:
+            if _is_virtual_all_folder(f):
+                continue
+            try:
+                uids = await receiver.fetch_unseen_uids(f.path)
+                marked = 0
+                if uids:
+                    marked = await receiver.mark_as_read_batch([str(u) for u in uids], f.path)
+                await mark_all_cached_messages_read(account.id, f.path)
+                stats = await get_folder_stats(account.id, f.path)
+                await upsert_folder_stats(account.id, f.path, stats.get("total_count", 0), 0)
+                if marked:
+                    try:
+                        await sync_service.notify_message_state_changed(
+                            account.id, "mark_read", [str(u) for u in uids],
+                            folder=f.path, user_uid=user_uid,
+                        )
+                    except Exception:
+                        pass
+                result["folders"].append({"folder": f.path, "marked": marked, "error": ""})
+                result["total_marked"] += marked
+            except Exception as e:
+                logger.warning("账号级全部已读失败: %s/%s, %s", account.email, f.path, e)
+                result["folders"].append({"folder": f.path, "marked": 0, "error": str(e)[:200]})
+    finally:
+        _conn_cache.pop(account.id, None)
+        try:
+            await _safe_disconnect(receiver)
+        except Exception:
+            pass
+
+    return result
+
+
+@router.post(
+    "/api/messages/mark-all-read-account",
+    response_model=MarkAccountAllReadResponse,
+    summary="整个邮箱全部已读（所有文件夹）",
+)
+async def mark_all_read_account(
+    request: Request,
+    body: MarkAccountAllReadRequest = Body(description="整个邮箱全部已读请求"),
+):
+    """把一个邮箱账号下所有文件夹的未读邮件标记为已读（服务端生效）。
+
+    覆盖范围不受分页/当前文件夹影响；Gmail 的「所有邮件」虚拟文件夹会跳过，
+    避免重复处理同一批邮件。
+    """
+    user_uid = await get_uid(request)
+    accounts = await get_accounts(user_uid)
+    account = next((a for a in accounts if a.id == body.account_id), None)
+    if account is None:
+        raise AppError(404, "未找到指定账号")
+
+    result = await _mark_account_all_read(account, user_uid)
+    return {"success": True, **result}
 
 
 # 写信/定时发送接口已拆分到 routes/compose.py

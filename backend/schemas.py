@@ -252,6 +252,25 @@ class MarkAllReadRequest(BaseModel):
   folder: str = Field(default="INBOX", description="文件夹路径")
 
 
+class MarkAccountAllReadRequest(BaseModel):
+  """整个邮箱（所有文件夹）全部已读请求"""
+  account_id: str = Field(description="账号ID")
+
+
+class AccountFolderMarkedResult(BaseModel):
+  folder: str = Field(description="文件夹路径")
+  marked: int = Field(default=0, description="该文件夹标记数量")
+  error: str = Field(default="", description="该文件夹失败原因（成功时为空）")
+
+
+class MarkAccountAllReadResponse(BaseModel):
+  success: bool = Field(description="是否成功")
+  account_id: str = Field(description="账号ID")
+  email: str = Field(default="", description="邮箱地址")
+  folders: List[AccountFolderMarkedResult] = Field(default=[], description="各文件夹结果")
+  total_marked: int = Field(default=0, description="总计标记数量")
+
+
 class MarkAllReadAccountResult(BaseModel):
   """单个账号的全部已读结果"""
   account_id: str = Field(description="账号ID")
