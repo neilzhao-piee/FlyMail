@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { i18n } from '../i18n'
 import { ref, computed } from 'vue';
 import api from '../utils/api';
 
@@ -71,7 +72,7 @@ export const useBackupStore = defineStore('backup', () => {
   /** 文件夹路径转中文显示名（固定5个核心文件夹） */
   function folderDisplayName(folder: string): string {
   const f = CORE_FOLDERS.find(c => c.path === folder);
-  return f ? f.name : folder;
+  return (i18n.global as any).t(f ? f.name : folder) as string;
   }
 
   /** 根据文件夹路径返回颜色标识 class */

@@ -6,7 +6,7 @@
   <div v-if="!selectMode" class="list-toolbar">
   <div class="toolbar-left">
   <!-- 多选图标按钮 -->
-  <button class="btn-icon" @click="enterSelectMode()" title="多选">
+  <button class="btn-icon" @click="enterSelectMode()" :title='$t("多选")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
   </svg>
@@ -15,16 +15,16 @@
   <!-- 邮箱筛选下拉框 -->
   <span class="toolbar-divider"></span>
   <select v-if="hasUnifiedAccounts" class="filter-select" v-model="accountFilter" @change="onFilterChange">
-  <option value="">全部邮箱</option>
+  <option value="">{{ $t("全部邮箱") }}</option>
   <option v-for="acc in unifiedAccounts" :key="acc.id" :value="acc.id">
   {{ acc.email }}
   </option>
   </select>
   <!-- 筛选按钮 -->
-  <button class="filter-btn" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter('')">全部 {{ filterCounts.all }}</button>
-  <button class="filter-btn" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread')">未读 {{ filterCounts.unread }}</button>
-  <button class="filter-btn" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read')">已读 {{ filterCounts.read }}</button>
-  <button class="filter-btn" :class="{ active: attachmentFilter }" @click="setAttachmentFilter()">附件 {{ filterCounts.attachments }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter('')">{{ $t("全部") }}{{ filterCounts.all }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread')">{{ $t("未读") }}{{ filterCounts.unread }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read')">{{ $t("已读") }}{{ filterCounts.read }}</button>
+  <button class="filter-btn" :class="{ active: attachmentFilter }" @click="setAttachmentFilter()">{{ $t("附件") }}{{ filterCounts.attachments }}</button>
   </div>
   <div class="toolbar-right">
   <!-- 移动端：筛选展开/收起按钮 -->
@@ -38,7 +38,7 @@
   </svg>
   </button>
   <!-- 聚合设置按钮 -->
-  <button class="btn-icon" @click="openSettings" title="聚合设置">
+  <button class="btn-icon" @click="openSettings" :title='$t("聚合设置")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
   </svg>
@@ -61,17 +61,17 @@
   <!-- 邮箱列表（可展开收起） -->
   <transition name="sub-list">
   <div v-if="showAccountList" class="filter-sub-list">
-  <button class="filter-dropdown-item" :class="{ active: accountFilter === '' }" @click="accountFilter = ''; onFilterChange(); showAccountList = false">全部邮箱</button>
+  <button class="filter-dropdown-item" :class="{ active: accountFilter === '' }" @click="accountFilter = ''; onFilterChange(); showAccountList = false">{{ $t("全部邮箱") }}</button>
   <button v-for="acc in unifiedAccounts" :key="acc.id" class="filter-dropdown-item" :class="{ active: accountFilter === acc.id }" @click="accountFilter = acc.id; onFilterChange(); showAccountList = false">{{ acc.email }}</button>
   </div>
   </transition>
   <div class="filter-dropdown-divider"></div>
   </template>
   <!-- 筛选条件 -->
-  <button class="filter-dropdown-item" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter(''); showMobileFilters = false">全部 {{ filterCounts.all }}</button>
-  <button class="filter-dropdown-item" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread'); showMobileFilters = false">未读 {{ filterCounts.unread }}</button>
-  <button class="filter-dropdown-item" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read'); showMobileFilters = false">已读 {{ filterCounts.read }}</button>
-  <button class="filter-dropdown-item" :class="{ active: attachmentFilter }" @click="setAttachmentFilter(); showMobileFilters = false">附件 {{ filterCounts.attachments }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter(''); showMobileFilters = false">{{ $t("全部") }}{{ filterCounts.all }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread'); showMobileFilters = false">{{ $t("未读") }}{{ filterCounts.unread }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read'); showMobileFilters = false">{{ $t("已读") }}{{ filterCounts.read }}</button>
+  <button class="filter-dropdown-item" :class="{ active: attachmentFilter }" @click="setAttachmentFilter(); showMobileFilters = false">{{ $t("附件") }}{{ filterCounts.attachments }}</button>
   </div>
   </div>
   </transition>
@@ -83,19 +83,19 @@
   <button class="select-btn" @click="exitSelectMode">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
-  <span class="select-info">已选 {{ selectedIds.size }} 封</span>
+  <span class="select-info">{{ $t("已选") }}{{ selectedIds.size }}{{ $t("封") }}</span>
   <div class="select-actions">
   <button class="select-btn" @click="toggleSelectAll" :title="isAllSelected ? '取消全选' : '全选'">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
   </svg>
   </button>
-  <button class="select-btn mark-read" @click="batchMarkRead" :disabled="selectedIds.size === 0" title="标记已读">
+  <button class="select-btn mark-read" @click="batchMarkRead" :disabled="selectedIds.size === 0" :title='$t("标记已读")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
   </svg>
   </button>
-  <button class="select-btn delete" @click="batchDelete" :disabled="selectedIds.size === 0" title="删除选中">
+  <button class="select-btn delete" @click="batchDelete" :disabled="selectedIds.size === 0" :title='$t("删除选中")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
   </svg>
@@ -108,7 +108,7 @@
   <!-- 加载中（首次加载无缓存数据时显示） -->
   <div v-if="loading && messages.length === 0" class="list-loading">
   <div class="spinner"></div>
-  <span>加载中...</span>
+  <span>{{ $t("加载中...") }}</span>
   </div>
 
   <!-- 空状态：未选择聚合邮箱（后端返回 no_accounts 时显示引导提示） -->
@@ -116,8 +116,8 @@
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3">
   <rect x="2" y="6" width="20" height="12" rx="2"/><path d="M22 10L12 16L2 10"/><path d="M2 6l10 6 10-6"/>
   </svg>
-  <span>暂未选择聚合邮箱，请在设置中选择需要聚合的邮箱账号</span>
-  <button class="btn btn-primary btn-add" @click="openSettings">前往设置</button>
+  <span>{{ $t("暂未选择聚合邮箱，请在设置中选择需要聚合的邮箱账号") }}</span>
+  <button class="btn btn-primary btn-add" @click="openSettings">{{ $t("前往设置") }}</button>
   </div>
 
   <!-- 空状态：已选择聚合邮箱但无邮件 -->
@@ -126,7 +126,7 @@
   <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/>
   </svg>
   <span>{{ searchQuery ? '未找到匹配的邮件' : '暂无邮件' }}</span>
-  <span v-if="searchQuery" class="list-empty-hint">仅搜索已参与聚合的邮箱收件箱</span>
+  <span v-if="searchQuery" class="list-empty-hint">{{ $t("仅搜索已参与聚合的邮箱收件箱") }}</span>
   </div>
 
   <!-- 邮件列表 -->
@@ -197,22 +197,22 @@
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 18 9 12 15 6"/>
   </svg>
-  <span>返回</span>
+  <span>{{ $t("返回") }}</span>
   </button>
   <div class="detail-actions">
-  <button class="btn-action" @click="replyMessage" title="回复邮件">
+  <button class="btn-action" @click="replyMessage" :title='$t("回复邮件")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
   </svg>
-  <span>回复</span>
+  <span>{{ $t("回复") }}</span>
   </button>
-  <button class="btn-action" @click="forwardMessage" title="转发邮件">
+  <button class="btn-action" @click="forwardMessage" :title='$t("转发邮件")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
   </svg>
-  <span>转发</span>
+  <span>{{ $t("转发") }}</span>
   </button>
-  <button class="btn-action" @click="printMail" :disabled="printing" title="打印">
+  <button class="btn-action" @click="printMail" :disabled="printing" :title='$t("打印")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
   </svg>
@@ -241,7 +241,7 @@
   <div class="meta-from">
   <span class="from-name">{{ displayName(selectedMessage.from_addr) }}</span>
   <span class="from-email" v-if="displayName(selectedMessage.from_addr) !== selectedMessage.from_addr">&lt;{{ selectedMessage.from_addr }}&gt;</span>
-  <button class="btn-add-contact" @click="addToContacts" title="加入联系人">
+  <button class="btn-add-contact" @click="addToContacts" :title='$t("加入联系人")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
   </svg>
@@ -258,19 +258,19 @@
   <!-- 灰色信息卡：发件人 / 收件人 / 抄送 / 时间（全宽） -->
   <div class="meta-card">
   <div class="meta-row">
-  <span class="meta-row-label">发件人</span>
+  <span class="meta-row-label">{{ $t("发件人") }}</span>
   <span class="meta-row-value" :title="selectedMessage.from_addr">{{ formatAddressList(selectedMessage.from_addr) }}</span>
   </div>
   <div class="meta-row" v-if="selectedMessage.to_addr">
-  <span class="meta-row-label">收件人</span>
+  <span class="meta-row-label">{{ $t("收件人") }}</span>
   <span class="meta-row-value" :title="selectedMessage.to_addr">{{ formatAddressList(selectedMessage.to_addr) }}</span>
   </div>
   <div class="meta-row" v-if="selectedMessage.cc">
-  <span class="meta-row-label">抄送</span>
+  <span class="meta-row-label">{{ $t("抄送") }}</span>
   <span class="meta-row-value" :title="selectedMessage.cc">{{ formatAddressList(selectedMessage.cc) }}</span>
   </div>
   <div class="meta-row">
-  <span class="meta-row-label">时间</span>
+  <span class="meta-row-label">{{ $t("时间") }}</span>
   <span class="meta-row-value">{{ formatDetailDate(selectedMessage.date) }}</span>
   </div>
   </div>
@@ -296,7 +296,7 @@
   <div class="attachment-list" v-if="selectedMessage.attachments && selectedMessage.attachments.length > 0">
   <div class="attachment-header">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-  <span>附件 ({{ selectedMessage.attachments.length }})</span>
+  <span>{{ $t("附件 (") }}{{ selectedMessage.attachments.length }})</span>
   </div>
   <div
   class="attachment-item"
@@ -322,14 +322,14 @@
   <!-- 附件下载菜单：本机 / NAS -->
   <div v-if="attMenuVisible" class="att-menu-overlay" @click="attMenuVisible = false">
   <div class="att-menu" :style="attMenuStyle" @click.stop>
-  <button type="button" class="att-menu-item" @click="downloadAttachmentLocal">下载到本机</button>
-  <button type="button" class="att-menu-item" @click="downloadAttachmentNas">下载到NAS</button>
+  <button type="button" class="att-menu-item" @click="downloadAttachmentLocal">{{ $t("下载到本机") }}</button>
+  <button type="button" class="att-menu-item" @click="downloadAttachmentNas">{{ $t("下载到NAS") }}</button>
   </div>
   </div>
   <NasPathPicker
   v-model="showNasDirPicker"
   mode="dir"
-  title="选择保存目录"
+  :title='$t("选择保存目录")'
   @confirm="onNasDirConfirmed"
   />
 
@@ -338,12 +338,12 @@
   <div v-if="showSettings" class="settings-overlay" @click.self="showSettings = false">
   <div class="settings-panel">
   <div class="settings-header">
-  <h3 class="settings-title">聚合设置</h3>
+  <h3 class="settings-title">{{ $t("聚合设置") }}</h3>
   <button class="settings-close" @click="showSettings = false">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
   </div>
-  <p class="settings-desc">选择要聚合的邮箱账号</p>
+  <p class="settings-desc">{{ $t("选择要聚合的邮箱账号") }}</p>
   <div class="settings-list">
   <label v-for="acc in mailStore.accounts" :key="acc.id" class="settings-item">
   <input type="checkbox" :value="acc.id" v-model="settingsSelectedIds" />
@@ -352,7 +352,7 @@
   </label>
   </div>
   <div class="settings-footer">
-  <button class="btn btn-primary" @click="saveSettings">保存</button>
+  <button class="btn btn-primary" @click="saveSettings">{{ $t("保存") }}</button>
   </div>
   </div>
   </div>
@@ -361,6 +361,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { useMailStore } from '../stores/mail';
 import { useListSearchStore } from '../stores/listSearch';
@@ -535,7 +537,7 @@ async function loadUnifiedMessages() {
   if (version !== loadVersion) return;
   // Outlook 连接异常时，后端返回 reconnecting: true，前端展示友好提示
   if (data.reconnecting) {
-  uiStore.error('邮箱连接异常，正在重新连接，请稍后再试');
+  uiStore.error(t("邮箱连接异常，正在重新连接，请稍后再试"));
   return;
   }
   // 后端返回 no_accounts=true 表示未添加聚合邮箱
@@ -550,7 +552,7 @@ async function loadUnifiedMessages() {
   } catch (e) {
   if (version !== loadVersion) return;
   console.error('加载聚合邮件失败:', e);
-  uiStore.error('加载邮件失败');
+  uiStore.error(t("加载邮件失败"));
   } finally {
   if (version === loadVersion) {
   loading.value = false;
@@ -623,7 +625,7 @@ async function batchDelete() {
   mailStore.loadFolderCounts();
   } catch (e) {
   console.error('批量删除失败:', e);
-  uiStore.error('批量删除失败');
+  uiStore.error(t("批量删除失败"));
   }
 }
 
@@ -655,7 +657,7 @@ async function batchMarkRead() {
   exitSelectMode();
   } catch (e) {
   console.error('批量标记已读失败:', e);
-  uiStore.error('标记已读失败');
+  uiStore.error(t("标记已读失败"));
   }
 }
 
@@ -667,16 +669,16 @@ async function batchMarkRead() {
 async function markAllRead() {
   // 两次点击确认机制
   if (!onMarkAllReadConfirm('unified')) {
-  uiStore.info('再次点击确认将所有聚合邮箱的未读邮件标记为已读');
+  uiStore.info(t("再次点击确认将所有聚合邮箱的未读邮件标记为已读"));
   return;
   }
   clearMarkAllReadConfirm();
   const accountIds = mailStore.unifiedAccountIds;
   if (!accountIds || accountIds.length === 0) {
-  uiStore.error('没有参与聚合的邮箱');
+  uiStore.error(t("没有参与聚合的邮箱"));
   return;
   }
-  uiStore.info('正在标记全部已读...');
+  uiStore.info(t("正在标记全部已读..."));
   try {
   const res = await api.post('/messages/mark-all-read', {
   account_ids: accountIds,
@@ -690,13 +692,13 @@ async function markAllRead() {
   // 刷新侧边栏各邮箱未读数（folder_stats.unread_count 已置 0）
   mailStore.loadFolderCounts();
   if (total > 0) {
-  uiStore.success(`已标记 ${total} 封邮件为已读`);
+  uiStore.success(t("已标记 {0} 封邮件为已读", [total]));
   } else {
-  uiStore.info('没有未读邮件');
+  uiStore.info(t("没有未读邮件"));
   }
   } catch (e: any) {
   console.error('全部已读失败:', e);
-  uiStore.error('全部已读失败：' + (e.response?.data?.detail || e.message || '网络错误'));
+  uiStore.error(t("全部已读失败：") + (e.response?.data?.detail || e.message || t("网络错误")));
   }
 }
 
@@ -751,9 +753,9 @@ async function selectMessage(msg: Message) {
   // Outlook 连接异常时，后端返回 503 + { reconnecting: true }
   const respData = e?.response?.data;
   if (respData?.reconnecting) {
-  uiStore.error('邮箱连接异常，正在重新连接，请稍后再试');
+  uiStore.error(t("邮箱连接异常，正在重新连接，请稍后再试"));
   } else {
-  uiStore.error('加载邮件详情失败');
+  uiStore.error(t("加载邮件详情失败"));
   }
   }
 }
@@ -774,7 +776,7 @@ async function onDeleteMessage() {
   mailStore.loadFolderCounts();
   } catch (e) {
   console.error('删除邮件失败:', e);
-  uiStore.error('删除邮件失败');
+  uiStore.error(t("删除邮件失败"));
   }
 }
 
@@ -789,7 +791,7 @@ async function addToContacts() {
   // 从 from_addr 提取邮箱地址（支持 "姓名 <邮箱>" 和纯邮箱格式）
   const emails = extractEmails(fromAddr);
   if (emails.length === 0) {
-  uiStore.error('无法识别发件人邮箱');
+  uiStore.error(t("无法识别发件人邮箱"));
   return;
   }
   const email = emails[0];
@@ -797,11 +799,11 @@ async function addToContacts() {
   const name = extractName(fromAddr);
   try {
   await quickAddContact(name, email);
-  uiStore.success('已加入联系人');
+  uiStore.success(t("已加入联系人"));
   // 刷新联系人映射表，让邮件列表立即显示联系人名称
   reloadContactMap();
   } catch (e: any) {
-  uiStore.error(e?.response?.data?.error || '添加失败');
+  uiStore.error(e?.response?.data?.error || t("添加失败"));
   }
 }
 
@@ -819,7 +821,7 @@ function replyMessage() {
   // 聚合视图：发件账号必须是邮件所属账号，不能用侧边栏当前选中账号
   const accountId = (msg.account_id || '').trim();
   if (!accountId) {
-  uiStore.error('无法确定邮件所属账号，请重新打开邮件后再回复');
+  uiStore.error(t("无法确定邮件所属账号，请重新打开邮件后再回复"));
   return;
   }
   const currentAccount = mailStore.accounts.find(a => a.id === accountId);
@@ -838,7 +840,7 @@ function forwardMessage() {
   // 转发同样必须用邮件所属账号作为发件账号
   const accountId = (msg.account_id || '').trim();
   if (!accountId) {
-  uiStore.error('无法确定邮件所属账号，请重新打开邮件后再转发');
+  uiStore.error(t("无法确定邮件所属账号，请重新打开邮件后再转发"));
   return;
   }
   mailStore.setComposeDraft(buildForwardDraft(msg, accountId));
@@ -857,7 +859,7 @@ async function printMail() {
   // 只有 print() 抛异常时才说明真正出错
   } catch (e: any) {
   console.error('打印失败:', e);
-  uiStore.error(e?.message || '打印失败');
+  uiStore.error(e?.message || t("打印失败"));
   } finally {
   printing.value = false;
   }
@@ -960,9 +962,9 @@ async function onNasDirConfirmed(targetDir: string) {
       targetDir,
       filename: att.filename || '',
     });
-    uiStore.success(`已保存到 NAS：${result.filename}`);
+    uiStore.success(t("已保存到 NAS：{0}", [result.filename]));
   } catch (e: any) {
-    uiStore.error(e?.response?.data?.detail || e?.message || '保存到 NAS 失败');
+    uiStore.error(e?.response?.data?.detail || e?.message || t("保存到 NAS 失败"));
   }
 }
 </script>

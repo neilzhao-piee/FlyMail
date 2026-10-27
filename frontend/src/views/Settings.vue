@@ -1,5 +1,14 @@
 <template>
   <div class="settings-page">
+  <!-- 界面语言 -->
+  <div class="provider-card lang-card">
+  <div class="field lang-field">
+  <label class="field-label">{{ $t("界面语言") }}</label>
+  <select class="input lang-select" :value="locale" @change="onLocaleChange">
+  <option v-for="l in locales" :key="l.value" :value="l.value">{{ l.label }}</option>
+  </select>
+  </div>
+  </div>
   <!-- Gmail 网络代理配置：OAuth Client 密钥由 Cloudflare Broker 管理，本地只保留网络代理设置 -->
   <div class="provider-card">
   <button class="gmail-toggle" @click="proxyOpen = !proxyOpen">
@@ -13,8 +22,8 @@
   </svg>
   </div>
   <div class="gmail-toggle-text">
-  <span class="gmail-toggle-title">Gmail 网络代理</span>
-  <span class="gmail-toggle-desc">用于 Gmail 收件、发件和 Broker token 刷新</span>
+  <span class="gmail-toggle-title">{{ $t("Gmail 网络代理") }}</span>
+  <span class="gmail-toggle-desc">{{ $t("用于 Gmail 收件、发件和 Broker token 刷新") }}</span>
   </div>
   </div>
   <svg class="guide-arrow" :class="{ open: proxyOpen }" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -30,7 +39,7 @@
   <input type="checkbox" v-model="form.gmail_proxy_enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>启用 HTTP 代理</span>
+  <span>{{ $t("启用 HTTP 代理") }}</span>
   </label>
   <div class="field-input proxy-url-row" v-if="form.gmail_proxy_enabled">
   <input
@@ -67,7 +76,7 @@
   {{ proxyTestMsg }}
   </span>
   </transition>
-  <span class="field-hint">网络受限时启用，对 Gmail IMAP 收件、SMTP 发件、通过 Cloudflare Broker 刷新 token 生效。支持认证：http://user:pass@host:port</span>
+  <span class="field-hint">{{ $t("网络受限时启用，对 Gmail IMAP 收件、SMTP 发件、通过 Cloudflare Broker 刷新 token 生效。支持认证：http://user:pass@host:port") }}</span>
   </div>
 
   <div class="save-bar">
@@ -76,18 +85,14 @@
   <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
   </svg>
   <span v-if="saving" class="saving-text">
-  <span class="saving-dot"></span>
-  保存中...
-  </span>
-  <span v-else>保存设置</span>
+  <span class="saving-dot"></span>{{ $t("保存中...") }}</span>
+  <span v-else>{{ $t("保存设置") }}</span>
   </button>
   <transition name="fade">
   <span v-if="saveSuccess" class="status-msg success">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="20 6 9 17 4 12"/>
-  </svg>
-  保存成功
-  </span>
+  </svg>{{ $t("保存成功") }}</span>
   </transition>
   <transition name="fade">
   <span v-if="saveError" class="status-msg error">
@@ -114,8 +119,8 @@
   </svg>
   </div>
   <div class="gmail-toggle-text">
-  <span class="gmail-toggle-title">邮件备份</span>
-  <span class="gmail-toggle-desc">将邮件以 .eml 格式备份到飞牛OS 授权目录</span>
+  <span class="gmail-toggle-title">{{ $t("邮件备份") }}</span>
+  <span class="gmail-toggle-desc">{{ $t("将邮件以 .eml 格式备份到飞牛OS 授权目录") }}</span>
   </div>
   </div>
   <svg class="guide-arrow" :class="{ open: backupOpen }" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -132,14 +137,14 @@
   <input type="checkbox" v-model="backupForm.enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>启用自动备份</span>
+  <span>{{ $t("启用自动备份") }}</span>
   </label>
-  <span class="field-hint">开启后，收件时自动将邮件归档为 .eml 文件保存到本地授权目录，防止邮件服务器删除后无法找回。</span>
+  <span class="field-hint">{{ $t("开启后，收件时自动将邮件归档为 .eml 文件保存到本地授权目录，防止邮件服务器删除后无法找回。") }}</span>
   </div>
 
   <!-- 备份邮箱下拉多选 -->
   <div class="field" v-if="backupAccounts.length > 0" ref="backupSelectRef">
-  <label class="field-label">备份邮箱</label>
+  <label class="field-label">{{ $t("备份邮箱") }}</label>
   <div class="backup-multi-select" :class="{ disabled: !backupForm.enabled }">
   <!-- 触发器：点击展开/收起 -->
   <div class="select-trigger" @click="backupForm.enabled && (backupDropdownOpen = !backupDropdownOpen)">
@@ -158,7 +163,7 @@
   </span>
   </div>
   <!-- 占位文字 -->
-  <span class="select-placeholder" v-else>请选择需要备份的邮箱</span>
+  <span class="select-placeholder" v-else>{{ $t("请选择需要备份的邮箱") }}</span>
   <!-- 下拉箭头 -->
   <svg class="select-arrow" :class="{ open: backupDropdownOpen }" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 12 15 18 9"/>
@@ -184,12 +189,12 @@
   </div>
   </transition>
   </div>
-  <span class="field-hint">仅备份选中邮箱账号的邮件，已选 {{ backupForm.account_ids.length }} 个。</span>
+  <span class="field-hint">{{ $t("仅备份选中邮箱账号的邮件，已选") }}{{ backupForm.account_ids.length }}{{ $t("个。") }}</span>
   </div>
 
   <!-- 备份位置选择（目录选择器弹窗） -->
   <div class="field">
-  <label class="field-label">备份位置</label>
+  <label class="field-label">{{ $t("备份位置") }}</label>
   <div class="field-input backup-path-row">
   <div class="backup-path-display" @click="backupForm.enabled && openBackupPathPicker()">
   <span class="backup-path-text" :class="{ 'path-empty': !backupForm.target_dir }">
@@ -199,12 +204,12 @@
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2f"/></svg>
   </button>
   </div>
-  <button class="btn-refresh-paths" @click.stop="loadBackupAccessiblePaths" title="刷新授权目录">
+  <button class="btn-refresh-paths" @click.stop="loadBackupAccessiblePaths" :title='$t("刷新授权目录")'>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-  <span>刷新</span>
+  <span>{{ $t("刷新") }}</span>
   </button>
   </div>
-  <span class="field-hint">选择邮件 .eml 文件的存储目录，必须为飞牛OS 授权目录。如无可用目录，请先在飞牛应用设置中为 FlyMail 授权目录后点击"刷新"。</span>
+  <span class="field-hint">{{ $t("选择邮件 .eml 文件的存储目录，必须为飞牛OS 授权目录。如无可用目录，请先在飞牛应用设置中为 FlyMail 授权目录后点击\"刷新\"。") }}</span>
   </div>
 
   <!-- 保存按钮 -->
@@ -214,18 +219,14 @@
   <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
   </svg>
   <span v-if="backupSaving" class="saving-text">
-  <span class="saving-dot"></span>
-  保存中...
-  </span>
-  <span v-else>保存设置</span>
+  <span class="saving-dot"></span>{{ $t("保存中...") }}</span>
+  <span v-else>{{ $t("保存设置") }}</span>
   </button>
   <transition name="fade">
   <span v-if="backupSuccess" class="status-msg success">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="20 6 9 17 4 12"/>
-  </svg>
-  保存成功
-  </span>
+  </svg>{{ $t("保存成功") }}</span>
   </transition>
   <transition name="fade">
   <span v-if="backupError" class="status-msg error">
@@ -252,8 +253,8 @@
   </svg>
   </div>
   <div class="gmail-toggle-text">
-  <span class="gmail-toggle-title">通知设置</span>
-  <span class="gmail-toggle-desc">推送到 Bark、Telegram、Webhook 等</span>
+  <span class="gmail-toggle-title">{{ $t("通知设置") }}</span>
+  <span class="gmail-toggle-desc">{{ $t("推送到 Bark、Telegram、Webhook 等") }}</span>
   </div>
   </div>
   <svg class="guide-arrow" :class="{ open: notifyOpen }" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -271,42 +272,42 @@
   <input type="checkbox" v-model="notifyForm.enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>启用第三方通知</span>
+  <span>{{ $t("启用第三方通知") }}</span>
   </label>
-  <span class="field-hint">开启后，新邮件将按下方配置推送到外部渠道。</span>
+  <span class="field-hint">{{ $t("开启后，新邮件将按下方配置推送到外部渠道。") }}</span>
   </div>
 
   <!-- 免打扰 + 通知模式：同一行左右排布 -->
   <div class="notify-inline-row" :class="{ 'notify-dim': !notifyForm.enabled }">
   <div class="field notify-inline-field notify-inline-dnd">
-  <label class="field-label">免打扰时段</label>
+  <label class="field-label">{{ $t("免打扰时段") }}</label>
   <div class="notify-dnd-row">
   <input class="input notify-time" type="time" v-model="notifyForm.dnd_start" :disabled="!notifyForm.enabled" />
-  <span class="notify-dnd-sep">至</span>
+  <span class="notify-dnd-sep">{{ $t("至") }}</span>
   <input class="input notify-time" type="time" v-model="notifyForm.dnd_end" :disabled="!notifyForm.enabled" />
   </div>
-  <span class="field-hint">默认 21:00–07:00（跨午夜）；起止相同=关闭免打扰</span>
+  <span class="field-hint">{{ $t("默认 21:00–07:00（跨午夜）；起止相同=关闭免打扰") }}</span>
   </div>
 
   <div class="field notify-inline-field notify-inline-mode">
-  <label class="field-label">通知模式</label>
-  <div class="notify-segment" role="group" aria-label="通知模式">
+  <label class="field-label">{{ $t("通知模式") }}</label>
+  <div class="notify-segment" role="group" :aria-label='$t("通知模式")'>
   <button
   type="button"
   class="notify-segment-item"
   :class="{ active: notifyForm.mode === 'text' }"
   :disabled="!notifyForm.enabled"
   @click="notifyForm.mode = 'text'"
-  >文字</button>
+  >{{ $t("文字") }}</button>
   <button
   type="button"
   class="notify-segment-item"
   :class="{ active: notifyForm.mode === 'image' }"
   :disabled="!notifyForm.enabled"
   @click="notifyForm.mode = 'image'"
-  >图片</button>
+  >{{ $t("图片") }}</button>
   </div>
-  <span class="field-hint">图片：Telegram / 企微 Webhook 直传；Bark / 钉钉 / 飞书需图床</span>
+  <span class="field-hint">{{ $t("图片：Telegram / 企微 Webhook 直传；Bark / 钉钉 / 飞书需图床") }}</span>
   </div>
   </div>
 
@@ -314,7 +315,7 @@
   <div class="notify-imgbed" :class="{ 'notify-dim': !notifyForm.enabled }">
   <div class="notify-imgbed-head">
   <div class="notify-imgbed-title-row">
-  <div class="notify-imgbed-title">Cloudflare 图床</div>
+  <div class="notify-imgbed-title">{{ $t("Cloudflare 图床") }}</div>
   <a
   class="cf-deploy-btn"
   :href="notifyForm.imgbed_deploy_url || defaultImgbedDeployUrl"
@@ -329,11 +330,11 @@
   <span class="cf-deploy-text">Deploy to Cloudflare</span>
   </a>
   </div>
-  <span class="field-hint notify-imgbed-desc">图片通知：Bark / 钉钉 / 飞书需图床；Telegram / 企业微信可直传</span>
+  <span class="field-hint notify-imgbed-desc">{{ $t("图片通知：Bark / 钉钉 / 飞书需图床；Telegram / 企业微信可直传") }}</span>
   </div>
   <div class="notify-inline-row notify-imgbed-fields">
   <div class="field notify-inline-field">
-  <label class="field-label">图床地址</label>
+  <label class="field-label">{{ $t("图床地址") }}</label>
   <input
   class="input"
   type="text"
@@ -343,7 +344,7 @@
   />
   </div>
   <div class="field notify-inline-field">
-  <label class="field-label">上传密钥</label>
+  <label class="field-label">{{ $t("上传密钥") }}</label>
   <div class="notify-secret-row notify-secret-row-full">
   <input
   class="input"
@@ -384,7 +385,7 @@
   <transition name="fade">
   <span v-if="notifyImgbedMsg" class="status-msg" :class="notifyImgbedOk ? 'success' : 'error'">
   {{ notifyImgbedMsg }}
-  <a v-if="notifyImgbedOk && notifyImgbedPreviewUrl" :href="notifyImgbedPreviewUrl" target="_blank" rel="noopener" class="notify-imgbed-link">查看图片</a>
+  <a v-if="notifyImgbedOk && notifyImgbedPreviewUrl" :href="notifyImgbedPreviewUrl" target="_blank" rel="noopener" class="notify-imgbed-link">{{ $t("查看图片") }}</a>
   </span>
   </transition>
   </div>
@@ -446,7 +447,7 @@
   <input type="checkbox" v-model="notifyForm.bark.enabled" :disabled="!notifyForm.enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>启用 Bark</span>
+  <span>{{ $t("启用 Bark") }}</span>
   </label>
   </div>
   <div class="notify-inline-row" :class="{ 'notify-dim': !notifyForm.bark.enabled || !notifyForm.enabled }">
@@ -459,7 +460,7 @@
   placeholder="https://api.day.app"
   :disabled="!notifyForm.enabled || !notifyForm.bark.enabled"
   />
-  <span class="field-hint">须与 Bark App 服务器一致；默认 api.day.app</span>
+  <span class="field-hint">{{ $t("须与 Bark App 服务器一致；默认 api.day.app") }}</span>
   </div>
   <div class="field notify-inline-field">
   <label class="field-label">Device Key</label>
@@ -468,7 +469,7 @@
   class="input"
   :type="notifyBarkKeyVisible ? 'text' : 'password'"
   v-model="notifyForm.bark.device_key"
-  placeholder="Bark App 中复制 Device Key"
+  :placeholder='$t("Bark App 中复制 Device Key")'
   :disabled="!notifyForm.enabled || !notifyForm.bark.enabled"
   autocomplete="off"
   />
@@ -510,7 +511,7 @@
   <input type="checkbox" v-model="notifyForm.telegram.enabled" :disabled="!notifyForm.enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>启用 Telegram</span>
+  <span>{{ $t("启用 Telegram") }}</span>
   </label>
   </div>
   <div class="field proxy-field notify-inline-field" :class="{ 'notify-dim': !notifyForm.telegram.enabled || !notifyForm.enabled }">
@@ -519,14 +520,14 @@
   <input type="checkbox" v-model="notifyForm.telegram.use_gmail_proxy" :disabled="!notifyForm.enabled || !notifyForm.telegram.enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>使用 Gmail 网络代理</span>
+  <span>{{ $t("使用 Gmail 网络代理") }}</span>
   </label>
   </div>
   </div>
   <span
   v-if="notifyForm.telegram.use_gmail_proxy && !form.gmail_proxy_enabled && notifyForm.telegram.enabled"
   class="field-hint notify-warn-hint"
-  >当前未启用 Gmail 网络代理，请先在顶部卡片配置并测试连通。</span>
+  >{{ $t("当前未启用 Gmail 网络代理，请先在顶部卡片配置并测试连通。") }}</span>
   <div class="notify-inline-row" :class="{ 'notify-dim': !notifyForm.telegram.enabled || !notifyForm.enabled }">
   <div class="field notify-inline-field">
   <label class="field-label">Bot Token</label>
@@ -551,7 +552,7 @@
   class="input"
   type="text"
   v-model="notifyForm.telegram.chat_id"
-  placeholder="用户 / 群 / 频道 ID"
+  :placeholder='$t("用户 / 群 / 频道 ID")'
   :disabled="!notifyForm.enabled || !notifyForm.telegram.enabled"
   />
   </div>
@@ -586,7 +587,7 @@
   <input type="checkbox" v-model="notifyForm.webhook.enabled" :disabled="!notifyForm.enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>启用 Webhook</span>
+  <span>{{ $t("启用 Webhook") }}</span>
   </label>
   </div>
   <div class="field proxy-field notify-inline-field" :class="{ 'notify-dim': !notifyForm.webhook.enabled || !notifyForm.enabled }">
@@ -595,14 +596,14 @@
   <input type="checkbox" v-model="notifyForm.webhook.use_gmail_proxy" :disabled="!notifyForm.enabled || !notifyForm.webhook.enabled" />
   <span class="toggle-slider"></span>
   </label>
-  <span>使用 Gmail 网络代理</span>
+  <span>{{ $t("使用 Gmail 网络代理") }}</span>
   </label>
   </div>
   </div>
   <span
   v-if="notifyForm.webhook.use_gmail_proxy && !form.gmail_proxy_enabled && notifyForm.webhook.enabled"
   class="field-hint notify-warn-hint"
-  >当前未启用 Gmail 网络代理，请先在顶部卡片配置并测试连通。</span>
+  >{{ $t("当前未启用 Gmail 网络代理，请先在顶部卡片配置并测试连通。") }}</span>
   <div class="notify-inline-row" :class="{ 'notify-dim': !notifyForm.webhook.enabled || !notifyForm.enabled }">
   <div class="field notify-inline-field">
   <label class="field-label">URL</label>
@@ -610,19 +611,19 @@
   class="input"
   type="text"
   v-model="notifyForm.webhook.url"
-  placeholder="企微 / 钉钉 / 飞书机器人地址，或其它 https://.../hook"
+  :placeholder='$t("企微 / 钉钉 / 飞书机器人地址，或其它 https://.../hook")'
   :disabled="!notifyForm.enabled || !notifyForm.webhook.enabled"
   />
-  <span class="field-hint">自动识别企微 / 钉钉 / 飞书；其它地址走通用 JSON</span>
+  <span class="field-hint">{{ $t("自动识别企微 / 钉钉 / 飞书；其它地址走通用 JSON") }}</span>
   </div>
   <div class="field notify-inline-field">
-  <label class="field-label">密钥（可选）</label>
+  <label class="field-label">{{ $t("密钥（可选）") }}</label>
   <div class="notify-secret-row notify-secret-row-full">
   <input
   class="input"
   :type="notifyWhSecretVisible ? 'text' : 'password'"
   v-model="notifyForm.webhook.secret"
-  placeholder="通用 Bearer；钉钉/飞书填加签密钥；企微可不填"
+  :placeholder='$t("通用 Bearer；钉钉/飞书填加签密钥；企微可不填")'
   :disabled="!notifyForm.enabled || !notifyForm.webhook.enabled"
   autocomplete="off"
   />
@@ -662,18 +663,14 @@
   <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
   </svg>
   <span v-if="notifySaving" class="saving-text">
-  <span class="saving-dot"></span>
-  保存中...
-  </span>
-  <span v-else>保存设置</span>
+  <span class="saving-dot"></span>{{ $t("保存中...") }}</span>
+  <span v-else>{{ $t("保存设置") }}</span>
   </button>
   <transition name="fade">
   <span v-if="notifySuccess" class="status-msg success">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="20 6 9 17 4 12"/>
-  </svg>
-  保存成功
-  </span>
+  </svg>{{ $t("保存成功") }}</span>
   </transition>
   <transition name="fade">
   <span v-if="notifyError" class="status-msg error">
@@ -700,8 +697,8 @@
   </svg>
   </div>
   <div class="guide-toggle-text">
-  <span class="guide-toggle-title">邮箱配置教程</span>
-  <span class="guide-toggle-desc">按步骤开启邮箱服务并获取授权凭据</span>
+  <span class="guide-toggle-title">{{ $t("邮箱配置教程") }}</span>
+  <span class="guide-toggle-desc">{{ $t("按步骤开启邮箱服务并获取授权凭据") }}</span>
   </div>
   </div>
   <svg class="guide-arrow" :class="{ open: guideOpen }" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -720,7 +717,7 @@
   @click="activeTab = 'qq'"
   >
   <svg width="16" height="16" viewBox="0 0 1024 1024"><path d="M211.101867 363.776c-14.933333 66.56-7.466667 133.12 7.466666 192.256 14.933333 51.754667-7.466667 103.509333-52.309333 133.077333-67.285333 36.949333-149.461333-14.805333-156.970667-81.322666C-57.954133 260.266667 255.944533-57.642667 614.728533 8.874667c-209.28 22.186667-366.250667 162.688-403.626666 354.901333z" fill="#FFDC04"/><path d="M532.4672 844.373333c59.818667-22.186667 119.594667-59.136 164.437333-103.509333 37.376-36.992 97.152-44.373333 141.994667-14.805333 67.285333 36.992 67.285333 133.12 7.509333 177.493333-269.098667 229.162667-702.549333 118.272-822.186666-221.866667 112.128 162.688 321.408 221.866667 508.245333 162.688z" fill="#E03A22"/><path d="M794.056533 326.826667a425.173333 425.173333 0 0 0-171.861333-88.746667c-52.352-14.762667-89.728-59.136-89.728-110.933333 0-73.898667 82.218667-125.653333 149.504-96.085334 336.341333 118.314667 455.893333 539.733333 216.746667 813.312 89.685333-177.493333 37.376-391.850667-104.661334-517.546666z" fill="#27AA3A"/><path d="M652.104533 489.472c0-14.805333 0-29.568-7.509333-36.949333 0-7.424 0-7.424-7.466667-14.805334 0-73.941333-44.842667-133.12-127.061333-133.12-82.218667 0-127.061333 59.178667-127.061333 133.12 0 7.381333-7.466667 7.381333-7.466667 14.805334-7.466667 14.762667-7.466667 22.186667-7.466667 29.568v7.381333c-14.933333 7.381333-29.909333 29.568-37.376 51.754667-14.933333 36.949333-14.933333 73.941333-7.466666 73.941333 7.466667 7.381333 22.4-7.381333 37.333333-22.186667 0 22.186667 14.933333 44.373333 29.909333 59.136-14.933333 0-29.866667 14.805333-29.866666 29.568 0 22.186667 29.866667 36.992 74.709333 36.992 37.376 0 67.285333-14.805333 74.752-29.568h7.466667c7.466667 14.762667 37.376 29.568 74.752 29.568s74.752-14.805333 74.752-36.992c0-14.762667-14.933333-22.186667-29.909334-29.568 14.933333-14.762667 29.866667-29.568 37.376-51.754666 14.933333 22.186667 29.866667 29.568 37.376 22.186666 14.933333-7.381333 7.466667-36.949333-7.466667-73.941333-7.466667-22.186667-22.4-44.373333-37.376-51.754667v-7.381333z" fill="#2B2B2B"/></svg>
-  <span class="tab-label">腾讯邮箱</span>
+  <span class="tab-label">{{ $t("腾讯邮箱") }}</span>
   </button>
   <button
   class="guide-tab"
@@ -728,7 +725,7 @@
   @click="activeTab = 'netease'"
   >
   <svg width="16" height="16" viewBox="0 0 1024 1024"><path d="M592.298667 661.76c60.458667-47.573333 67.072-49.92 84.992-27.392 15.573333 19.242667 12.245333 22.741333-91.733334 113.365333-34.688 30.592-63.744 62.293333-63.744 71.381334 0 7.936-8.96 14.762667-19.029333 14.762666-10.026667 0-46.933333 19.285333-81.493333 44.288C353.024 926.890667 227.84 981.333333 184.192 981.333333c-71.466667 0-67.072-71.381333 5.632-91.733333 124.117333-34.090667 251.605333-106.581333 402.432-227.84z m-46.848-200.618667c14.506667-5.717333 39.125333-7.978667 54.826666-5.589333 15.573333 1.109333 51.370667 5.674667 80.426667 9.045333 128.512 14.805333 224.64 132.693333 214.613333 259.626667-5.546667 70.229333-24.576 106.538667-81.578666 158.634667-89.514667 81.536-214.698667 121.216-257.109334 82.688-27.989333-26.112-50.304-81.706667-41.344-103.210667 5.546667-15.914667 10.069333-15.914667 41.344 1.152 70.4 36.266667 171.008-2.261333 229.12-87.296 58.154667-86.186667 33.493333-180.266667-46.933333-180.266667-29.056 0-40.234667-6.741333-51.370667-31.701333-21.333333-44.16-63.744-46.378667-111.829333-4.48-223.530667 196.053333-431.488 302.592-478.421333 245.930667-30.165333-36.224-6.741333-54.357333 117.333333-90.666667 42.538667-12.544 112.938667-49.834667 191.146667-103.168 111.786667-74.752 124.074667-86.058667 119.68-112.170667-4.522667-21.504 0-30.592 20.096-38.528z m-191.146667-410.282666c60.330667-12.458667 257.024-10.24 307.370667 3.328 95.061333 25.002667 110.634667 41.941333 138.666666 160 16.725333 70.272 15.616 101.973333-4.522666 150.698666-22.314667 55.594667-64.853333 69.12-201.216 68.010667-109.610667-1.109333-111.786667 0-130.816 29.44-23.509333 38.442667-118.570667 114.432-160.981334 130.346667-128.512 46.378667-200.106667 50.944-211.285333 14.677333-11.136-35.2 13.397333-56.704 66.005333-56.704 65.834667 0 174.336-44.245333 205.610667-82.773333 12.245333-13.568 4.437333-17.066667-48.085333-21.546667-70.4-5.589333-95.018667-28.330667-108.373334-99.712-12.245333-66.56 7.466667-125.738667 52.309334-147.242667 22.314667-10.24 74.922667-22.186667 119.765333-29.568 44.842667-5.674667 89.685333-22.186667 97.152-36.949333 7.466667-14.805333 29.866667-22.186667 52.309333-14.805333 22.314667 7.381333 52.309333 2.261333 67.242667-10.24 22.314667-19.242667 37.376-17.066667 52.309333 5.674666 14.933333 22.186667 44.842667 29.568 82.218667 22.186667z" fill="#C5161C"/></svg>
-  <span class="tab-label">网易邮箱</span>
+  <span class="tab-label">{{ $t("网易邮箱") }}</span>
   </button>
   <button
   class="guide-tab"
@@ -736,7 +733,7 @@
   @click="activeTab = 'icloud'"
   >
   <svg width="16" height="16" viewBox="0 0 1024 1024"><path d="M791.488 544.095c-1.28-129.695 105.76-191.871 110.528-194.975-60.16-88.032-153.856-100.064-187.232-101.472-79.744-8.064-155.584 46.944-196.064 46.944-40.352 0-102.816-45.76-168.96-44.544-86.912 1.28-167.072 50.528-211.808 128.384-90.304 156.703-23.136 388.831 64.896 515.935 43.008 62.208 94.304 132.064 161.632 129.568 64.832-2.592 89.376-41.952 167.744-41.952s100.416 41.952 169.056 40.672c69.76-1.312 113.984-63.392 156.704-125.792 49.376-72.16 69.728-142.048 70.912-145.632-1.536-0.704-136.064-52.224-137.408-207.136zM662.56 163.52C698.304 120.16 722.432 60 715.84 0c-51.488 2.112-113.888 34.304-150.816 77.536-33.152 38.368-62.144 99.616-54.368 158.432 57.472 4.48 116.128-29.216 151.904-72.448z" fill="currentColor"/></svg>
-  <span class="tab-label">iCloud邮箱</span>
+  <span class="tab-label">{{ $t("iCloud邮箱") }}</span>
   </button>
   <button
   class="guide-tab"
@@ -744,7 +741,7 @@
   @click="activeTab = 'sina'"
   >
   <svg width="16" height="16" viewBox="0 0 1024 1024"><path d="M769.92256 503.466667c-40.96-8.618667-21.162667-30.250667-21.162667-30.250667s39.509333-66.218667-8.490666-115.2c-59.306667-60.458667-201.856 7.253333-201.856 7.253333-55.04 17.237333-39.552-7.253333-32.469334-50.432 0-50.389333-16.938667-135.381333-162.346666-84.949333-142.592 51.84-266.837333 228.949333-266.837334 228.949333C-10.792107 576.853333 0.471893 667.648 0.471893 667.648c21.162667 201.6 231.552 256.298667 393.898667 269.269333 172.202667 14.421333 402.346667-60.458667 472.917333-213.12 72.021333-151.210667-56.448-211.669333-97.408-220.330666m-361.386666 377.301333c-170.837333 7.210667-307.797333-79.232-307.797334-195.84 0-116.650667 136.96-208.810667 307.797334-217.472 169.386667-7.168 307.754667 64.853333 307.754666 180.053333 0 116.608-138.368 224.597333-307.754666 233.258667" fill="#D81E06"/><path d="M374.65856 545.237333c-170.837333 20.138667-151.04 184.32-151.04 184.32s-1.450667 51.84 46.549333 77.738667c100.266667 54.741333 203.306667 21.632 255.530667-47.488 50.816-67.712 19.754667-234.752-151.04-214.613333m-43.776 228.992c-32.469333 4.309333-57.898667-14.378667-57.898667-41.770667 0-27.306667 22.613333-56.149333 55.04-59.008 36.693333-2.901333 60.714667 18.688 60.714667 44.629333 0 27.349333-25.386667 53.290667-57.856 56.149334m100.224-87.850667c-11.306667 8.661333-23.978667 7.253333-29.653333-2.858667a25.770667 25.770667 0 0 1 7.082666-33.109333c12.672-10.112 25.386667-7.253333 31.061334 2.858667 7.04 10.069333 2.816 24.490667-8.490667 33.109333" fill="#2C2C2C"/></svg>
-  <span class="tab-label">新浪邮箱</span>
+  <span class="tab-label">{{ $t("新浪邮箱") }}</span>
   </button>
   </div>
 
@@ -768,9 +765,7 @@
   </div>
   </div>
   <div class="guide-tip">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-  授权码只显示一次，请务必复制保存。获取授权码后，在「账号管理」中添加腾讯邮箱时填入即可。
-  </div>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>{{ $t("授权码只显示一次，请务必复制保存。获取授权码后，在「账号管理」中添加腾讯邮箱时填入即可。") }}</div>
   </div>
 
   <!-- 网易邮箱教程 -->
@@ -791,9 +786,7 @@
   </div>
   </div>
   <div class="guide-tip">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-  支持 163、126、188、yeah.net 邮箱。授权码只显示一次，请务必复制保存。
-  </div>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>{{ $t("支持 163、126、188、yeah.net 邮箱。授权码只显示一次，请务必复制保存。") }}</div>
   </div>
 
   <!-- iCloud 邮箱教程 -->
@@ -814,9 +807,7 @@
   </div>
   </div>
   <div class="guide-tip">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-  应用专用密码生成后，在「账号管理」中添加 iCloud 邮箱时填入即可。支持 @icloud.com、@me.com、@mac.com 邮箱。
-  </div>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>{{ $t("应用专用密码生成后，在「账号管理」中添加 iCloud 邮箱时填入即可。支持 @icloud.com、@me.com、@mac.com 邮箱。") }}</div>
   </div>
 
   <!-- 新浪邮箱教程 -->
@@ -837,9 +828,7 @@
   </div>
   </div>
   <div class="guide-tip">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-  支持 sina.com、sina.cn、2008.sina.com、vip.sina.com、vip.sina.cn 邮箱。客户端授权码生成后，在「账号管理」中添加新浪邮箱时填入即可。
-  </div>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>{{ $t("支持 sina.com、sina.cn、2008.sina.com、vip.sina.com、vip.sina.cn 邮箱。客户端授权码生成后，在「账号管理」中添加新浪邮箱时填入即可。") }}</div>
   </div>
 
   </div>
@@ -874,11 +863,11 @@
   <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
   </svg>
   </div>
-  <h3 id="notify-purge-title" class="notify-confirm-title">清理图床</h3>
-  <p class="notify-confirm-message">将删除图床中的全部图片，此操作不可恢复。确定继续？</p>
+  <h3 id="notify-purge-title" class="notify-confirm-title">{{ $t("清理图床") }}</h3>
+  <p class="notify-confirm-message">{{ $t("将删除图床中的全部图片，此操作不可恢复。确定继续？") }}</p>
   <div class="notify-confirm-actions">
-  <button type="button" class="btn btn-secondary" @click="notifyPurgeConfirmVisible = false">取消</button>
-  <button type="button" class="btn btn-danger" :disabled="notifyImgbedBusy" @click="confirmPurgeImgbed">确认清理</button>
+  <button type="button" class="btn btn-secondary" @click="notifyPurgeConfirmVisible = false">{{ $t("取消") }}</button>
+  <button type="button" class="btn btn-danger" :disabled="notifyImgbedBusy" @click="confirmPurgeImgbed">{{ $t("确认清理") }}</button>
   </div>
   </div>
   </div>
@@ -888,13 +877,15 @@
   <NasPathPicker
   v-model="showBackupPathPicker"
   mode="dir"
-  title="选择备份目录"
+  :title='$t("选择备份目录")'
   @confirm="onBackupPathConfirmed"
   />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref, onMounted, onUnmounted } from 'vue';
 import api from '../utils/api';
 import { providerIcon } from '../utils/provider';
@@ -903,6 +894,18 @@ import NasPathPicker from '../components/NasPathPicker.vue';
 import { useUIStore } from '../stores/ui';
 
 const ui = useUIStore();
+
+// 界面语言切换（保存在 localStorage，切换后立即生效）
+import { currentLocale, setLocale, SUPPORTED_LOCALES } from '../i18n'
+
+const locales = SUPPORTED_LOCALES
+const locale = ref(currentLocale())
+
+function onLocaleChange(e: Event) {
+  const value = (e.target as HTMLSelectElement).value
+  setLocale(value)
+  locale.value = currentLocale()
+}
 
 // ==================== 教程数据 ====================
 
@@ -917,28 +920,28 @@ const guideBase = import.meta.env.BASE_URL + 'guide/';
 /** 腾讯邮箱教程步骤 */
 const qqSteps = [
   {
-  text: '打开腾讯邮箱，点击右上角「设置」',
-  images: [{ src: guideBase + 'QQ1.png', caption: '点击右上角设置' }],
+  text: t("打开腾讯邮箱，点击右上角「设置」"),
+  images: [{ src: guideBase + 'QQ1.png', caption: t("点击右上角设置") }],
   },
   {
-  text: '进入设置页面，点击左侧「账号与安全」',
-  images: [{ src: guideBase + 'QQ2.png', caption: '账号与安全' }],
+  text: t("进入设置页面，点击左侧「账号与安全」"),
+  images: [{ src: guideBase + 'QQ2.png', caption: t("账号与安全") }],
   },
   {
-  text: '选择左侧「安全设置」，开启 POP3/IMAP/SMTP/Exchange/CardDAV 服务，点击「生成授权码」，授权码只显示一次请务必复制保存',
-  images: [{ src: guideBase + 'QQ3.png', caption: '开启服务并生成授权码' }],
+  text: t("选择左侧「安全设置」，开启 POP3/IMAP/SMTP/Exchange/CardDAV 服务，点击「生成授权码」，授权码只显示一次请务必复制保存"),
+  images: [{ src: guideBase + 'QQ3.png', caption: t("开启服务并生成授权码") }],
   },
 ];
 
 /** 网易邮箱教程步骤 */
 const neteaseSteps = [
   {
-  text: '打开网易邮箱，点击账号旁边的「设置」，选择「POP3/SMTP/IMAP」',
-  images: [{ src: guideBase + 'netease1.png', caption: '进入 POP3/SMTP/IMAP 设置' }],
+  text: t("打开网易邮箱，点击账号旁边的「设置」，选择「POP3/SMTP/IMAP」"),
+  images: [{ src: guideBase + 'netease1.png', caption: t("进入 POP3/SMTP/IMAP 设置") }],
   },
   {
-  text: '开启 POP3/SMTP/IMAP 服务，点击「生成授权码」，授权码只显示一次请务必复制保存。根据需要修改下方的收取选项',
-  images: [{ src: guideBase + 'netease2.png', caption: '开启服务并生成授权码' }],
+  text: t("开启 POP3/SMTP/IMAP 服务，点击「生成授权码」，授权码只显示一次请务必复制保存。根据需要修改下方的收取选项"),
+  images: [{ src: guideBase + 'netease2.png', caption: t("开启服务并生成授权码") }],
   },
 ];
 
@@ -946,23 +949,23 @@ const neteaseSteps = [
 const icloudSteps = [
   {
   text: '访问 <a href="https://appleid.apple.com/account/manage" target="_blank">Apple ID 管理页面</a>，登录你的 Apple ID 账号',
-  images: [{ src: guideBase + 'iCloud1.png', caption: 'Apple ID 登录页面' }],
+  images: [{ src: guideBase + 'iCloud1.png', caption: t("Apple ID 登录页面") }],
   },
   {
-  text: '在「登录与安全」部分，找到「应用专用密码」，点击「生成应用专用密码」，按提示输入标签（如 FlyMail），复制生成的密码',
-  images: [{ src: guideBase + 'iCloud2.png', caption: '生成应用专用密码' }],
+  text: t("在「登录与安全」部分，找到「应用专用密码」，点击「生成应用专用密码」，按提示输入标签（如 FlyMail），复制生成的密码"),
+  images: [{ src: guideBase + 'iCloud2.png', caption: t("生成应用专用密码") }],
   },
 ];
 
 /** 新浪邮箱教程步骤 */
 const sinaSteps = [
   {
-  text: '登录新浪邮箱网页版，点击左上角的「设置」',
-  images: [{ src: guideBase + 'sina1.png', caption: '点击左上角设置' }],
+  text: t("登录新浪邮箱网页版，点击左上角的「设置」"),
+  images: [{ src: guideBase + 'sina1.png', caption: t("点击左上角设置") }],
   },
   {
-  text: '点击左侧「客户端 POP/IMAP/SMTP」，开启 IMAP/SMTP 服务，生成客户端授权码，授权码只显示一次请务必复制保存',
-  images: [{ src: guideBase + 'sina2.png', caption: '开启服务并生成授权码' }],
+  text: t("点击左侧「客户端 POP/IMAP/SMTP」，开启 IMAP/SMTP 服务，生成客户端授权码，授权码只显示一次请务必复制保存"),
+  images: [{ src: guideBase + 'sina2.png', caption: t("开启服务并生成授权码") }],
   },
 ];
 
@@ -1008,7 +1011,7 @@ async function testProxy() {
   const url = form.value.gmail_proxy_url.trim();
   if (!url) {
   proxyTestOk.value = false;
-  proxyTestMsg.value = '请先填写代理地址';
+  proxyTestMsg.value = t("请先填写代理地址");
   return;
   }
   proxyTesting.value = true;
@@ -1017,11 +1020,11 @@ async function testProxy() {
   // 超时拉长：代理探测可能需要两次 CONNECT（IMAP + HTTPS）
   const data = await api.post('/settings/proxy/test', { proxy_url: url }, { timeout: 30000 }) as any;
   proxyTestOk.value = !!data.success;
-  proxyTestMsg.value = data.message || (data.success ? '代理可用' : '代理不可用');
+  proxyTestMsg.value = data.message || (data.success ? t("代理可用") : t("代理不可用"));
   } catch (e: any) {
   proxyTestOk.value = false;
   const detail = e?.response?.data?.error || e?.response?.data?.detail || e?.message;
-  proxyTestMsg.value = detail ? `测试失败：${detail}` : '测试失败，请检查网络或后端服务';
+  proxyTestMsg.value = detail ? t("测试失败：{0}", [detail]) : t("测试失败，请检查网络或后端服务");
   } finally {
   proxyTesting.value = false;
   }
@@ -1054,7 +1057,7 @@ async function saveSettings() {
   await loadSettingsData();
   setTimeout(() => { saveSuccess.value = false; }, 3000);
   } catch (e: any) {
-  saveError.value = e.message || '保存失败';
+  saveError.value = e.message || t("保存失败");
   setTimeout(() => { saveError.value = ''; }, 5000);
   } finally {
   saving.value = false;
@@ -1174,7 +1177,7 @@ async function saveNotifySettings() {
       imgbed: { ...notifyForm.value.imgbed },
     }) as any;
     if (res && res.success === false) {
-      notifyError.value = res.message || '保存失败';
+      notifyError.value = res.message || t("保存失败");
       setTimeout(() => { notifyError.value = ''; }, 5000);
       return;
     }
@@ -1182,7 +1185,7 @@ async function saveNotifySettings() {
     await loadNotifySettings();
     setTimeout(() => { notifySuccess.value = false; }, 2500);
   } catch (e: any) {
-    notifyError.value = e.message || '保存失败';
+    notifyError.value = e.message || t("保存失败");
     setTimeout(() => { notifyError.value = ''; }, 5000);
   } finally {
     notifySaving.value = false;
@@ -1212,11 +1215,11 @@ async function testNotifyChannel(channel: 'bark' | 'telegram' | 'webhook') {
     const testTimeout = notifyForm.value.mode === 'image' ? 60000 : 30000;
     const res = await api.post('/notify/test', { channel }, { timeout: testTimeout }) as any;
     notifyTestOk.value = !!res?.success;
-    notifyTestMsg.value = res?.message || (res?.success ? '测试成功' : '测试失败');
+    notifyTestMsg.value = res?.message || (res?.success ? t("测试成功") : t("测试失败"));
   } catch (e: any) {
     notifyTestOk.value = false;
     const detail = e?.response?.data?.message || e?.response?.data?.detail || e?.message;
-    notifyTestMsg.value = detail ? `测试失败：${detail}` : '测试失败';
+    notifyTestMsg.value = detail ? t("测试失败：{0}", [detail]) : t("测试失败");
   } finally {
     notifyTesting.value = false;
   }
@@ -1243,7 +1246,7 @@ async function testImgbed() {
   try {
     const res = await api.post('/notify/imgbed/test', imgbedPayload(), { timeout: 45000 }) as any;
     notifyImgbedOk.value = !!res?.success;
-    notifyImgbedMsg.value = res?.message || (res?.success ? '测试成功' : '测试失败');
+    notifyImgbedMsg.value = res?.message || (res?.success ? t("测试成功") : t("测试失败"));
     if (res?.success && res?.data?.url) {
       notifyImgbedPreviewUrl.value = res.data.url;
       // 测试成功后自动落库图床配置，便于 Bark 图片推送立刻可用
@@ -1265,7 +1268,7 @@ async function testImgbed() {
   } catch (e: any) {
     notifyImgbedOk.value = false;
     const detail = e?.response?.data?.message || e?.response?.data?.detail || e?.message;
-    notifyImgbedMsg.value = detail ? `测试失败：${detail}` : '测试失败';
+    notifyImgbedMsg.value = detail ? t("测试失败：{0}", [detail]) : t("测试失败");
   } finally {
     notifyImgbedBusy.value = false;
     notifyImgbedAction.value = '';
@@ -1291,16 +1294,16 @@ async function confirmPurgeImgbed() {
   try {
     const res = await api.post('/notify/imgbed/purge', imgbedPayload(), { timeout: 60000 }) as any;
     notifyImgbedOk.value = !!res?.success;
-    notifyImgbedMsg.value = res?.message || (res?.success ? '清理完成' : '清理失败');
+    notifyImgbedMsg.value = res?.message || (res?.success ? t("清理完成") : t("清理失败"));
     if (res?.success) {
-      ui.success(notifyImgbedMsg.value || '清理完成');
+      ui.success(notifyImgbedMsg.value || t("清理完成"));
     } else {
-      ui.error(notifyImgbedMsg.value || '清理失败');
+      ui.error(notifyImgbedMsg.value || t("清理失败"));
     }
   } catch (e: any) {
     notifyImgbedOk.value = false;
     const detail = e?.response?.data?.message || e?.response?.data?.detail || e?.message;
-    notifyImgbedMsg.value = detail ? `清理失败：${detail}` : '清理失败';
+    notifyImgbedMsg.value = detail ? t("清理失败：{0}", [detail]) : t("清理失败");
     ui.error(notifyImgbedMsg.value);
   } finally {
     notifyImgbedBusy.value = false;
@@ -1393,7 +1396,7 @@ async function saveBackupSettings() {
   }) as any;
   // 后端可能返回 success=false（如 target_dir 不在授权目录内）
   if (res && res.success === false) {
-  backupError.value = res.message || '保存失败';
+  backupError.value = res.message || t("保存失败");
   setTimeout(() => { backupError.value = ''; }, 5000);
   return;
   }
@@ -1401,7 +1404,7 @@ async function saveBackupSettings() {
   await loadBackupSettings();
   setTimeout(() => { backupSuccess.value = false; }, 2500);
   } catch (e: any) {
-  backupError.value = e.message || '保存失败';
+  backupError.value = e.message || t("保存失败");
   setTimeout(() => { backupError.value = ''; }, 5000);
   } finally {
   backupSaving.value = false;
@@ -1435,6 +1438,10 @@ function onBackupPathConfirmed(path: string) {
 </script>
 
 <style scoped>
+.lang-card { margin-bottom: 14px; }
+.lang-field { flex-direction: row; align-items: center; gap: 12px; }
+.lang-select { max-width: 200px; }
+
 .settings-page {
   /* 覆盖 App.vue .content>* 的 display:flex，避免展开后卡片被 flex 压缩裁剪 */
   display: block;

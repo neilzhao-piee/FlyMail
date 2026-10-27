@@ -3,8 +3,8 @@
   <div v-if="modelValue" class="nas-overlay" @click.self="onCancel">
     <div class="nas-modal">
       <div class="nas-head">
-        <h4>{{ title }}</h4>
-        <button type="button" class="nas-close" @click="onCancel" aria-label="关闭">
+        <h4>{{ $t(title) }}</h4>
+        <button type="button" class="nas-close" @click="onCancel" :aria-label='$t("关闭")'>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -15,7 +15,7 @@
           class="nav-item"
           :class="{ clickable: breadcrumbs.length > 0 }"
           @click="navigateToRoot"
-        >授权目录</span>
+        >{{ $t("授权目录") }}</span>
         <template v-for="(b, i) in breadcrumbs" :key="i">
           <span class="nav-sep">/</span>
           <span class="nav-item clickable" @click="navigateTo(i)">{{ b.name }}</span>
@@ -24,7 +24,7 @@
 
       <!-- 列表 -->
       <div class="nas-list">
-        <div v-if="loading" class="nas-empty">加载中...</div>
+        <div v-if="loading" class="nas-empty">{{ $t("加载中...") }}</div>
         <div v-else-if="dirs.length === 0 && files.length === 0" class="nas-empty">
           {{ breadcrumbs.length === 0
             ? '暂无可用授权目录，请先在飞牛应用设置中授权目录后重试'
@@ -58,15 +58,15 @@
       </div>
 
       <div class="nas-foot">
-        <span class="nas-path" :title="displayPath">{{ displayPath || '请选择' }}</span>
+        <span class="nas-path" :title="displayPath">{{ displayPath || $t('请选择') }}</span>
         <div class="nas-btns">
-          <button type="button" class="btn-cancel" @click="onCancel">取消</button>
+          <button type="button" class="btn-cancel" @click="onCancel">{{ $t("取消") }}</button>
           <button
             type="button"
             class="btn-ok"
             :disabled="!canConfirm"
             @click="onConfirm"
-          >确定</button>
+          >{{ $t("确定") }}</button>
         </div>
       </div>
     </div>
@@ -84,7 +84,7 @@ const props = withDefaults(defineProps<{
   title?: string;
 }>(), {
   mode: 'dir',
-  title: '选择目录',
+  title: "选择目录",
 });
 
 const emit = defineEmits<{

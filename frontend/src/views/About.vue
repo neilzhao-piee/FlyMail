@@ -9,7 +9,7 @@
   <span class="brand-name">Fly<span class="accent">Mail</span></span>
   <span class="ver">v{{ version }}</span>
   </div>
-  <p class="brand-slogan">专为多邮箱用户打造的自托管邮件客户端</p>
+  <p class="brand-slogan">{{ $t("专为多邮箱用户打造的自托管邮件客户端") }}</p>
   </div>
   <!-- 检测更新按钮：点击后从 GitHub 拉取最新 VERSION 比对 -->
   <button
@@ -27,11 +27,7 @@
   <span>{{ checking ? '检测中' : '检测更新' }}</span>
   </button>
   </div>
-  <p class="brand-desc">
-  统一管理 Gmail、Outlook、QQ 邮箱、网易邮箱、iCloud、新浪邮箱等主流平台的邮件数据。
-  聚合收件箱让您在一个界面查看所有邮箱的重要邮件，告别频繁切换账号的烦恼。
-  支持多账号管理、邮件收发、富文本编辑、附件上传下载、定时发送、草稿箱、个性签名、本地备份及实时同步等丰富功能，满足日常办公与个人使用需求。
-  </p>
+  <p class="brand-desc">{{ $t("统一管理 Gmail、Outlook、QQ 邮箱、网易邮箱、iCloud、新浪邮箱等主流平台的邮件数据。 聚合收件箱让您在一个界面查看所有邮箱的重要邮件，告别频繁切换账号的烦恼。 支持多账号管理、邮件收发、富文本编辑、附件上传下载、定时发送、草稿箱、个性签名、本地备份及实时同步等丰富功能，满足日常办公与个人使用需求。") }}</p>
   </div>
 
   <!-- 功能 + 技术栈 -->
@@ -50,19 +46,21 @@
   <!-- 联系方式 -->
   <div class="about-card">
   <div class="contact-row">
-  <span class="contact-label">联系 / Contact</span>
+  <span class="contact-label">{{ $t("联系 / Contact") }}</span>
   <a class="contact-link" href="mailto:neil@zhao.digital">neil@zhao.digital</a>
   </div>
   </div>
 
   <!-- 底部 -->
   <div class="footer">
-  <span>GNU GPL-3.0 · 基于 FlyMail 1.0.7</span>
+  <span>{{ $t("GNU GPL-3.0 · 基于 FlyMail 1.0.7") }}</span>
   </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref } from 'vue';
 import { useUIStore } from '../stores/ui';
 
@@ -80,7 +78,7 @@ function onLogoError(e: Event) {
   (e.target as HTMLImageElement).style.display = 'none';
 }
 
-const features = ['多邮箱聚合', '实时同步', '本地备份', '自托管隐私', '移动端适配'];
+const features = [t("多邮箱聚合"), t("实时同步"), t("本地备份"), t("自托管隐私"), t("移动端适配")];
 const techs = ['Vue 3', 'TypeScript', 'FastAPI', 'SQLite', 'IMAP', 'WebSocket'];
 
 /**
@@ -114,18 +112,18 @@ async function checkUpdate() {
   const res = await fetch(GITHUB_VERSION_URL, { cache: 'no-store' });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const latestVersion = (await res.text()).trim();
-  if (!latestVersion) throw new Error('版本号为空');
+  if (!latestVersion) throw new Error(t("版本号为空"));
 
   const result = compareVersions(version, latestVersion);
   if (result < 0) {
   // 当前版本低于 GitHub 版本，提示可更新
-  uiStore.success(`发现新版本 v${latestVersion}，请前往 GitHub 下载`);
+  uiStore.success(t("发现新版本 v{0}，请前往 GitHub 下载", [latestVersion]));
   } else {
   // 版本一致或当前更高
-  uiStore.success(`当前已是最新版本（v${version}）`);
+  uiStore.success(t("当前已是最新版本（v{0}）", [version]));
   }
   } catch (e: any) {
-  uiStore.error('检测更新失败，请检查网络连接');
+  uiStore.error(t("检测更新失败，请检查网络连接"));
   } finally {
   checking.value = false;
   }

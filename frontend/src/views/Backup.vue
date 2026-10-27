@@ -26,10 +26,9 @@
   <div v-if="progress.running || progress.paused" class="archive-progress">
   <div class="ap-row">
   <span class="ap-text">
-  <template v-if="progress.paused">已暂停 · </template>
+  <template v-if="progress.paused">{{ $t("已暂停 ·") }}</template>
   {{ progress.account_email }} / {{ progress.folder }} · {{ progress.done }} / {{ progress.total }}（{{ progress.percent }}%）
-  · {{ progress.per_minute }} 封/分
-  <template v-if="progress.eta_seconds"> · 剩余 {{ formatEta(progress.eta_seconds) }}</template>
+  · {{ progress.per_minute }}{{ $t("封/分") }}<template v-if="progress.eta_seconds">{{ $t("· 剩余") }}{{ formatEta(progress.eta_seconds) }}</template>
   </span>
   <button class="ap-btn" type="button" @click="togglePause">{{ progress.paused ? '继续' : '暂停' }}</button>
   </div>
@@ -48,9 +47,9 @@
   <span class="toolbar-divider"></span>
   <!-- 桌面端：内联筛选按钮 -->
   <template v-if="!isMobile">
-  <button class="filter-btn" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted('')">全部 {{ currentFolderStats.count }}</button>
-  <button class="filter-btn" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive')">存活 {{ currentFolderStats.alive }}</button>
-  <button class="filter-btn" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted')">已删除 {{ currentFolderStats.deleted }}</button>
+  <button class="filter-btn" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted('')">{{ $t("全部") }}{{ currentFolderStats.count }}</button>
+  <button class="filter-btn" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive')">{{ $t("存活") }}{{ currentFolderStats.alive }}</button>
+  <button class="filter-btn" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted')">{{ $t("已删除") }}{{ currentFolderStats.deleted }}</button>
   </template>
   </div>
   <div class="toolbar-right">
@@ -73,9 +72,9 @@
   <div v-if="showMobileFilters" class="mobile-filter-dropdown">
   <div class="filter-backdrop" @click="showMobileFilters = false"></div>
   <div class="filter-dropdown-menu filter-dropdown-compact">
-  <button class="filter-dropdown-item" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted(''); showMobileFilters = false">全部 {{ currentFolderStats.count }}</button>
-  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive'); showMobileFilters = false">存活 {{ currentFolderStats.alive }}</button>
-  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted'); showMobileFilters = false">已删除 {{ currentFolderStats.deleted }}</button>
+  <button class="filter-dropdown-item" :class="{ active: filterDeleted === '' }" @click="setFilterDeleted(''); showMobileFilters = false">{{ $t("全部") }}{{ currentFolderStats.count }}</button>
+  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'alive' }" @click="setFilterDeleted('alive'); showMobileFilters = false">{{ $t("存活") }}{{ currentFolderStats.alive }}</button>
+  <button class="filter-dropdown-item" :class="{ active: filterDeleted === 'deleted' }" @click="setFilterDeleted('deleted'); showMobileFilters = false">{{ $t("已删除") }}{{ currentFolderStats.deleted }}</button>
   </div>
   </div>
   </transition>
@@ -87,7 +86,7 @@
   <div v-if="showFolderSheet" class="sheet-backdrop" @click.self="showFolderSheet = false">
   <div class="sheet-content">
   <div class="sheet-handle"></div>
-  <div class="sheet-title">文件夹</div>
+  <div class="sheet-title">{{ $t("文件夹") }}</div>
   <div class="sheet-list">
   <button
   v-for="f in backupStore.folders"
@@ -109,10 +108,10 @@
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
-  <p>暂无备份邮箱</p>
-  <p class="empty-hint">请在设置中开启备份并选择需要备份的邮箱</p>
+  <p>{{ $t("暂无备份邮箱") }}</p>
+  <p class="empty-hint">{{ $t("请在设置中开启备份并选择需要备份的邮箱") }}</p>
   </div>
-  <div v-else-if="loading" class="loading-state">加载中...</div>
+  <div v-else-if="loading" class="loading-state">{{ $t("加载中...") }}</div>
   <div v-else-if="messages.length === 0" class="empty-state">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -140,7 +139,7 @@
   <div class="mail-main-row">
   <span class="mail-subject">{{ msg.subject || '(无主题)' }}</span>
   <svg v-if="msg.has_attachments" class="att-badge" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-  <span v-if="msg.is_deleted_on_server" class="deleted-tag">服务器已删除</span>
+  <span v-if="msg.is_deleted_on_server" class="deleted-tag">{{ $t("服务器已删除") }}</span>
   </div>
   </div>
   <!-- 右列：日期 -->
@@ -149,9 +148,9 @@
 
   <!-- 分页 -->
   <div v-if="total > pageSize" class="pagination">
-  <button :disabled="page <= 1" @click="changePage(page - 1)">上一页</button>
+  <button :disabled="page <= 1" @click="changePage(page - 1)">{{ $t("上一页") }}</button>
   <span class="page-info">{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-  <button :disabled="page * pageSize >= total" @click="changePage(page + 1)">下一页</button>
+  <button :disabled="page * pageSize >= total" @click="changePage(page + 1)">{{ $t("下一页") }}</button>
   </div>
   </div>
 
@@ -163,10 +162,10 @@
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 18 9 12 15 6"/>
   </svg>
-  <span>返回</span>
+  <span>{{ $t("返回") }}</span>
   </button>
   <div class="detail-actions">
-  <button class="btn-action" @click="printMail" :disabled="printing" title="打印">
+  <button class="btn-action" @click="printMail" :disabled="printing" :title='$t("打印")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
   </svg>
@@ -199,19 +198,19 @@
   <!-- 灰色信息卡：发件人 / 收件人 / 抄送 / 时间（全宽，优先用详情数据） -->
   <div class="meta-card">
   <div class="meta-row">
-  <span class="meta-row-label">发件人</span>
+  <span class="meta-row-label">{{ $t("发件人") }}</span>
   <span class="meta-row-value" :title="metaFrom">{{ formatAddressList(metaFrom) }}</span>
   </div>
   <div class="meta-row" v-if="metaTo">
-  <span class="meta-row-label">收件人</span>
+  <span class="meta-row-label">{{ $t("收件人") }}</span>
   <span class="meta-row-value" :title="metaTo">{{ formatAddressList(metaTo) }}</span>
   </div>
   <div class="meta-row" v-if="metaCc">
-  <span class="meta-row-label">抄送</span>
+  <span class="meta-row-label">{{ $t("抄送") }}</span>
   <span class="meta-row-value" :title="metaCc">{{ formatAddressList(metaCc) }}</span>
   </div>
   <div class="meta-row">
-  <span class="meta-row-label">时间</span>
+  <span class="meta-row-label">{{ $t("时间") }}</span>
   <span class="meta-row-value">{{ formatDetailDate(selectedMessage.date) }}</span>
   </div>
   </div>
@@ -222,12 +221,12 @@
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
   </svg>
-  <span>您正在查看本地备份</span>
-  <span v-if="detailData?.is_deleted_on_server" class="deleted-notice">· 此邮件已从服务器删除</span>
+  <span>{{ $t("您正在查看本地备份") }}</span>
+  <span v-if="detailData?.is_deleted_on_server" class="deleted-notice">{{ $t("· 此邮件已从服务器删除") }}</span>
   </div>
   <div class="archive-meta">
-  <span v-if="selectedMessage.size">大小 {{ formatSize(selectedMessage.size) }}</span>
-  <span>归档于 {{ formatTimestamp(selectedMessage.archived_at) }}</span>
+  <span v-if="selectedMessage.size">{{ $t("大小") }}{{ formatSize(selectedMessage.size) }}</span>
+  <span>{{ $t("归档于") }}{{ formatTimestamp(selectedMessage.archived_at) }}</span>
   </div>
   </div>
 
@@ -251,13 +250,13 @@
   v-html="renderMailBody(detailData.body_html, detailData.body_text)"
   @click="handleMailLinkClick"
   ></div>
-  <div v-else class="body-empty">（无正文内容）</div>
+  <div v-else class="body-empty">{{ $t("（无正文内容）") }}</div>
 
   <!-- 附件列表 -->
   <div v-if="detailData.attachments && detailData.attachments.length > 0" class="attachment-list">
   <div class="attachment-header">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-  <span>附件 ({{ detailData.attachments.length }})</span>
+  <span>{{ $t("附件 (") }}{{ detailData.attachments.length }})</span>
   </div>
   <div v-for="(att, i) in detailData.attachments" :key="i" class="attachment-item" @click="downloadAttachment(att)">
   <div class="att-icon">
@@ -280,6 +279,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import api from '../utils/api';
 import { renderMailBody, handleMailLinkClick } from '../utils/sanitize';
@@ -363,22 +364,22 @@ async function togglePause() {
   try {
     if (progress.value.paused) {
       await api.post('/backup/resume');
-      uiStore.success('已恢复归档');
+      uiStore.success(t("已恢复归档"));
     } else {
       await api.post('/backup/pause');
-      uiStore.success('已暂停，将在当前邮件归档后停下');
+      uiStore.success(t("已暂停，将在当前邮件归档后停下"));
     }
     await loadProgress();
   } catch (e: any) {
-    uiStore.error(e?.message || '操作失败');
+    uiStore.error(e?.message || t("操作失败"));
   }
 }
 
 function formatEta(seconds: number): string {
   const s = Math.max(0, Math.round(seconds));
-  if (s < 60) return s + ' 秒';
-  if (s < 3600) return Math.round(s / 60) + ' 分钟';
-  return (s / 3600).toFixed(1) + ' 小时';
+  if (s < 60) return s + t("秒");
+  if (s < 3600) return Math.round(s / 60) + t("分钟");
+  return (s / 3600).toFixed(1) + t("小时");
 }
 
 // 移动端状态
@@ -480,7 +481,7 @@ async function loadList() {
   total.value = data.total || 0;
   } catch (e) {
   console.error('加载归档列表失败:', e);
-  uiStore.error('加载归档列表失败');
+  uiStore.error(t("加载归档列表失败"));
   } finally {
   loading.value = false;
   }
@@ -497,7 +498,7 @@ async function selectMessage(msg: ArchivedMessage) {
   ) as any;
   detailData.value = data;
   } catch (e: any) {
-  uiStore.error(e.message || '加载详情失败');
+  uiStore.error(e.message || t("加载详情失败"));
   } finally {
   detailLoading.value = false;
   }
@@ -527,7 +528,7 @@ async function switchAccount(accountId: string) {
 /** 触发全量备份 */
 async function triggerBackup() {
   if (!selectedAccount.value) {
-  uiStore.error('请先选择要备份的邮箱');
+  uiStore.error(t("请先选择要备份的邮箱"));
   return;
   }
   backingUp.value = true;
@@ -535,14 +536,14 @@ async function triggerBackup() {
   // 仅备份当前选中的邮箱（account_id 参数）
   const data = await api.post('/backup/run', null, { params: { account_id: selectedAccount.value } }) as any;
   if (data.success) {
-  uiStore.success('备份任务已启动，请稍后刷新查看');
+  uiStore.success(t("备份任务已启动，请稍后刷新查看"));
   startProgressPolling();
   setTimeout(() => { loadStatus(); backupStore.loadFolders(selectedAccount.value); loadList(); }, 3000);
   } else {
-  uiStore.error(data.message || '备份启动失败');
+  uiStore.error(data.message || t("备份启动失败"));
   }
   } catch (e: any) {
-  uiStore.error(e.message || '备份启动失败');
+  uiStore.error(e.message || t("备份启动失败"));
   } finally {
   backingUp.value = false;
   }
@@ -569,7 +570,7 @@ async function printMail() {
   await exportMailToPDF(detailData.value as any);
   } catch (e: any) {
   console.error('打印失败:', e);
-  uiStore.error(e?.message || '打印失败');
+  uiStore.error(e?.message || t("打印失败"));
   } finally {
   printing.value = false;
   }

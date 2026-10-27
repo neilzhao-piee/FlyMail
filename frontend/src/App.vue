@@ -16,7 +16,7 @@
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
   </svg>
-  <span>写邮件</span>
+  <span>{{ $t("写邮件") }}</span>
   </button>
 
   <template v-for="item in navItems" :key="item.key">
@@ -81,9 +81,7 @@
   <span v-if="f.count" class="folder-count">{{ f.count }}</span>
   </button>
   <!-- 无文件夹时的占位提示 -->
-  <div v-if="backupStore.folders.length === 0" class="nav-sub-empty">
-  暂无备份邮件
-  </div>
+  <div v-if="backupStore.folders.length === 0" class="nav-sub-empty">{{ $t("暂无备份邮件") }}</div>
   </div>
   </transition>
   </div>
@@ -135,7 +133,7 @@
   @keydown.enter.prevent="listSearch.flush()"
   @keydown.esc.prevent="onTopbarSearchEsc"
   />
-  <button v-if="listSearch.keyword" type="button" class="topbar-search-clear" title="清除搜索" @click="listSearch.clear()">
+  <button v-if="listSearch.keyword" type="button" class="topbar-search-clear" :title='$t("清除搜索")' @click="listSearch.clear()">
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
   </div>
@@ -174,22 +172,22 @@
   <!-- 聚合 -->
   <button class="tab-item" :class="{ active: currentView === 'unified' }" @click="currentView = 'unified'">
   <span class="tab-icon" v-html="mobileNavIcons.unified"></span>
-  <span class="tab-label">聚合</span>
+  <span class="tab-label">{{ $t("聚合") }}</span>
   </button>
   <!-- 邮件 -->
   <button class="tab-item" :class="{ active: currentView === 'mail' }" @click="currentView = 'mail'">
   <span class="tab-icon" v-html="mobileNavIcons.mail"></span>
-  <span class="tab-label">邮件</span>
+  <span class="tab-label">{{ $t("邮件") }}</span>
   </button>
   <!-- 账号 -->
   <button class="tab-item" :class="{ active: currentView === 'accounts' }" @click="currentView = 'accounts'">
   <span class="tab-icon" v-html="mobileNavIcons.accounts"></span>
-  <span class="tab-label">账号</span>
+  <span class="tab-label">{{ $t("账号") }}</span>
   </button>
   <!-- 其他：点击弹出写信/设置/关于 -->
   <button class="tab-item" :class="{ active: isOtherActive }" @click="showOtherMenu = !showOtherMenu">
   <span class="tab-icon" v-html="mobileNavIcons.other"></span>
-  <span class="tab-label">其他</span>
+  <span class="tab-label">{{ $t("其他") }}</span>
   </button>
   </nav>
 
@@ -199,23 +197,23 @@
   <div class="other-menu">
   <button class="other-menu-item" @click="currentView = 'compose'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.compose"></span>
-  <span>写信</span>
+  <span>{{ $t("写信") }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'contacts'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.contacts"></span>
-  <span>联系人</span>
+  <span>{{ $t("联系人") }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'backup'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.backup"></span>
-  <span>备份</span>
+  <span>{{ $t("备份") }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'settings'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.settings"></span>
-  <span>设置</span>
+  <span>{{ $t("设置") }}</span>
   </button>
   <button class="other-menu-item" @click="currentView = 'about'; showOtherMenu = false">
   <span class="other-menu-icon" v-html="mobileNavIcons.about"></span>
-  <span>关于</span>
+  <span>{{ $t("关于") }}</span>
   </button>
   </div>
   </div>
@@ -231,12 +229,12 @@
   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
   <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
   </svg>
-  <span class="drawer-title">通知</span>
+  <span class="drawer-title">{{ $t("通知") }}</span>
   <span v-if="mailStore.unreadNotificationCount > 0" class="drawer-badge">{{ mailStore.unreadNotificationCount }}</span>
   </div>
   <div class="drawer-actions">
-  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn" @click="mailStore.markAllNotificationsRead()">全读</button>
-  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn danger" @click="mailStore.clearNotifications()">清空</button>
+  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn" @click="mailStore.markAllNotificationsRead()">{{ $t("全读") }}</button>
+  <button v-if="mailStore.notifications.length > 0" class="drawer-action-btn danger" @click="mailStore.clearNotifications()">{{ $t("清空") }}</button>
   <button class="drawer-close-btn" @click="showNotificationPanel = false">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
@@ -282,7 +280,7 @@
   </div>
   </div>
   <div v-else class="drawer-empty">
-  <span>暂无通知</span>
+  <span>{{ $t("暂无通知") }}</span>
   </div>
   </div>
   </div>
@@ -331,6 +329,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useMailStore } from './stores/mail';
 import { useBackupStore } from './stores/backup';
@@ -500,7 +500,7 @@ function handleGlobalWsMessage(data: any) {
 /** 写邮件发送完成后，跳转回收件箱 */
 function onMailSent() {
   currentView.value = 'unified';
-  uiStore.success('邮件发送成功');
+  uiStore.success(t("邮件发送成功"));
 }
 
 /** 丢弃写邮件，返回上一视图 */
@@ -513,72 +513,72 @@ function formatNotifTime(timestamp: number): string {
   const now = Date.now();
   const diff = now - timestamp;
   const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return '刚刚';
+  if (seconds < 60) return t("刚刚");
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}分钟前`;
+  if (minutes < 60) return t("{0}分钟前", [minutes]);
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}小时前`;
+  if (hours < 24) return t("{0}小时前", [hours]);
   const date = new Date(timestamp);
-  return `${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  return t("{0}月{1}日 {2}:{3}", [date.getMonth() + 1, date.getDate(), date.getHours().toString().padStart(2, '0'), date.getMinutes().toString().padStart(2, '0')]);
 }
 
 // 导航项配置
 const navItems = [
   {
   key: 'compose',
-  label: '写邮件',
-  shortLabel: '写信',
+  label: t("写邮件"),
+  shortLabel: t("写信"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
   },
   {
   key: 'unified',
-  label: '聚合',
-  shortLabel: '聚合',
+  label: t("聚合"),
+  shortLabel: t("聚合"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/><line x1="10" y1="7" x2="14" y2="7"/><line x1="7" y1="10" x2="7" y2="14"/><line x1="17" y1="10" x2="17" y2="14"/><line x1="10" y1="17" x2="14" y2="17"/></svg>',
   },
   {
   key: 'mail',
-  label: '邮件',
-  shortLabel: '邮件',
+  label: t("邮件"),
+  shortLabel: t("邮件"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/></svg>',
   },
   {
   key: 'accounts',
-  label: '账号',
-  shortLabel: '账号',
+  label: t("账号"),
+  shortLabel: t("账号"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
   },
   {
   key: 'contacts',
-  label: '联系人',
-  shortLabel: '联系人',
+  label: t("联系人"),
+  shortLabel: t("联系人"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   },
   {
   key: 'backup',
-  label: '备份',
-  shortLabel: '备份',
+  label: t("备份"),
+  shortLabel: t("备份"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
   },
   {
   key: 'settings',
-  label: '设置',
-  shortLabel: '设置',
+  label: t("设置"),
+  shortLabel: t("设置"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
   },
   {
   key: 'about',
-  label: '关于',
-  shortLabel: '关于',
+  label: t("关于"),
+  shortLabel: t("关于"),
   icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
   },
 ];
 
 // 当前页面标题
 const currentTitle = computed(() => {
-  if (currentView.value === 'unified') return '聚合';
+  if (currentView.value === 'unified') return t("聚合");
   if (currentView.value === 'mail') {
-  return mailStore.currentFolderName || '邮件';
+  return mailStore.currentFolderName || t("邮件");
   }
   const item = navItems.find(i => i.key === currentView.value);
   return item?.label || '';
@@ -586,7 +586,7 @@ const currentTitle = computed(() => {
 
 // 根据用户名生成确定性头像颜色
 const userAvatarStyle = computed(() => {
-  const name = mailStore.user?.username || '用户';
+  const name = mailStore.user?.username || t("用户");
   const colors = ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#EF4444', '#6366F1', '#14B8A6'];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -638,7 +638,7 @@ function selectBackupFolder(folder: string) {
  * 收件箱显示未读数，其他文件夹显示邮件总数
  */
 function getFolderCount(folder: any): number {
-  if (folder.name === '收件箱') {
+  if (folder.name === '收件箱' || folder.path?.toUpperCase() === 'INBOX') {
   return folder.unread_count || 0;
   }
   return folder.total_count || 0;
@@ -718,7 +718,7 @@ function handleOAuthCallback() {
   const oauthSuccess = urlParams.get('oauth_success');
   const oauthEmail = urlParams.get('email');
   if (oauthSuccess === '1') {
-  uiStore.success(`${pName}账号添加成功：` + (oauthEmail || ''));
+  uiStore.success(t("{0}账号添加成功：", [pName]) + (oauthEmail || ''));
   sessionStorage.setItem('flymail_oauth_just_added', '1');
   currentView.value = 'accounts';
   mailStore.loadAccounts();
@@ -728,7 +728,7 @@ function handleOAuthCallback() {
 
   const oauthError = urlParams.get('oauth_error');
   if (oauthError) {
-  uiStore.error(`${pName}授权失败：` + oauthError);
+  uiStore.error(t("{0}授权失败：", [pName]) + oauthError);
   cleanOAuthParams();
   }
 }
@@ -751,14 +751,14 @@ function handleOAuthPostMessage(event: MessageEvent) {
   sessionStorage.removeItem('flymail_oauth_reauth');
 
   if (isReauth) {
-  uiStore.success(`${pName}重新授权成功`);
+  uiStore.success(t("{0}重新授权成功", [pName]));
   // 重新授权后重载账号数据，刷新邮件列表
   mailStore.loadAccounts().then(() => {
   mailStore.loadFolderCounts();
   });
   sessionStorage.removeItem('flymail_oauth_just_added');
   } else {
-  uiStore.success(`${pName}账号添加成功：` + (data.email || ''));
+  uiStore.success(t("{0}账号添加成功：", [pName]) + (data.email || ''));
   sessionStorage.setItem('flymail_oauth_just_added', '1');
   currentView.value = 'accounts';
   mailStore.loadAccounts();
@@ -766,7 +766,7 @@ function handleOAuthPostMessage(event: MessageEvent) {
   window.removeEventListener('message', handleOAuthPostMessage);
   } else if (data.type === 'flymail_oauth_error') {
   const pName = providerName(data.provider || 'gmail');
-  uiStore.error(`${pName}授权失败：` + (data.error || '未知错误'));
+  uiStore.error(t("{0}授权失败：", [pName]) + (data.error || t("未知错误")));
   window.removeEventListener('message', handleOAuthPostMessage);
   }
 }

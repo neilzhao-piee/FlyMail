@@ -1,4 +1,5 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
+import { i18n } from '../i18n';
 import { ref, computed } from 'vue';
 import api from '../utils/api';
 import { useUIStore } from './ui';
@@ -255,6 +256,10 @@ export const useMailStore = defineStore('mail', () => {
   * 这里只做英文名兼容映射，不再硬编码Modified UTF-7路径。
   */
   function folderDisplayName(name: string): string {
+    return (i18n.global as any).t(rawFolderDisplayName(name)) as string
+  }
+
+  function rawFolderDisplayName(name: string): string {
   const map: Record<string, string> = {
   // 英文名兼容映射
   'INBOX': '收件箱',

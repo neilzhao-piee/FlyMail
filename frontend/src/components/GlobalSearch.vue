@@ -1,5 +1,5 @@
 <template>
-  <button class="gs-trigger" type="button" title="全局搜索（Ctrl/⌘ + K）" @click="openPanel">
+  <button class="gs-trigger" type="button" :title='$t("全局搜索（Ctrl/⌘ + K）")' @click="openPanel">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -19,13 +19,13 @@
             v-model="keyword"
             class="gs-input"
             type="search"
-            placeholder="搜索所有邮箱（主题 / 发件人 / 正文；中文 ≥3 字走全文索引）"
+            :placeholder='$t("搜索所有邮箱（主题 / 发件人 / 正文；中文 ≥3 字走全文索引）")'
             @keydown.enter.prevent="doSearch"
             @keydown.esc.prevent="closePanel"
           />
-          <select v-model="sort" class="gs-sort" title="排序方式" @change="doSearch">
-            <option value="date">按时间</option>
-            <option value="relevance">按相关度</option>
+          <select v-model="sort" class="gs-sort" :title='$t("排序方式")' @change="doSearch">
+            <option value="date">{{ $t("按时间") }}</option>
+            <option value="relevance">{{ $t("按相关度") }}</option>
           </select>
           <button class="gs-btn" type="button" :disabled="loading || !keyword.trim()" @click="doSearch">
             {{ loading ? '搜索中…' : '搜索' }}
@@ -34,8 +34,7 @@
 
         <div v-if="error" class="gs-error">{{ error }}</div>
 
-        <div v-if="result" class="gs-meta">
-          共 {{ result.total }} 条 · {{ result.took_ms }} ms · {{ result.mode === 'fts' ? '全文索引' : '模糊匹配（短词/索引不可用）' }}
+        <div v-if="result" class="gs-meta">{{ $t("共") }}{{ result.total }}{{ $t("条 ·") }}{{ result.took_ms }} ms · {{ result.mode === 'fts' ? '全文索引' : '模糊匹配（短词/索引不可用）' }}
         </div>
 
         <div class="gs-list">
@@ -49,7 +48,7 @@
             <div class="gs-item-head">
               <span class="gs-account">{{ item.account_email || item.account_id }}</span>
               <span class="gs-folder">{{ item.folder }}</span>
-              <span v-if="item.has_attachments" class="gs-attach" title="含附件">📎</span>
+              <span v-if="item.has_attachments" class="gs-attach" :title='$t("含附件")'>📎</span>
               <span class="gs-date">{{ formatDate(item.date) }}</span>
             </div>
             <div class="gs-subject" v-html="renderSnippet(item)"></div>
@@ -57,18 +56,16 @@
           </button>
         </div>
 
-        <div v-if="!loading && result && result.messages.length === 0" class="gs-empty">
-          没有匹配的邮件
-        </div>
-        <div v-if="!result && !loading && !error" class="gs-empty">
-          输入关键词后回车；结果覆盖所有已同步的邮箱与文件夹
-        </div>
+        <div v-if="!loading && result && result.messages.length === 0" class="gs-empty">{{ $t("没有匹配的邮件") }}</div>
+        <div v-if="!result && !loading && !error" class="gs-empty">{{ $t("输入关键词后回车；结果覆盖所有已同步的邮箱与文件夹") }}</div>
       </div>
     </div>
   </Teleport>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 import api from '../utils/api';
 
@@ -111,7 +108,7 @@ async function doSearch() {
       params: { q, page: 1, page_size: 50, sort: sort.value },
     });
   } catch (e: any) {
-    error.value = e?.response?.data?.detail || e?.message || '搜索失败';
+    error.value = e?.response?.data?.detail || e?.message || t("搜索失败");
     result.value = null;
   } finally {
     loading.value = false;

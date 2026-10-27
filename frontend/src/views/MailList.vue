@@ -23,7 +23,7 @@
   <span class="account-icon" :class="acc.provider" v-html="providerIcon(acc.provider)"></span>
   <span class="account-email">{{ acc.email }}</span>
   </button>
-  <button v-if="mailStore.reauthAccountIds.has(acc.id)" class="btn-reauth" @click.stop="reauthorize(acc.id)" title="重新授权">
+  <button v-if="mailStore.reauthAccountIds.has(acc.id)" class="btn-reauth" @click.stop="reauthorize(acc.id)" :title='$t("重新授权")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
   </button>
   </div>
@@ -32,8 +32,8 @@
 
   <!-- 单账号重新授权提示（多账号时 Tab 栏已有按钮，此处仅单账号显示） -->
   <div v-if="mailStore.accounts.length === 1 && mailStore.reauthAccountIds.has(mailStore.currentAccountId)" class="reauth-banner">
-  <span>账号授权已过期</span>
-  <button class="btn btn-primary btn-sm" @click="reauthorize(mailStore.currentAccountId)">重新授权</button>
+  <span>{{ $t("账号授权已过期") }}</span>
+  <button class="btn btn-primary btn-sm" @click="reauthorize(mailStore.currentAccountId)">{{ $t("重新授权") }}</button>
   </div>
 
   <!-- 邮件列表视图 -->
@@ -42,7 +42,7 @@
   <div v-if="!selectMode" class="list-toolbar">
   <div class="toolbar-left">
   <!-- 多选图标按钮 -->
-  <button class="btn-icon" @click="enterSelectMode()" title="多选">
+  <button class="btn-icon" @click="enterSelectMode()" :title='$t("多选")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
   </svg>
@@ -56,10 +56,10 @@
   <span v-else class="list-count">{{ searchQuery ? ("搜索 · " + totalMessages + "封") : (mailStore.currentFolderName + " · " + totalMessages + "封") }}</span>
   <!-- 筛选按钮 -->
   <span class="toolbar-divider"></span>
-  <button class="filter-btn" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter('')">全部 {{ filterCounts.all }}</button>
-  <button class="filter-btn" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread')">未读 {{ filterCounts.unread }}</button>
-  <button class="filter-btn" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read')">已读 {{ filterCounts.read }}</button>
-  <button class="filter-btn" :class="{ active: attachmentFilter }" @click="setAttachmentFilter()">附件 {{ filterCounts.attachments }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter('')">{{ $t("全部") }}{{ filterCounts.all }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread')">{{ $t("未读") }}{{ filterCounts.unread }}</button>
+  <button class="filter-btn" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read')">{{ $t("已读") }}{{ filterCounts.read }}</button>
+  <button class="filter-btn" :class="{ active: attachmentFilter }" @click="setAttachmentFilter()">{{ $t("附件") }}{{ filterCounts.attachments }}</button>
   </div>
   <div class="toolbar-right">
   <!-- 移动端：筛选展开/收起按钮 -->
@@ -72,7 +72,7 @@
   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
   </svg>
   </button>
-  <button class="btn-icon rebuild-btn" @click="rebuildSync" title="数据缓存不准确，可尝试清空缓存同步" :disabled="rebuilding">
+  <button class="btn-icon rebuild-btn" @click="rebuildSync" :title='$t("数据缓存不准确，可尝试清空缓存同步")' :disabled="rebuilding">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
   </svg>
@@ -87,10 +87,10 @@
   <div v-if="showMobileFilters" class="mobile-filter-dropdown">
   <div class="filter-backdrop" @click="showMobileFilters = false"></div>
   <div class="filter-dropdown-menu filter-dropdown-compact">
-  <button class="filter-dropdown-item" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter(''); showMobileFilters = false">全部 {{ filterCounts.all }}</button>
-  <button class="filter-dropdown-item" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread'); showMobileFilters = false">未读 {{ filterCounts.unread }}</button>
-  <button class="filter-dropdown-item" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read'); showMobileFilters = false">已读 {{ filterCounts.read }}</button>
-  <button class="filter-dropdown-item" :class="{ active: attachmentFilter }" @click="setAttachmentFilter(); showMobileFilters = false">附件 {{ filterCounts.attachments }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === '' && !attachmentFilter }" @click="setReadFilter(''); showMobileFilters = false">{{ $t("全部") }}{{ filterCounts.all }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === 'unread' }" @click="setReadFilter('unread'); showMobileFilters = false">{{ $t("未读") }}{{ filterCounts.unread }}</button>
+  <button class="filter-dropdown-item" :class="{ active: readFilter === 'read' }" @click="setReadFilter('read'); showMobileFilters = false">{{ $t("已读") }}{{ filterCounts.read }}</button>
+  <button class="filter-dropdown-item" :class="{ active: attachmentFilter }" @click="setAttachmentFilter(); showMobileFilters = false">{{ $t("附件") }}{{ filterCounts.attachments }}</button>
   </div>
   </div>
   </transition>
@@ -104,19 +104,19 @@
   <button class="select-btn" @click="exitSelectMode">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
-  <span class="select-info">已选 {{ selectedIds.size }} 封</span>
+  <span class="select-info">{{ $t("已选") }}{{ selectedIds.size }}{{ $t("封") }}</span>
   <div class="select-actions">
   <button class="select-btn" @click="toggleSelectAll" :title="isAllSelected ? '取消全选' : '全选'">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
   </svg>
   </button>
-  <button class="select-btn mark-read" @click="batchMarkRead" :disabled="selectedIds.size === 0" title="标记已读">
+  <button class="select-btn mark-read" @click="batchMarkRead" :disabled="selectedIds.size === 0" :title='$t("标记已读")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
   </svg>
   </button>
-  <button class="select-btn delete" @click="batchDelete" :disabled="selectedIds.size === 0" title="删除选中">
+  <button class="select-btn delete" @click="batchDelete" :disabled="selectedIds.size === 0" :title='$t("删除选中")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
   </svg>
@@ -130,7 +130,7 @@
   <div v-if="showFolderSheet" class="sheet-backdrop" @click.self="showFolderSheet = false">
   <div class="sheet-content">
   <div class="sheet-handle"></div>
-  <div class="sheet-title">文件夹</div>
+  <div class="sheet-title">{{ $t("文件夹") }}</div>
   <div class="sheet-list">
   <button
   v-for="folder in mailStore.folders"
@@ -151,7 +151,7 @@
   <!-- 加载中（首次加载无缓存数据时显示） -->
   <div v-if="loading && messages.length === 0" class="list-loading">
   <div class="spinner"></div>
-  <span>加载中...</span>
+  <span>{{ $t("加载中...") }}</span>
   </div>
 
   <!-- 空状态 -->
@@ -160,7 +160,7 @@
   <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/>
   </svg>
   <span>{{ searchQuery ? '未找到匹配的邮件' : '暂无邮件' }}</span>
-  <span v-if="searchQuery" class="list-empty-hint">试试其他关键词，或切换文件夹</span>
+  <span v-if="searchQuery" class="list-empty-hint">{{ $t("试试其他关键词，或切换文件夹") }}</span>
   </div>
 
   <!-- 邮件列表 -->
@@ -229,22 +229,22 @@
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 18 9 12 15 6"/>
   </svg>
-  <span>返回</span>
+  <span>{{ $t("返回") }}</span>
   </button>
   <div class="detail-actions">
-  <button class="btn-action" @click="replyMessage" title="回复邮件">
+  <button class="btn-action" @click="replyMessage" :title='$t("回复邮件")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
   </svg>
-  <span>回复</span>
+  <span>{{ $t("回复") }}</span>
   </button>
-  <button class="btn-action" @click="forwardMessage" title="转发邮件">
+  <button class="btn-action" @click="forwardMessage" :title='$t("转发邮件")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
   </svg>
-  <span>转发</span>
+  <span>{{ $t("转发") }}</span>
   </button>
-  <button class="btn-action" @click="printMail" :disabled="printing" title="打印">
+  <button class="btn-action" @click="printMail" :disabled="printing" :title='$t("打印")'>
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
   </svg>
@@ -273,7 +273,7 @@
   <div class="meta-from">
   <span class="from-name">{{ displayName(selectedMessage.from_addr) }}</span>
   <span class="from-email" v-if="displayName(selectedMessage.from_addr) !== selectedMessage.from_addr">&lt;{{ selectedMessage.from_addr }}&gt;</span>
-  <button class="btn-add-contact" @click="addToContacts" title="加入联系人">
+  <button class="btn-add-contact" @click="addToContacts" :title='$t("加入联系人")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
   </svg>
@@ -287,19 +287,19 @@
   <!-- 灰色信息卡：发件人 / 收件人 / 抄送 / 时间（全宽） -->
   <div class="meta-card">
   <div class="meta-row">
-  <span class="meta-row-label">发件人</span>
+  <span class="meta-row-label">{{ $t("发件人") }}</span>
   <span class="meta-row-value" :title="selectedMessage.from_addr">{{ formatAddressList(selectedMessage.from_addr) }}</span>
   </div>
   <div class="meta-row" v-if="selectedMessage.to_addr">
-  <span class="meta-row-label">收件人</span>
+  <span class="meta-row-label">{{ $t("收件人") }}</span>
   <span class="meta-row-value" :title="selectedMessage.to_addr">{{ formatAddressList(selectedMessage.to_addr) }}</span>
   </div>
   <div class="meta-row" v-if="selectedMessage.cc">
-  <span class="meta-row-label">抄送</span>
+  <span class="meta-row-label">{{ $t("抄送") }}</span>
   <span class="meta-row-value" :title="selectedMessage.cc">{{ formatAddressList(selectedMessage.cc) }}</span>
   </div>
   <div class="meta-row">
-  <span class="meta-row-label">时间</span>
+  <span class="meta-row-label">{{ $t("时间") }}</span>
   <span class="meta-row-value">{{ formatDetailDate(selectedMessage.date) }}</span>
   </div>
   </div>
@@ -325,7 +325,7 @@
   <div class="attachment-list" v-if="selectedMessage.attachments && selectedMessage.attachments.length > 0">
   <div class="attachment-header">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-  <span>附件 ({{ selectedMessage.attachments.length }})</span>
+  <span>{{ $t("附件 (") }}{{ selectedMessage.attachments.length }})</span>
   </div>
   <div class="attachment-item" v-for="att in selectedMessage.attachments" :key="att.part_number" @click="openAttachmentMenu(att, $event)">
   <div class="att-icon">
@@ -347,19 +347,21 @@
   <!-- 附件下载菜单：本机 / NAS（必须在根级，不能塞进 draggable #item） -->
   <div v-if="attMenuVisible" class="att-menu-overlay" @click="attMenuVisible = false">
   <div class="att-menu" :style="attMenuStyle" @click.stop>
-  <button type="button" class="att-menu-item" @click="downloadAttachmentLocal">下载到本机</button>
-  <button type="button" class="att-menu-item" @click="downloadAttachmentNas">下载到NAS</button>
+  <button type="button" class="att-menu-item" @click="downloadAttachmentLocal">{{ $t("下载到本机") }}</button>
+  <button type="button" class="att-menu-item" @click="downloadAttachmentNas">{{ $t("下载到NAS") }}</button>
   </div>
   </div>
   <NasPathPicker
   v-model="showNasDirPicker"
   mode="dir"
-  title="选择保存目录"
+  :title='$t("选择保存目录")'
   @confirm="onNasDirConfirmed"
   />
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { openAuthWindowSync, navigateAuthWindow, closeAuthWindow, authWindowBlockedMessage } from '../utils/oauthWindow';
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import draggable from 'vuedraggable';
@@ -493,7 +495,7 @@ const { selectMode, selectedIds, isAllSelected, enterSelectMode, exitSelectMode,
 async function batchDelete() {
   if (selectedIds.value.size === 0) return;
   const count = selectedIds.value.size;
-  uiStore.success(`正在删除 ${count} 封邮件...`);
+  uiStore.success(t("正在删除 {0} 封邮件...", [count]));
   try {
   await api.post('/messages/batch-delete', {
   message_ids: [...selectedIds.value],
@@ -503,10 +505,10 @@ async function batchDelete() {
   exitSelectMode();
   pageCache.clear();
   await loadMessages();
-  uiStore.success(`已删除 ${count} 封邮件`);
+  uiStore.success(t("已删除 {0} 封邮件", [count]));
   } catch (e) {
   console.error('批量删除失败:', e);
-  uiStore.error('批量删除失败');
+  uiStore.error(t("批量删除失败"));
   }
 }
 
@@ -514,7 +516,7 @@ async function batchDelete() {
 async function batchMarkRead() {
   if (selectedIds.value.size === 0) return;
   const count = selectedIds.value.size;
-  uiStore.success(`正在标记 ${count} 封邮件...`);
+  uiStore.success(t("正在标记 {0} 封邮件...", [count]));
   try {
   await api.post('/messages/batch-mark-read', {
   message_ids: [...selectedIds.value],
@@ -530,10 +532,10 @@ async function batchMarkRead() {
   mailStore.decrementUnreadCount(mailStore.currentFolder);
   }
   exitSelectMode();
-  uiStore.success(`已标记 ${count} 封邮件为已读`);
+  uiStore.success(t("已标记 {0} 封邮件为已读", [count]));
   } catch (e) {
   console.error('批量标记已读失败:', e);
-  uiStore.error('标记已读失败');
+  uiStore.error(t("标记已读失败"));
   }
 }
 
@@ -544,17 +546,17 @@ async function batchMarkRead() {
 async function markAllRead() {
   // 两次点击确认机制：第一次点击提示确认，第二次点击执行
   if (!onMarkAllReadConfirm('mail-list')) {
-  uiStore.info('再次点击确认将当前文件夹所有邮件标记为已读');
+  uiStore.info(t("再次点击确认将当前文件夹所有邮件标记为已读"));
   return;
   }
   clearMarkAllReadConfirm();
   const accountId = mailStore.currentAccountId;
   const folder = mailStore.currentFolder;
   if (!accountId) {
-  uiStore.error('请先选择邮箱账号');
+  uiStore.error(t("请先选择邮箱账号"));
   return;
   }
-  uiStore.info('正在标记全部已读...');
+  uiStore.info(t("正在标记全部已读..."));
   try {
   const res = await api.post('/messages/mark-all-read', {
   account_ids: [accountId],
@@ -568,13 +570,13 @@ async function markAllRead() {
   // 刷新侧边栏未读数（folder_stats.unread_count 已置 0）
   mailStore.loadFolderCounts();
   if (total > 0) {
-  uiStore.success(`已标记 ${total} 封邮件为已读`);
+  uiStore.success(t("已标记 {0} 封邮件为已读", [total]));
   } else {
-  uiStore.info('没有未读邮件');
+  uiStore.info(t("没有未读邮件"));
   }
   } catch (e: any) {
   console.error('全部已读失败:', e);
-  uiStore.error('全部已读失败：' + (e.response?.data?.detail || e.message || '网络错误'));
+  uiStore.error(t("全部已读失败：") + (e.response?.data?.detail || e.message || t("网络错误")));
   }
 }
 
@@ -608,7 +610,7 @@ function handleWsMessage(data: any) {
   syncing.value = false;
   syncProgress.value = '';
   if (data.error) {
-  uiStore.error('重建同步失败: ' + data.error);
+  uiStore.error(t("重建同步失败:") + data.error);
   }
   }
   } else if (data.type === 'schedule_success' || data.type === 'schedule_failed') {
@@ -633,7 +635,7 @@ function handleWsMessage(data: any) {
   } else if (data.type === 'sync_progress') {
   // 同步进度更新
   if (data.account_id === mailStore.currentAccountId && rebuilding.value) {
-  syncProgress.value = `同步中 (${data.completed}/${data.total})`;
+  syncProgress.value = t("同步中 ({0}/{1})", [data.completed, data.total]);
   }
   } else if (data.type === 'message_state_changed') {
   // 跨标签页邮件状态同步
@@ -729,7 +731,7 @@ watch(
       await selectMessage(stub);
     } catch (e) {
       console.error('通知跳转打开邮件失败:', e);
-      uiStore.error('无法打开该邮件，可能已删除或尚未同步');
+      uiStore.error(t("无法打开该邮件，可能已删除或尚未同步"));
     }
   },
   // immediate: 从其他页切入 MailList 时 pending 已先写入，需挂载即消费
@@ -789,7 +791,7 @@ async function reauthorize(accountId?: string) {
     const data = await api.post('/accounts/auth-url', { provider }) as any;
     if (data.error) {
       closeAuthWindow(authWindow);
-      uiStore.error('获取授权链接失败：' + data.error);
+      uiStore.error(t("获取授权链接失败：") + data.error);
       return;
     }
     if (data.auth_url) {
@@ -798,11 +800,11 @@ async function reauthorize(accountId?: string) {
       }
     } else {
       closeAuthWindow(authWindow);
-      uiStore.error('获取授权链接失败');
+      uiStore.error(t("获取授权链接失败"));
     }
   } catch (e: any) {
     closeAuthWindow(authWindow);
-    uiStore.error('重新授权失败：' + (e.response?.data?.error || e.message || '网络错误'));
+    uiStore.error(t("重新授权失败：") + (e.response?.data?.error || e.message || t("网络错误")));
   }
 }
 
@@ -828,7 +830,7 @@ async function onDeleteMessage() {
   await loadMessages();
   } catch (e) {
   console.error('删除邮件失败:', e);
-  uiStore.error('删除邮件失败');
+  uiStore.error(t("删除邮件失败"));
   }
 }
 
@@ -860,7 +862,7 @@ async function loadMessages() {
   if (version !== loadVersion) return;
   // Outlook 连接异常时，后端返回 reconnecting: true，前端展示友好提示
   if (data.reconnecting) {
-  uiStore.error('邮箱连接异常，正在重新连接，请稍后再试');
+  uiStore.error(t("邮箱连接异常，正在重新连接，请稍后再试"));
   return;
   }
   saveCurrentPageCache(data);
@@ -882,7 +884,7 @@ async function loadMessages() {
   } catch (e) {
   if (version !== loadVersion) return;
   console.error('加载邮件失败:', e);
-  uiStore.error('加载邮件失败');
+  uiStore.error(t("加载邮件失败"));
   } finally {
   if (version === loadVersion) {
   loading.value = false;
@@ -903,16 +905,16 @@ async function rebuildSync() {
 
   // 使用项目统一的确认弹窗
   const ok = await uiStore.showConfirm({
-  title: '清空缓存同步',
-  message: '数据缓存不准确，可尝试清空缓存同步。将清空当前账号的本地缓存并重新从邮箱拉取所有邮件。',
-  confirmText: '清空并同步',
+  title: t("清空缓存同步"),
+  message: t("数据缓存不准确，可尝试清空缓存同步。将清空当前账号的本地缓存并重新从邮箱拉取所有邮件。"),
+  confirmText: t("清空并同步"),
   danger: true,
   });
   if (!ok) return;
 
   rebuilding.value = true;
   syncing.value = true;
-  syncProgress.value = '同步中';
+  syncProgress.value = t("同步中");
   try {
   await api.post(`/accounts/${accountId}/rebuild-sync`);
   // 后端立即返回，同步在后台执行。清空前端缓存并刷新文件夹
@@ -921,7 +923,7 @@ async function rebuildSync() {
   // 保持 syncing 状态（按钮转圈），等待后端 WebSocket 推送 rebuild_done 后自动结束
   } catch (e: any) {
   console.error('重建同步失败:', e);
-  uiStore.error('重建同步失败');
+  uiStore.error(t("重建同步失败"));
   rebuilding.value = false;
   syncing.value = false;
   }
@@ -976,9 +978,9 @@ async function selectMessage(msg: Message) {
   // Outlook 连接异常时，后端返回 503 + { reconnecting: true }
   const respData = e?.response?.data;
   if (respData?.reconnecting) {
-  uiStore.error('邮箱连接异常，正在重新连接，请稍后再试');
+  uiStore.error(t("邮箱连接异常，正在重新连接，请稍后再试"));
   } else {
-  uiStore.error('加载邮件详情失败');
+  uiStore.error(t("加载邮件详情失败"));
   }
   }
 }
@@ -1023,7 +1025,7 @@ async function addToContacts() {
   // 从 from_addr 提取邮箱地址（支持 "姓名 <邮箱>" 和纯邮箱格式）
   const emails = extractEmails(fromAddr);
   if (emails.length === 0) {
-  uiStore.error('无法识别发件人邮箱');
+  uiStore.error(t("无法识别发件人邮箱"));
   return;
   }
   const email = emails[0];
@@ -1031,11 +1033,11 @@ async function addToContacts() {
   const name = extractName(fromAddr);
   try {
   await quickAddContact(name, email);
-  uiStore.success('已加入联系人');
+  uiStore.success(t("已加入联系人"));
   // 刷新联系人映射表，让邮件列表立即显示联系人名称
   reloadContactMap();
   } catch (e: any) {
-  uiStore.error(e?.response?.data?.error || '添加失败');
+  uiStore.error(e?.response?.data?.error || t("添加失败"));
   }
 }
 
@@ -1079,7 +1081,7 @@ async function printMail() {
   // 只有 print() 抛异常时才说明真正出错
   } catch (e: any) {
   console.error('打印失败:', e);
-  uiStore.error(e?.message || '打印失败');
+  uiStore.error(e?.message || t("打印失败"));
   } finally {
   printing.value = false;
   }
@@ -1154,9 +1156,9 @@ async function onNasDirConfirmed(targetDir: string) {
       targetDir,
       filename: att.filename || '',
     });
-    uiStore.success(`已保存到 NAS：${result.filename}`);
+    uiStore.success(t("已保存到 NAS：{0}", [result.filename]));
   } catch (e: any) {
-    uiStore.error(e?.response?.data?.detail || e?.message || '保存到 NAS 失败');
+    uiStore.error(e?.response?.data?.detail || e?.message || t("保存到 NAS 失败"));
   }
 }
 </script>

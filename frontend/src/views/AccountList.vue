@@ -3,21 +3,19 @@
   <!-- 操作栏 -->
   <div class="toolbar">
   <div class="sort-toggle">
-  <button class="toggle-btn" :class="{ active: sortBy === 'group' }" @click="sortBy = 'group'">按分组</button>
-  <button class="toggle-btn" :class="{ active: sortBy === 'platform' }" @click="sortBy = 'platform'">按平台</button>
+  <button class="toggle-btn" :class="{ active: sortBy === 'group' }" @click="sortBy = 'group'">{{ $t("按分组") }}</button>
+  <button class="toggle-btn" :class="{ active: sortBy === 'platform' }" @click="sortBy = 'platform'">{{ $t("按平台") }}</button>
   </div>
   <button class="btn btn-primary" @click="showAddDialog = true">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>
-  添加账号
-  </button>
+  </svg>{{ $t("添加账号") }}</button>
   </div>
 
   <!-- 加载状态 -->
   <div v-if="loading" class="loading-state">
   <div class="loading-dot"></div>
-  <span>加载中...</span>
+  <span>{{ $t("加载中...") }}</span>
   </div>
 
   <!-- 空状态 -->
@@ -28,8 +26,8 @@
   <path d="M22 4L12 13L2 4"/>
   </svg>
   </div>
-  <p class="empty-title">还没有添加邮箱账号</p>
-  <p class="empty-desc">点击上方「添加账号」按钮，添加你的邮箱即可开始使用</p>
+  <p class="empty-title">{{ $t("还没有添加邮箱账号") }}</p>
+  <p class="empty-desc">{{ $t("点击上方「添加账号」按钮，添加你的邮箱即可开始使用") }}</p>
   </div>
 
   <!-- 账号列表 -->
@@ -66,14 +64,10 @@
   </div>
   <!-- 操作按钮 -->
   <div class="card-actions">
-  <button v-if="mailStore.reauthAccountIds.has(account.id)" class="btn-reauth-card" @click.stop="reauthorizeAccount(account)" title="重新授权">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-  重新授权
-  </button>
-  <button class="mark-read-btn" @click.stop="markAccountAllRead(account)" title="把该邮箱所有文件夹的未读邮件标记为已读">
-  全部已读
-  </button>
-  <button class="edit-btn" @click.stop="openEditDialog(account)" title="编辑">
+  <button v-if="mailStore.reauthAccountIds.has(account.id)" class="btn-reauth-card" @click.stop="reauthorizeAccount(account)" :title='$t("重新授权")'>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>{{ $t("重新授权") }}</button>
+  <button class="mark-read-btn" @click.stop="markAccountAllRead(account)" :title='$t("把该邮箱所有文件夹的未读邮件标记为已读")'>{{ $t("全部已读") }}</button>
+  <button class="edit-btn" @click.stop="openEditDialog(account)" :title='$t("编辑")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -88,8 +82,8 @@
   <!-- 添加账号对话框 -->
   <div v-if="showAddDialog" class="dialog-overlay" @click.self="showAddDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">添加邮箱账号</h3>
-  <p class="dialog-desc">选择邮箱服务商，授权后即可使用</p>
+  <h3 class="dialog-title">{{ $t("添加邮箱账号") }}</h3>
+  <p class="dialog-desc">{{ $t("选择邮箱服务商，授权后即可使用") }}</p>
   <div class="provider-grid">
   <button v-for="p in providers" :key="p.type" class="provider-card" :class="{ active: selectedProvider === p.type }" @click="selectedProvider = p.type">
   <div class="provider-icon" v-html="p.icon"></div>
@@ -97,7 +91,7 @@
   </button>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showAddDialog = false">取消</button>
+  <button class="btn btn-secondary" @click="showAddDialog = false">{{ $t("取消") }}</button>
   <button class="btn btn-primary" @click="startAuth" :disabled="!selectedProvider">
   {{ (selectedProvider === 'qq' || selectedProvider === 'netease' || selectedProvider === 'sina' || selectedProvider === 'custom') ? '下一步' : '授权登录' }}
   </button>
@@ -113,29 +107,25 @@
   <button class="toggle-switch" :class="{ active: qqForm.is_exmail }" @click="qqForm.is_exmail = !qqForm.is_exmail" type="button">
   <span class="toggle-knob"></span>
   </button>
-  <span style="font-size: var(--text-sm); color: var(--text-secondary);">腾讯企业邮箱</span>
+  <span style="font-size: var(--text-sm); color: var(--text-secondary);">{{ $t("腾讯企业邮箱") }}</span>
   </div>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">邮箱地址</label>
+  <label class="field-label">{{ $t("邮箱地址") }}</label>
   <input v-model="qqForm.email" class="input" type="email" :placeholder="qqForm.is_exmail ? 'yourname@yourcompany.com' : 'example@qq.com'" />
   </div>
   <div class="form-field">
   <label class="field-label">{{ qqForm.is_exmail ? '客户端专用密码' : '授权码' }}</label>
   <input v-model="qqForm.auth_code" class="input" type="password" :placeholder="qqForm.is_exmail ? '腾讯企业邮箱客户端专用密码' : 'QQ邮箱授权码'" />
-  <p class="field-hint" v-if="!qqForm.is_exmail">
-  授权码需要在QQ邮箱设置中开启IMAP/SMTP服务后获取
-  <a href="https://service.mail.qq.com/detail?search=SMTP/IMAP" target="_blank" class="hint-link">查看教程</a>
+  <p class="field-hint" v-if="!qqForm.is_exmail">{{ $t("授权码需要在QQ邮箱设置中开启IMAP/SMTP服务后获取") }}<a href="https://service.mail.qq.com/detail?search=SMTP/IMAP" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
   </p>
-  <p class="field-hint" v-else>
-  需管理员开启IMAP/SMTP服务，用户开启安全登录后生成客户端专用密码
-  <a href="https://open.work.weixin.qq.com/help/wap/detail?docid=19886" target="_blank" class="hint-link">查看教程</a>
+  <p class="field-hint" v-else>{{ $t("需管理员开启IMAP/SMTP服务，用户开启安全登录后生成客户端专用密码") }}<a href="https://open.work.weixin.qq.com/help/wap/detail?docid=19886" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showQQDialog = false">取消</button>
-  <button class="btn btn-primary" @click="addQQAccount" :disabled="!qqForm.email || !qqForm.auth_code">添加账号</button>
+  <button class="btn btn-secondary" @click="showQQDialog = false">{{ $t("取消") }}</button>
+  <button class="btn btn-primary" @click="addQQAccount" :disabled="!qqForm.email || !qqForm.auth_code">{{ $t("添加账号") }}</button>
   </div>
   </div>
   </div>
@@ -143,25 +133,23 @@
   <!-- 网易邮箱授权码对话框 -->
   <div v-if="showNeteaseDialog" class="dialog-overlay" @click.self="showNeteaseDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">添加网易邮箱</h3>
-  <p class="dialog-desc">请输入网易邮箱地址（163/126/188/yeah.net）和授权码</p>
+  <h3 class="dialog-title">{{ $t("添加网易邮箱") }}</h3>
+  <p class="dialog-desc">{{ $t("请输入网易邮箱地址（163/126/188/yeah.net）和授权码") }}</p>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">邮箱地址</label>
+  <label class="field-label">{{ $t("邮箱地址") }}</label>
   <input v-model="neteaseForm.email" class="input" type="email" placeholder="example@163.com / @126.com / @188.com" />
   </div>
   <div class="form-field">
-  <label class="field-label">授权码</label>
-  <input v-model="neteaseForm.auth_code" class="input" type="password" placeholder="网易邮箱授权码" />
-  <p class="field-hint">
-  授权码需要在网易邮箱设置中开启IMAP/SMTP服务后获取
-  <a href="https://help.mail.163.com/searchFAQ.do?m=search&word=POP3/SMTP/IMAP" target="_blank" class="hint-link">查看教程</a>
+  <label class="field-label">{{ $t("授权码") }}</label>
+  <input v-model="neteaseForm.auth_code" class="input" type="password" :placeholder='$t("网易邮箱授权码")' />
+  <p class="field-hint">{{ $t("授权码需要在网易邮箱设置中开启IMAP/SMTP服务后获取") }}<a href="https://help.mail.163.com/searchFAQ.do?m=search&word=POP3/SMTP/IMAP" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showNeteaseDialog = false">取消</button>
-  <button class="btn btn-primary" @click="addNeteaseAccount" :disabled="!neteaseForm.email || !neteaseForm.auth_code">添加账号</button>
+  <button class="btn btn-secondary" @click="showNeteaseDialog = false">{{ $t("取消") }}</button>
+  <button class="btn btn-primary" @click="addNeteaseAccount" :disabled="!neteaseForm.email || !neteaseForm.auth_code">{{ $t("添加账号") }}</button>
   </div>
   </div>
   </div>
@@ -169,25 +157,23 @@
   <!-- 新浪邮箱授权码对话框 -->
   <div v-if="showSinaDialog" class="dialog-overlay" @click.self="showSinaDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">添加新浪邮箱</h3>
-  <p class="dialog-desc">请输入新浪邮箱地址和授权码</p>
+  <h3 class="dialog-title">{{ $t("添加新浪邮箱") }}</h3>
+  <p class="dialog-desc">{{ $t("请输入新浪邮箱地址和授权码") }}</p>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">邮箱地址</label>
+  <label class="field-label">{{ $t("邮箱地址") }}</label>
   <input v-model="sinaForm.email" class="input" type="email" placeholder="example@sina.com / @sina.cn / @vip.sina.com" />
   </div>
   <div class="form-field">
-  <label class="field-label">授权码</label>
-  <input v-model="sinaForm.auth_code" class="input" type="password" placeholder="新浪邮箱授权码" />
-  <p class="field-hint">
-  授权码需要在新浪邮箱设置中开启IMAP/SMTP服务后获取
-  <a href="https://mail.sina.com.cn/help2.html" target="_blank" class="hint-link">查看教程</a>
+  <label class="field-label">{{ $t("授权码") }}</label>
+  <input v-model="sinaForm.auth_code" class="input" type="password" :placeholder='$t("新浪邮箱授权码")' />
+  <p class="field-hint">{{ $t("授权码需要在新浪邮箱设置中开启IMAP/SMTP服务后获取") }}<a href="https://mail.sina.com.cn/help2.html" target="_blank" class="hint-link">{{ $t("查看教程") }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showSinaDialog = false">取消</button>
-  <button class="btn btn-primary" @click="addSinaAccount" :disabled="!sinaForm.email || !sinaForm.auth_code">添加账号</button>
+  <button class="btn btn-secondary" @click="showSinaDialog = false">{{ $t("取消") }}</button>
+  <button class="btn btn-primary" @click="addSinaAccount" :disabled="!sinaForm.email || !sinaForm.auth_code">{{ $t("添加账号") }}</button>
   </div>
   </div>
   </div>
@@ -195,25 +181,23 @@
   <!-- iCloud邮箱应用专用密码对话框 -->
   <div v-if="showICloudDialog" class="dialog-overlay" @click.self="showICloudDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">添加iCloud邮箱</h3>
-  <p class="dialog-desc">请输入iCloud邮箱地址和应用专用密码</p>
+  <h3 class="dialog-title">{{ $t("添加iCloud邮箱") }}</h3>
+  <p class="dialog-desc">{{ $t("请输入iCloud邮箱地址和应用专用密码") }}</p>
   <div class="qq-form">
   <div class="form-field">
-  <label class="field-label">iCloud邮箱地址</label>
+  <label class="field-label">{{ $t("iCloud邮箱地址") }}</label>
   <input v-model="icloudForm.email" class="input" type="email" placeholder="example@icloud.com" />
   </div>
   <div class="form-field">
-  <label class="field-label">应用专用密码</label>
-  <input v-model="icloudForm.auth_code" class="input" type="password" placeholder="Apple ID 应用专用密码" />
-  <p class="field-hint">
-  应用专用密码需要在 Apple ID 账户页面生成
-  <a href="https://appleid.apple.com/account/manage" target="_blank" class="hint-link">前往生成</a>
+  <label class="field-label">{{ $t("应用专用密码") }}</label>
+  <input v-model="icloudForm.auth_code" class="input" type="password" :placeholder='$t("Apple ID 应用专用密码")' />
+  <p class="field-hint">{{ $t("应用专用密码需要在 Apple ID 账户页面生成") }}<a href="https://appleid.apple.com/account/manage" target="_blank" class="hint-link">{{ $t("前往生成") }}</a>
   </p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showICloudDialog = false">取消</button>
-  <button class="btn btn-primary" @click="addICloudAccount" :disabled="!icloudForm.email || !icloudForm.auth_code">添加账号</button>
+  <button class="btn btn-secondary" @click="showICloudDialog = false">{{ $t("取消") }}</button>
+  <button class="btn btn-primary" @click="addICloudAccount" :disabled="!icloudForm.email || !icloudForm.auth_code">{{ $t("添加账号") }}</button>
   </div>
   </div>
   </div>
@@ -221,42 +205,42 @@
   <!-- 自定义邮箱（标准 IMAP/SMTP）对话框 -->
   <div v-if="showCustomDialog" class="dialog-overlay" @click.self="showCustomDialog = false">
   <div class="dialog" style="width: 420px;">
-  <h3 class="dialog-title">添加自定义邮箱</h3>
-  <p class="dialog-desc">支持所有标准 IMAP/SMTP 协议的邮箱服务</p>
+  <h3 class="dialog-title">{{ $t("添加自定义邮箱") }}</h3>
+  <p class="dialog-desc">{{ $t("支持所有标准 IMAP/SMTP 协议的邮箱服务") }}</p>
   <div class="qq-form">
   <!-- 邮箱地址 -->
   <div class="form-field">
-  <label class="field-label">邮箱地址</label>
+  <label class="field-label">{{ $t("邮箱地址") }}</label>
   <input v-model="customForm.email" class="input" type="email" placeholder="example@example.com" />
   </div>
   <!-- 授权码/密码 -->
   <div class="form-field">
-  <label class="field-label">授权码 / 密码</label>
-  <input v-model="customForm.auth_code" class="input" type="password" placeholder="邮箱授权码或登录密码" />
-  <p class="field-hint">部分邮箱需要在设置中开启 IMAP/SMTP 服务并生成授权码</p>
+  <label class="field-label">{{ $t("授权码 / 密码") }}</label>
+  <input v-model="customForm.auth_code" class="input" type="password" :placeholder='$t("邮箱授权码或登录密码")' />
+  <p class="field-hint">{{ $t("部分邮箱需要在设置中开启 IMAP/SMTP 服务并生成授权码") }}</p>
   </div>
   <!-- IMAP 服务器配置 -->
   <div class="form-field">
-  <label class="field-label">IMAP 服务器</label>
+  <label class="field-label">{{ $t("IMAP 服务器") }}</label>
   <div class="form-row">
   <input v-model="customForm.imap_host" class="input" type="text" placeholder="imap.example.com" />
   <input v-model.number="customForm.imap_port" class="input port-input" type="number" placeholder="993" />
   </div>
-  <p class="field-hint">用于收信。139 邮箱这类服务通常使用 143 + 不加密</p>
+  <p class="field-hint">{{ $t("用于收信。139 邮箱这类服务通常使用 143 + 不加密") }}</p>
   </div>
   <!-- IMAP 加密方式 -->
   <div class="form-field">
-  <label class="field-label">IMAP 加密方式</label>
+  <label class="field-label">{{ $t("IMAP 加密方式") }}</label>
   <select class="input ssl-select" :value="customForm.imap_ssl" @change="onImapSslChange(($event.target as HTMLSelectElement).value as 'ssl' | 'starttls' | 'none')">
-  <option value="ssl">SSL 直连（默认 993）</option>
-  <option value="starttls">STARTTLS（默认 143）</option>
-  <option value="none">不加密（默认 143）</option>
+  <option value="ssl">{{ $t("SSL 直连（默认 993）") }}</option>
+  <option value="starttls">{{ $t("STARTTLS（默认 143）") }}</option>
+  <option value="none">{{ $t("不加密（默认 143）") }}</option>
   </select>
-  <p class="field-hint">切换加密方式时端口会自动联动，可手动修改</p>
+  <p class="field-hint">{{ $t("切换加密方式时端口会自动联动，可手动修改") }}</p>
   </div>
   <!-- SMTP 服务器配置 -->
   <div class="form-field">
-  <label class="field-label">SMTP 服务器</label>
+  <label class="field-label">{{ $t("SMTP 服务器") }}</label>
   <div class="form-row">
   <input v-model="customForm.smtp_host" class="input" type="text" placeholder="smtp.example.com" />
   <input v-model.number="customForm.smtp_port" class="input port-input" type="number" placeholder="465" />
@@ -264,17 +248,17 @@
   </div>
   <!-- SMTP 加密方式 -->
   <div class="form-field">
-  <label class="field-label">SMTP 加密方式</label>
+  <label class="field-label">{{ $t("SMTP 加密方式") }}</label>
   <select class="input ssl-select" :value="customForm.smtp_ssl" @change="onSmtpSslChange(($event.target as HTMLSelectElement).value as 'ssl' | 'starttls')">
-  <option value="ssl">SSL 直连（默认 465）</option>
-  <option value="starttls">STARTTLS（默认 587）</option>
+  <option value="ssl">{{ $t("SSL 直连（默认 465）") }}</option>
+  <option value="starttls">{{ $t("STARTTLS（默认 587）") }}</option>
   </select>
-  <p class="field-hint">切换加密方式时端口会自动联动，可手动修改</p>
+  <p class="field-hint">{{ $t("切换加密方式时端口会自动联动，可手动修改") }}</p>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showCustomDialog = false">取消</button>
-  <button class="btn btn-primary" @click="addCustomAccount" :disabled="!customForm.email || !customForm.auth_code || !customForm.imap_host || !customForm.smtp_host">添加账号</button>
+  <button class="btn btn-secondary" @click="showCustomDialog = false">{{ $t("取消") }}</button>
+  <button class="btn btn-primary" @click="addCustomAccount" :disabled="!customForm.email || !customForm.auth_code || !customForm.imap_host || !customForm.smtp_host">{{ $t("添加账号") }}</button>
   </div>
   </div>
   </div>
@@ -282,31 +266,31 @@
   <!-- 编辑账号对话框 -->
   <div v-if="showEditDialog" class="dialog-overlay" @click.self="showEditDialog = false">
   <div class="dialog">
-  <h3 class="dialog-title">编辑账号</h3>
+  <h3 class="dialog-title">{{ $t("编辑账号") }}</h3>
   <p class="dialog-desc">{{ editingAccount?.email }}</p>
   <div class="edit-form">
   <div class="form-field">
-  <label class="field-label">备注名</label>
-  <input v-model="editForm.remark" class="input" type="text" placeholder="如：工作邮箱" />
+  <label class="field-label">{{ $t("备注名") }}</label>
+  <input v-model="editForm.remark" class="input" type="text" :placeholder='$t("如：工作邮箱")' />
   </div>
   <div class="form-field">
-  <label class="field-label">分组</label>
-  <input v-model="editForm.group_name" class="input" type="text" placeholder="如：工作、个人" />
+  <label class="field-label">{{ $t("分组") }}</label>
+  <input v-model="editForm.group_name" class="input" type="text" :placeholder='$t("如：工作、个人")' />
   <div v-if="existingGroups.length" class="group-tags">
   <button v-for="g in existingGroups" :key="g" class="group-tag" :class="{ active: editForm.group_name === g }" @click="editForm.group_name = g">{{ g }}</button>
   </div>
   </div>
   <div class="form-field toggle-field">
-  <span class="toggle-label">隐藏邮箱地址</span>
+  <span class="toggle-label">{{ $t("隐藏邮箱地址") }}</span>
   <button class="toggle-switch" :class="{ active: editForm.hide_email }" @click="editForm.hide_email = !editForm.hide_email" type="button">
   <span class="toggle-knob"></span>
   </button>
   </div>
   </div>
   <div class="dialog-actions">
-  <button class="btn btn-secondary" @click="showEditDialog = false">取消</button>
-  <button class="btn btn-danger-text" @click="confirmDelete(editingAccount!)">删除账号</button>
-  <button class="btn btn-primary" @click="saveEdit">保存</button>
+  <button class="btn btn-secondary" @click="showEditDialog = false">{{ $t("取消") }}</button>
+  <button class="btn btn-danger-text" @click="confirmDelete(editingAccount!)">{{ $t("删除账号") }}</button>
+  <button class="btn btn-primary" @click="saveEdit">{{ $t("保存") }}</button>
   </div>
   </div>
   </div>
@@ -314,6 +298,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { openAuthWindowSync, navigateAuthWindow, closeAuthWindow, authWindowBlockedMessage } from '../utils/oauthWindow';
 import { ref, computed, onMounted } from 'vue';
 import api from '../utils/api';
@@ -382,22 +368,22 @@ const providers = [
   },
   {
   type: 'qq',
-  name: '腾讯邮箱',
+  name: t("腾讯邮箱"),
   icon: '<svg width="24" height="24" viewBox="0 0 1024 1024"><path d="M211.101867 363.776c-14.933333 66.56-7.466667 133.12 7.466666 192.256 14.933333 51.754667-7.466667 103.509333-52.309333 133.077333-67.285333 36.949333-149.461333-14.805333-156.970667-81.322666C-57.954133 260.266667 255.944533-57.642667 614.728533 8.874667c-209.28 22.186667-366.250667 162.688-403.626666 354.901333z" fill="#FFDC04"/><path d="M532.4672 844.373333c59.818667-22.186667 119.594667-59.136 164.437333-103.509333 37.376-36.992 97.152-44.373333 141.994667-14.805333 67.285333 36.992 67.285333 133.12 7.509333 177.493333-269.098667 229.162667-702.549333 118.272-822.186666-221.866667 112.128 162.688 321.408 221.866667 508.245333 162.688z" fill="#E03A22"/><path d="M794.056533 326.826667a425.173333 425.173333 0 0 0-171.861333-88.746667c-52.352-14.762667-89.728-59.136-89.728-110.933333 0-73.898667 82.218667-125.653333 149.504-96.085334 336.341333 118.314667 455.893333 539.733333 216.746667 813.312 89.685333-177.493333 37.376-391.850667-104.661334-517.546666z" fill="#27AA3A"/><path d="M652.104533 489.472c0-14.805333 0-29.568-7.509333-36.949333 0-7.424 0-7.424-7.466667-14.805334 0-73.941333-44.842667-133.12-127.061333-133.12-82.218667 0-127.061333 59.178667-127.061333 133.12 0 7.381333-7.466667 7.381333-7.466667 14.805334-7.466667 14.762667-7.466667 22.186667-7.466667 29.568v7.381333c-14.933333 7.381333-29.909333 29.568-37.376 51.754667-14.933333 36.949333-14.933333 73.941333-7.466666 73.941333 7.466667 7.381333 22.4-7.381333 37.333333-22.186667 0 22.186667 14.933333 44.373333 29.909333 59.136-14.933333 0-29.866667 14.805333-29.866666 29.568 0 22.186667 29.866667 36.992 74.709333 36.992 37.376 0 67.285333-14.805333 74.752-29.568h7.466667c7.466667 14.762667 37.376 29.568 74.752 29.568s74.752-14.805333 74.752-36.992c0-14.762667-14.933333-22.186667-29.909334-29.568 14.933333-14.762667 29.866667-29.568 37.376-51.754666 14.933333 22.186667 29.866667 29.568 37.376 22.186666 14.933333-7.381333 7.466667-36.949333-7.466667-73.941333-7.466667-22.186667-22.4-44.373333-37.376-51.754667v-7.381333z" fill="#2B2B2B"/></svg>',
   },
   {
   type: 'netease',
-  name: '网易邮箱',
+  name: t("网易邮箱"),
   icon: '<svg width="24" height="24" viewBox="0 0 1024 1024"><path d="M592.298667 661.76c60.458667-47.573333 67.072-49.92 84.992-27.392 15.573333 19.242667 12.245333 22.741333-91.733334 113.365333-34.688 30.592-63.744 62.293333-63.744 71.381334 0 7.936-8.96 14.762667-19.029333 14.762666-10.026667 0-46.933333 19.285333-81.493333 44.288C353.024 926.890667 227.84 981.333333 184.192 981.333333c-71.466667 0-67.072-71.381333 5.632-91.733333 124.117333-34.090667 251.605333-106.581333 402.432-227.84z m-46.848-200.618667c14.506667-5.717333 39.125333-7.978667 54.826666-5.589333 15.573333 1.109333 51.370667 5.674667 80.426667 9.045333 128.512 14.805333 224.64 132.693333 214.613333 259.626667-5.546667 70.229333-24.576 106.538667-81.578666 158.634667-89.514667 81.536-214.698667 121.216-257.109334 82.688-27.989333-26.112-50.304-81.706667-41.344-103.210667 5.546667-15.914667 10.069333-15.914667 41.344 1.152 70.4 36.266667 171.008-2.261333 229.12-87.296 58.154667-86.186667 33.493333-180.266667-46.933333-180.266667-29.056 0-40.234667-6.741333-51.370667-31.701333-21.333333-44.16-63.744-46.378667-111.829333-4.48-223.530667 196.053333-431.488 302.592-478.421333 245.930667-30.165333-36.224-6.741333-54.357333 117.333333-90.666667 42.538667-12.544 112.938667-49.834667 191.146667-103.168 111.786667-74.752 124.074667-86.058667 119.68-112.170667-4.522667-21.504 0-30.592 20.096-38.528z m-191.146667-410.282666c60.330667-12.458667 257.024-10.24 307.370667 3.328 95.061333 25.002667 110.634667 41.941333 138.666666 160 16.725333 70.272 15.616 101.973333-4.522666 150.698666-22.314667 55.594667-64.853333 69.12-201.216 68.010667-109.610667-1.109333-111.786667 0-130.816 29.44-23.509333 38.442667-118.570667 114.432-160.981334 130.346667-128.512 46.378667-200.106667 50.944-211.285333 14.677333-11.136-35.2 13.397333-56.704 66.005333-56.704 65.834667 0 174.336-44.245333 205.610667-82.773333 12.245333-13.568 4.437333-17.066667-48.085333-21.546667-70.4-5.589333-95.018667-28.330667-108.373334-99.712-12.245333-66.56 7.466667-125.738667 52.309334-147.242667 22.314667-10.24 74.922667-22.186667 119.765333-29.568 44.842667-5.674667 89.685333-22.186667 97.152-36.949333 7.466667-14.805333 29.866667-22.186667 52.309333-14.805333 22.314667 7.381333 52.309333 2.261333 67.242667-10.24 22.314667-19.242667 37.376-17.066667 52.309333 5.674666 14.933333 22.186667 44.842667 29.568 82.218667 22.186667z" fill="#C5161C"/></svg>',
   },
   {
   type: 'sina',
-  name: '新浪邮箱',
+  name: t("新浪邮箱"),
   icon: '<svg width="24" height="24" viewBox="0 0 1024 1024"><path d="M769.92256 503.466667c-40.96-8.618667-21.162667-30.250667-21.162667-30.250667s39.509333-66.218667-8.490666-115.2c-59.306667-60.458667-201.856 7.253333-201.856 7.253333-55.04 17.237333-39.552-7.253333-32.469334-50.432 0-50.389333-16.938667-135.381333-162.346666-84.949333-142.592 51.84-266.837333 228.949333-266.837334 228.949333C-10.792107 576.853333 0.471893 667.648 0.471893 667.648c21.162667 201.6 231.552 256.298667 393.898667 269.269333 172.202667 14.421333 402.346667-60.458667 472.917333-213.12 72.021333-151.210667-56.448-211.669333-97.408-220.330666m-361.386666 377.301333c-170.837333 7.210667-307.797333-79.232-307.797334-195.84 0-116.650667 136.96-208.810667 307.797334-217.472 169.386667-7.168 307.754667 64.853333 307.754666 180.053333 0 116.608-138.368 224.597333-307.754666 233.258667" fill="#D81E06"/><path d="M374.65856 545.237333c-170.837333 20.138667-151.04 184.32-151.04 184.32s-1.450667 51.84 46.549333 77.738667c100.266667 54.741333 203.306667 21.632 255.530667-47.488 50.816-67.712 19.754667-234.752-151.04-214.613333m-43.776 228.992c-32.469333 4.309333-57.898667-14.378667-57.898667-41.770667 0-27.306667 22.613333-56.149333 55.04-59.008 36.693333-2.901333 60.714667 18.688 60.714667 44.629333 0 27.349333-25.386667 53.290667-57.856 56.149334m100.224-87.850667c-11.306667 8.661333-23.978667 7.253333-29.653333-2.858667a25.770667 25.770667 0 0 1 7.082666-33.109333c12.672-10.112 25.386667-7.253333 31.061334 2.858667 7.04 10.069333 2.816 24.490667-8.490667 33.109333" fill="#2C2C2C"/><path d="M1018.413227 412.757333c1.408-2.901333 1.408-7.210667 1.408-10.069333 2.816-15.872 4.224-31.701333 4.224-47.530667C1024.045227 182.357333 885.677227 42.666667 716.29056 42.666667c-24.021333 0-42.368 18.730667-42.368 43.221333 0 24.448 18.346667 43.178667 42.368 43.178667 122.794667 0 221.653333 100.821333 221.653333 226.090666 0 14.378667-1.408 27.349333-4.266666 41.770667v4.266667c0 24.533333 18.346667 43.221333 42.368 43.221333 21.162667 0 38.101333-12.928 42.368-31.658667" fill="#D81E06"/><path d="M885.677227 370.986667c0-5.76 1.408-10.069333 1.408-15.829334 0-95.061333-76.202667-172.8-169.386667-172.8a35.285333 35.285333 0 0 0-35.285333 36.010667c0 20.138667 15.530667 35.968 35.285333 35.968 55.04 0 98.816 44.672 98.816 100.821333 0 4.309333 0 8.618667-1.408 12.970667h1.408c0 1.408-1.408 2.858667-1.408 4.266667 0 20.181333 15.530667 36.053333 35.285333 36.053333 18.346667 0 32.469333-14.421333 33.877334-31.701333v-2.858667c1.408 0 1.408 0 1.408-2.901333 0 1.450667 0 1.450667 0 0" fill="#D81E06"/></svg>',
   },
   {
   type: 'icloud',
-  name: 'iCloud邮箱',
+  name: t("iCloud邮箱"),
   icon: '<svg width="24" height="24" viewBox="0 0 1024 1024"><path d="M791.488 544.095c-1.28-129.695 105.76-191.871 110.528-194.975-60.16-88.032-153.856-100.064-187.232-101.472-79.744-8.064-155.584 46.944-196.064 46.944-40.352 0-102.816-45.76-168.96-44.544-86.912 1.28-167.072 50.528-211.808 128.384-90.304 156.703-23.136 388.831 64.896 515.935 43.008 62.208 94.304 132.064 161.632 129.568 64.832-2.592 89.376-41.952 167.744-41.952s100.416 41.952 169.056 40.672c69.76-1.312 113.984-63.392 156.704-125.792 49.376-72.16 69.728-142.048 70.912-145.632-1.536-0.704-136.064-52.224-137.408-207.136zM662.56 163.52C698.304 120.16 722.432 60 715.84 0c-51.488 2.112-113.888 34.304-150.816 77.536-33.152 38.368-62.144 99.616-54.368 158.432 57.472 4.48 116.128-29.216 151.904-72.448z" fill="currentColor"/></svg>',
   },
   {
@@ -408,7 +394,7 @@ const providers = [
   {
   // 自定义邮箱：用户填写 IMAP/SMTP 配置，兼容所有标准协议邮箱
   type: 'custom',
-  name: '自定义邮箱',
+  name: t("自定义邮箱"),
   icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 5L2 7"/></svg>',
   },
 ];
@@ -436,7 +422,7 @@ const groupedAccounts = computed(() => {
   } else {
   const map = new Map<string, any[]>();
   mailStore.accounts.forEach(a => {
-  const key = a.group_name || '未分组';
+  const key = a.group_name || t("未分组");
   if (!map.has(key)) map.set(key, []);
   map.get(key)!.push(a);
   });
@@ -481,7 +467,7 @@ async function checkAllAccountsStatus() {
   const data = await api.post(`/accounts/${account.id}/test`) as any;
   account.status = data.success ? 'connected' : 'error';
   if (!data.success) {
-  console.warn('账号连接检测失败:', account.email, data.error || '未知错误');
+  console.warn('账号连接检测失败:', account.email, data.error || t("未知错误"));
   }
   } catch {
   account.status = 'error';
@@ -531,7 +517,7 @@ async function startAuth() {
     }) as any;
     if (data.error) {
       closeAuthWindow(authWindow);
-      ui.error('获取授权链接失败：' + data.error);
+      ui.error(t("获取授权链接失败：") + data.error);
       return;
     }
     if (data.auth_url) {
@@ -540,100 +526,100 @@ async function startAuth() {
       }
     } else {
       closeAuthWindow(authWindow);
-      ui.error('获取授权链接失败');
+      ui.error(t("获取授权链接失败"));
     }
   } catch (e: any) {
     closeAuthWindow(authWindow);
-    ui.error('获取授权链接失败：' + (e.response?.data?.error || e.message || '网络错误'));
+    ui.error(t("获取授权链接失败：") + (e.response?.data?.error || e.message || t("网络错误")));
   }
 }
 async function addQQAccount() {
-  if (!qqForm.value.email || !qqForm.value.auth_code) { ui.warning('请填写邮箱地址和授权码'); return; }
+  if (!qqForm.value.email || !qqForm.value.auth_code) { ui.warning(t("请填写邮箱地址和授权码")); return; }
   try {
   const data = await api.post('/accounts/add-qq', { email: qqForm.value.email, auth_code: qqForm.value.auth_code, is_exmail: qqForm.value.is_exmail }, { timeout: 30000 }) as any;
   if (data.success) {
-  ui.success(qqForm.value.is_exmail ? '腾讯企业邮箱添加成功！' : '腾讯邮箱添加成功！');
+  ui.success(qqForm.value.is_exmail ? t("腾讯企业邮箱添加成功！") : t("腾讯邮箱添加成功！"));
   showQQDialog.value = false;
   qqForm.value = { email: '', auth_code: '', is_exmail: false };
   await mailStore.loadAccounts();
   checkAllAccountsStatus();
   } else {
-  ui.error('添加失败：' + (data.error || '未知错误'));
+  ui.error(t("添加失败：") + (data.error || t("未知错误")));
   }
   } catch (e: any) {
-  ui.error('添加失败：' + (e.response?.data?.error || e.message || '网络错误'));
+  ui.error(t("添加失败：") + (e.response?.data?.error || e.message || t("网络错误")));
   }
 }
 
 async function addNeteaseAccount() {
-  if (!neteaseForm.value.email || !neteaseForm.value.auth_code) { ui.warning('请填写邮箱地址和授权码'); return; }
+  if (!neteaseForm.value.email || !neteaseForm.value.auth_code) { ui.warning(t("请填写邮箱地址和授权码")); return; }
   const email = neteaseForm.value.email.toLowerCase();
   const validSuffixes = ['@163.com', '@126.com', '@188.com', '@yeah.net'];
   if (!validSuffixes.some(s => email.endsWith(s))) {
-  ui.warning('请输入163、126、188或yeah.net邮箱地址');
+  ui.warning(t("请输入163、126、188或yeah.net邮箱地址"));
   return;
   }
   try {
   const data = await api.post('/accounts/add-netease', { email: neteaseForm.value.email, auth_code: neteaseForm.value.auth_code }, { timeout: 30000 }) as any;
   if (data.success) {
-  ui.success('网易邮箱添加成功！');
+  ui.success(t("网易邮箱添加成功！"));
   showNeteaseDialog.value = false;
   neteaseForm.value = { email: '', auth_code: '' };
   await mailStore.loadAccounts();
   checkAllAccountsStatus();
   } else {
-  ui.error('添加失败：' + (data.error || '未知错误'));
+  ui.error(t("添加失败：") + (data.error || t("未知错误")));
   }
   } catch (e: any) {
-  ui.error('添加失败：' + (e.response?.data?.error || e.message || '网络错误'));
+  ui.error(t("添加失败：") + (e.response?.data?.error || e.message || t("网络错误")));
   }
 }
 
 async function addSinaAccount() {
-  if (!sinaForm.value.email || !sinaForm.value.auth_code) { ui.warning('请填写邮箱地址和授权码'); return; }
+  if (!sinaForm.value.email || !sinaForm.value.auth_code) { ui.warning(t("请填写邮箱地址和授权码")); return; }
   const email = sinaForm.value.email.toLowerCase();
   const validSuffixes = ['@sina.com', '@sina.cn', '@2008.sina.com', '@vip.sina.com', '@vip.sina.cn'];
   if (!validSuffixes.some(s => email.endsWith(s))) {
-  ui.warning('请输入sina.com、sina.cn、2008.sina.com、vip.sina.com或vip.sina.cn邮箱地址');
+  ui.warning(t("请输入sina.com、sina.cn、2008.sina.com、vip.sina.com或vip.sina.cn邮箱地址"));
   return;
   }
   try {
   const data = await api.post('/accounts/add-sina', { email: sinaForm.value.email, auth_code: sinaForm.value.auth_code }, { timeout: 30000 }) as any;
   if (data.success) {
-  ui.success('新浪邮箱添加成功！');
+  ui.success(t("新浪邮箱添加成功！"));
   showSinaDialog.value = false;
   sinaForm.value = { email: '', auth_code: '' };
   await mailStore.loadAccounts();
   checkAllAccountsStatus();
   } else {
-  ui.error('添加失败：' + (data.error || '未知错误'));
+  ui.error(t("添加失败：") + (data.error || t("未知错误")));
   }
   } catch (e: any) {
-  ui.error('添加失败：' + (e.response?.data?.error || e.message || '网络错误'));
+  ui.error(t("添加失败：") + (e.response?.data?.error || e.message || t("网络错误")));
   }
 }
 
 async function addICloudAccount() {
-  if (!icloudForm.value.email || !icloudForm.value.auth_code) { ui.warning('请填写邮箱地址和应用专用密码'); return; }
+  if (!icloudForm.value.email || !icloudForm.value.auth_code) { ui.warning(t("请填写邮箱地址和应用专用密码")); return; }
   const email = icloudForm.value.email.toLowerCase();
   const validSuffixes = ['@icloud.com', '@me.com', '@mac.com'];
   if (!validSuffixes.some(s => email.endsWith(s))) {
-  ui.warning('请输入icloud.com、me.com或mac.com邮箱地址');
+  ui.warning(t("请输入icloud.com、me.com或mac.com邮箱地址"));
   return;
   }
   try {
   const data = await api.post('/accounts/add-icloud', { email: icloudForm.value.email, auth_code: icloudForm.value.auth_code }, { timeout: 30000 }) as any;
   if (data.success) {
-  ui.success('iCloud邮箱添加成功！');
+  ui.success(t("iCloud邮箱添加成功！"));
   showICloudDialog.value = false;
   icloudForm.value = { email: '', auth_code: '' };
   await mailStore.loadAccounts();
   checkAllAccountsStatus();
   } else {
-  ui.error('添加失败：' + (data.error || '未知错误'));
+  ui.error(t("添加失败：") + (data.error || t("未知错误")));
   }
   } catch (e: any) {
-  ui.error('添加失败：' + (e.response?.data?.error || e.message || '网络错误'));
+  ui.error(t("添加失败：") + (e.response?.data?.error || e.message || t("网络错误")));
   }
 }
 
@@ -653,7 +639,7 @@ function onSmtpSslChange(value: 'ssl' | 'starttls') {
 async function addCustomAccount() {
   if (!customForm.value.email || !customForm.value.auth_code
   || !customForm.value.imap_host || !customForm.value.smtp_host) {
-  ui.warning('请填写邮箱地址、授权码和 IMAP/SMTP 服务器地址');
+  ui.warning(t("请填写邮箱地址、授权码和 IMAP/SMTP 服务器地址"));
   return;
   }
   try {
@@ -668,16 +654,16 @@ async function addCustomAccount() {
   smtp_ssl: customForm.value.smtp_ssl,
   }, { timeout: 30000 }) as any;
   if (data.success) {
-  ui.success('自定义邮箱添加成功！');
+  ui.success(t("自定义邮箱添加成功！"));
   showCustomDialog.value = false;
   customForm.value = { email: '', auth_code: '', imap_host: '', imap_port: 993, imap_ssl: 'ssl', smtp_host: '', smtp_port: 465, smtp_ssl: 'ssl' };
   await mailStore.loadAccounts();
   checkAllAccountsStatus();
   } else {
-  ui.error('添加失败：' + (data.error || '未知错误'));
+  ui.error(t("添加失败：") + (data.error || t("未知错误")));
   }
   } catch (e: any) {
-  ui.error('添加失败：' + (e.response?.data?.error || e.message || '网络错误'));
+  ui.error(t("添加失败：") + (e.response?.data?.error || e.message || t("网络错误")));
   }
 }
 
@@ -695,17 +681,17 @@ async function saveEdit() {
   editingAccount.value.group_name = editForm.value.group_name;
   editingAccount.value.hide_email = editForm.value.hide_email;
   showEditDialog.value = false;
-  ui.success('保存成功');
+  ui.success(t("保存成功"));
   } catch {
-  ui.error('保存失败');
+  ui.error(t("保存失败"));
   }
 }
 
 async function confirmDelete(account: any) {
   const ok = await ui.showConfirm({
-  title: '删除账号',
-  message: `确定要删除账号 ${account.email} 吗？此操作不可撤销。`,
-  confirmText: '删除',
+  title: t("删除账号"),
+  message: t("确定要删除账号 {0} 吗？此操作不可撤销。", [account.email]),
+  confirmText: t("删除"),
   danger: true,
   });
   if (ok) {
@@ -716,9 +702,9 @@ async function confirmDelete(account: any) {
   await mailStore.loadAccounts();
   await mailStore.loadFolders();
   showEditDialog.value = false;
-  ui.success('账号已删除');
+  ui.success(t("账号已删除"));
   } catch {
-  ui.error('删除失败');
+  ui.error(t("删除失败"));
   }
   }
 }
@@ -726,11 +712,11 @@ async function confirmDelete(account: any) {
 
 function statusText(status: string) {
   const map: Record<string, string> = {
-  connected: '已连接',
-  disconnected: '未连接',
-  error: '连接异常',
-  checking: '检测中',
-  reauth_needed: '需要重新授权',
+  connected: t("已连接"),
+  disconnected: t("未连接"),
+  error: t("连接异常"),
+  checking: t("检测中"),
+  reauth_needed: t("需要重新授权"),
   };
   return map[status] || status;
 }
@@ -751,7 +737,7 @@ async function reauthorizeAccount(account: any) {
     }) as any;
     if (data.error) {
       closeAuthWindow(authWindow);
-      ui.error('获取授权链接失败：' + data.error);
+      ui.error(t("获取授权链接失败：") + data.error);
       return;
     }
     if (data.auth_url) {
@@ -760,20 +746,20 @@ async function reauthorizeAccount(account: any) {
       }
     } else {
       closeAuthWindow(authWindow);
-      ui.error('获取授权链接失败');
+      ui.error(t("获取授权链接失败"));
     }
   } catch (e: any) {
     closeAuthWindow(authWindow);
-    ui.error('获取授权链接失败：' + (e?.response?.data?.error || e?.message || '网络错误'));
+    ui.error(t("获取授权链接失败：") + (e?.response?.data?.error || e?.message || t("网络错误")));
   }
 }
 
 /** 整个邮箱全部已读：遍历该账号所有文件夹，服务端 SEARCH UNSEEN + STORE \Seen */
 async function markAccountAllRead(account: any) {
   const ok = await ui.showConfirm({
-    title: '整个邮箱全部已读',
-    message: `将把 ${account.email} 下所有文件夹的未读邮件标记为已读，并同步到邮件服务器。确定吗？`,
-    confirmText: '全部标为已读',
+    title: t("整个邮箱全部已读"),
+    message: t("将把 {0} 下所有文件夹的未读邮件标记为已读，并同步到邮件服务器。确定吗？", [account.email]),
+    confirmText: t("全部标为已读"),
     danger: true,
   });
   if (!ok) return;
@@ -781,14 +767,14 @@ async function markAccountAllRead(account: any) {
     const data = await api.post('/messages/mark-all-read-account', { account_id: account.id }) as any;
     const n = Number(data?.total_marked || 0);
     const failed = (data?.folders || []).filter((f: any) => f.error);
-    if (n > 0) ui.success(`已标记 ${n} 封邮件为已读`);
-    else ui.success('没有未读邮件');
+    if (n > 0) ui.success(t("已标记 {0} 封邮件为已读", [n]));
+    else ui.success(t("没有未读邮件"));
     if (failed.length > 0) {
-      ui.error(`${failed.length} 个文件夹处理失败：${failed[0].folder} ${failed[0].error || ''}`.slice(0, 200));
+      ui.error(t("{0} 个文件夹处理失败：{1} {2}", [failed.length, failed[0].folder, failed[0].error || '']).slice(0, 200));
     }
     mailStore.loadFolderCounts();
   } catch (e: any) {
-    ui.error(e?.response?.data?.detail || e?.message || '操作失败');
+    ui.error(e?.response?.data?.detail || e?.message || t("操作失败"));
   }
 }
 

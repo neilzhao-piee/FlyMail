@@ -21,7 +21,7 @@
   <button v-for="size in fontSizes" :key="size" class="dropdown-item" @click="applyFontSize(size)">
   <span :style="{ fontSize: size }">{{ size }}</span>
   </button>
-  <button class="dropdown-item" @click="applyFontSize(null)">默认</button>
+  <button class="dropdown-item" @click="applyFontSize(null)">{{ $t("默认") }}</button>
   </template>
   <!-- 字体下拉 -->
   <template v-if="btn.dropdownType === 'fontFamily'">
@@ -34,30 +34,30 @@
   <button v-for="h in lineHeightOptions" :key="h.value" class="dropdown-item" @click="applyLineHeight(h.value)">
   {{ h.label }}
   </button>
-  <button class="dropdown-item" @click="applyLineHeight(null)">默认</button>
+  <button class="dropdown-item" @click="applyLineHeight(null)">{{ $t("默认") }}</button>
   </template>
   <!-- 颜色下拉 -->
   <template v-if="btn.dropdownType === 'color'">
   <div class="color-grid">
   <button v-for="c in presetColors" :key="c" class="color-swatch" :style="{ background: c }" @click="applyColor(c)"></button>
   </div>
-  <button class="dropdown-item" @click="applyColor(null)">默认颜色</button>
+  <button class="dropdown-item" @click="applyColor(null)">{{ $t("默认颜色") }}</button>
   </template>
   <!-- 表格操作下拉 -->
   <template v-if="btn.dropdownType === 'table'">
-  <button class="dropdown-item" @click="editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">插入表格</button>
+  <button class="dropdown-item" @click="editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">{{ $t("插入表格") }}</button>
   <div class="dropdown-divider"></div>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowBefore().run()">上方插入行</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowAfter().run()">下方插入行</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnBefore().run()">左侧插入列</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnAfter().run()">右侧插入列</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowBefore().run()">{{ $t("上方插入行") }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addRowAfter().run()">{{ $t("下方插入行") }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnBefore().run()">{{ $t("左侧插入列") }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().addColumnAfter().run()">{{ $t("右侧插入列") }}</button>
   <div class="dropdown-divider"></div>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().mergeCells().run()">合并单元格</button>
-  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().splitCell().run()">拆分单元格</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().mergeCells().run()">{{ $t("合并单元格") }}</button>
+  <button class="dropdown-item" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().splitCell().run()">{{ $t("拆分单元格") }}</button>
   <div class="dropdown-divider"></div>
-  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteRow().run()">删除行</button>
-  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteColumn().run()">删除列</button>
-  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteTable().run()">删除表格</button>
+  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteRow().run()">{{ $t("删除行") }}</button>
+  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteColumn().run()">{{ $t("删除列") }}</button>
+  <button class="dropdown-item danger" :disabled="!editor?.isActive('table')" @click="editor?.chain().focus().deleteTable().run()">{{ $t("删除表格") }}</button>
   </template>
   </div>
   </div>
@@ -76,7 +76,7 @@
 
   <!-- Emoji 选择器 -->
   <div class="toolbar-dropdown emoji-dropdown">
-  <button class="toolbar-btn" title="表情" type="button" @click="showEmojiPicker = !showEmojiPicker">
+  <button class="toolbar-btn" :title='$t("表情")' type="button" @click="showEmojiPicker = !showEmojiPicker">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
   </button>
   <div v-if="showEmojiPicker" class="emoji-picker">
@@ -110,6 +110,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 import { useEditor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -222,7 +224,7 @@ const editor = useEditor({
   }),
   Image,
   Placeholder.configure({
-  placeholder: '写点什么...',
+  placeholder: t("写点什么..."),
   }),
   ],
   content: props.modelValue || '',
@@ -275,13 +277,13 @@ const activeEmojiCategory = ref(0);
 
 /** Emoji 分类数据 */
 const emojiCategories = [
-  { name: '常用', emojis: ['😀','😂','🤣','😊','😍','🥰','😘','😜','🤗','🤔','😎','🥳','😢','😡','🤯','😴','🤮','👍','👎','👏','🙏','💪','❤️','🔥','⭐','🎉','💯','✅','❌','⚡'] },
-  { name: '表情', emojis: ['😁','😅','😆','😉','😋','😎','😏','😒','😞','😔','😟','😕','🙁','😣','😖','😫','😩','🥺','😤','😠','😈','👿','💀','💩','🤡','👹','👺','👻','👽','🤖'] },
-  { name: '手势', emojis: ['👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏'] },
-  { name: '动物', emojis: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦅','🦆','🦉','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞'] },
-  { name: '食物', emojis: ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍆','🌽','🌶️','🥕','🧅','🍔','🍟','🍕','🌭','🥪','🌮','🍜'] },
-  { name: '自然', emojis: ['🌸','🌺','🌻','🌹','🌷','🌼','💐','🌾','🍀','🌿','🌲','🌳','🌴','🌵','🍁','🍂','🍃','🌈','☀️','🌤️','⛅','🌥️','☁️','🌧️','❄️','💧','🌊','🔥','⭐','🌙'] },
-  { name: '物品', emojis: ['📧','📩','📨','📮','📝','📄','📅','📌','📎','✏️','🖊️','🖋️','💻','📱','☎️','💡','🔑','🔒','🎁','🎀','🎈','🎊','🏆','🥇','🎵','🎶','🎸','🎮','🎯','🚀'] },
+  { name: t("常用"), emojis: ['😀','😂','🤣','😊','😍','🥰','😘','😜','🤗','🤔','😎','🥳','😢','😡','🤯','😴','🤮','👍','👎','👏','🙏','💪','❤️','🔥','⭐','🎉','💯','✅','❌','⚡'] },
+  { name: t("表情"), emojis: ['😁','😅','😆','😉','😋','😎','😏','😒','😞','😔','😟','😕','🙁','😣','😖','😫','😩','🥺','😤','😠','😈','👿','💀','💩','🤡','👹','👺','👻','👽','🤖'] },
+  { name: t("手势"), emojis: ['👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏'] },
+  { name: t("动物"), emojis: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦅','🦆','🦉','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞'] },
+  { name: t("食物"), emojis: ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🍆','🌽','🌶️','🥕','🧅','🍔','🍟','🍕','🌭','🥪','🌮','🍜'] },
+  { name: t("自然"), emojis: ['🌸','🌺','🌻','🌹','🌷','🌼','💐','🌾','🍀','🌿','🌲','🌳','🌴','🌵','🍁','🍂','🍃','🌈','☀️','🌤️','⛅','🌥️','☁️','🌧️','❄️','💧','🌊','🔥','⭐','🌙'] },
+  { name: t("物品"), emojis: ['📧','📩','📨','📮','📝','📄','📅','📌','📎','✏️','🖊️','🖋️','💻','📱','☎️','💡','🔑','🔒','🎁','🎀','🎈','🎊','🏆','🥇','🎵','🎶','🎸','🎮','🎯','🚀'] },
 ];
 
 /** 插入 emoji 到编辑器光标位置 */
@@ -319,11 +321,11 @@ const lineHeightOptions = [
   { label: '3.0', value: '3' },
 ];
 const fontFamilies = [
-  { label: '默认', value: '' },
-  { label: '宋体', value: 'SimSun, serif' },
-  { label: '黑体', value: 'SimHei, sans-serif' },
-  { label: '微软雅黑', value: 'Microsoft YaHei, sans-serif' },
-  { label: '楷体', value: 'KaiTi, serif' },
+  { label: t("默认"), value: '' },
+  { label: t("宋体"), value: 'SimSun, serif' },
+  { label: t("黑体"), value: 'SimHei, sans-serif' },
+  { label: t("微软雅黑"), value: 'Microsoft YaHei, sans-serif' },
+  { label: t("楷体"), value: 'KaiTi, serif' },
   { label: 'Arial', value: 'Arial, sans-serif' },
   { label: 'Times New Roman', value: 'Times New Roman, serif' },
   { label: 'Courier New', value: 'Courier New, monospace' },
@@ -336,7 +338,7 @@ const currentColor = computed(() => editor.value?.getAttributes('textStyle').col
 // 当前字体名称（用于字体按钮显示）
 const currentFontLabel = computed(() => {
   const family = editor.value?.getAttributes('textStyle').fontFamily as string | undefined;
-  if (!family) return '字体';
+  if (!family) return t("字体");
   const match = fontFamilies.find(f => f.value && family.startsWith(f.value.split(',')[0].trim()));
   return match ? match.label : family.split(',')[0].trim();
 });
@@ -344,7 +346,7 @@ const currentFontLabel = computed(() => {
 // 当前字号（用于字号按钮显示）
 const currentSizeLabel = computed(() => {
   const size = editor.value?.getAttributes('textStyle').fontSize as string | undefined;
-  return size || '字号';
+  return size || t("字号");
 });
 
 /**
@@ -404,88 +406,88 @@ const applyColor = (color: string | null) => {
 const toolbarButtons = [
   {
   name: 'fontFamily',
-  title: '字体',
+  title: t("字体"),
   isDropdown: true,
   dropdownType: 'fontFamily',
   },
   {
   name: 'fontSize',
-  title: '字号',
+  title: t("字号"),
   isDropdown: true,
   dropdownType: 'fontSize',
   },
   {
   name: 'color',
-  title: '文字颜色',
+  title: t("文字颜色"),
   isDropdown: true,
   dropdownType: 'color',
   },
   {
   name: 'bold',
-  title: '加粗',
+  title: t("加粗"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>',
   action: () => editor.value?.chain().focus().toggleBold().run(),
   isActive: () => editor.value?.isActive('bold'),
   },
   {
   name: 'italic',
-  title: '斜体',
+  title: t("斜体"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>',
   action: () => editor.value?.chain().focus().toggleItalic().run(),
   isActive: () => editor.value?.isActive('italic'),
   },
   {
   name: 'underline',
-  title: '下划线',
+  title: t("下划线"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3v7a6 6 0 0 0 12 0V3"/><line x1="4" y1="21" x2="20" y2="21"/></svg>',
   action: () => editor.value?.chain().focus().toggleUnderline().run(),
   isActive: () => editor.value?.isActive('underline'),
   },
   {
   name: 'strike',
-  title: '删除线',
+  title: t("删除线"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 4H9a3 3 0 0 0-3 3c0 1.5 1 2.5 2.5 3"/><line x1="4" y1="12" x2="20" y2="12"/><path d="M15 12c1.5.5 3 1.5 3 3a3 3 0 0 1-3 3H8"/></svg>',
   action: () => editor.value?.chain().focus().toggleStrike().run(),
   isActive: () => editor.value?.isActive('strike'),
   },
   {
   name: 'h1',
-  title: '标题1',
+  title: t("标题1"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h8"/><path d="M4 18V6"/><path d="M12 18V6"/><path d="M17 12l2-2v8"/></svg>',
   action: () => editor.value?.chain().focus().toggleHeading({ level: 1 }).run(),
   isActive: () => editor.value?.isActive('heading', { level: 1 }),
   },
   {
   name: 'h2',
-  title: '标题2',
+  title: t("标题2"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h8"/><path d="M4 18V6"/><path d="M12 18V6"/><path d="M18 12c1.5-1.5 3-2 3-3.5a2 2 0 0 0-4 0"/><path d="M17 16h4"/></svg>',
   action: () => editor.value?.chain().focus().toggleHeading({ level: 2 }).run(),
   isActive: () => editor.value?.isActive('heading', { level: 2 }),
   },
   {
   name: 'bulletList',
-  title: '无序列表',
+  title: t("无序列表"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>',
   action: () => editor.value?.chain().focus().toggleBulletList().run(),
   isActive: () => editor.value?.isActive('bulletList'),
   },
   {
   name: 'orderedList',
-  title: '有序列表',
+  title: t("有序列表"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="8" font-size="8" fill="currentColor" stroke="none">1</text><text x="2" y="14" font-size="8" fill="currentColor" stroke="none">2</text><text x="2" y="20" font-size="8" fill="currentColor" stroke="none">3</text></svg>',
   action: () => editor.value?.chain().focus().toggleOrderedList().run(),
   isActive: () => editor.value?.isActive('orderedList'),
   },
   {
   name: 'blockquote',
-  title: '引用',
+  title: t("引用"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C9.591 11.689 11 13.166 11 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.36-.598-2.917-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311C19.591 11.689 21 13.166 21 15c0 1.933-1.567 3.5-3.5 3.5-1.22 0-2.36-.598-2.917-1.179z"/></svg>',
   action: () => editor.value?.chain().focus().toggleBlockquote().run(),
   isActive: () => editor.value?.isActive('blockquote'),
   },
   {
   name: 'indent',
-  title: '增加缩进',
+  title: t("增加缩进"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="9" x2="15" y2="9"/><line x1="1" y1="14" x2="15" y2="14"/><line x1="1" y1="19" x2="15" y2="19"/><path d="M19 8l4 4-4 4"/></svg>',
   action: () => {
   const e = editor.value;
@@ -503,7 +505,7 @@ const toolbarButtons = [
   },
   {
   name: 'outdent',
-  title: '减少缩进',
+  title: t("减少缩进"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="9" x2="15" y2="9"/><line x1="1" y1="14" x2="15" y2="14"/><line x1="1" y1="19" x2="15" y2="19"/><path d="M23 8l-4 4 4 4"/></svg>',
   action: () => {
   const e = editor.value;
@@ -523,29 +525,29 @@ const toolbarButtons = [
   },
   {
   name: 'lineHeight',
-  title: '行间距',
+  title: t("行间距"),
   isDropdown: true,
   dropdownType: 'lineHeight',
   },
   {
   name: 'hr',
-  title: '插入分割线',
+  title: t("插入分割线"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="12" x2="22" y2="12"/></svg>',
   action: () => editor.value?.chain().focus().setHorizontalRule().run(),
   isActive: () => false,
   },
   {
   name: 'table',
-  title: '表格',
+  title: t("表格"),
   isDropdown: true,
   dropdownType: 'table',
   },
   {
   name: 'link',
-  title: '插入链接',
+  title: t("插入链接"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
   action: () => {
-  const url = window.prompt('输入链接地址:', 'https://');
+  const url = window.prompt(t("输入链接地址:"), 'https://');
   if (url) {
   editor.value?.chain().focus().setLink({ href: url }).run();
   }
@@ -554,10 +556,10 @@ const toolbarButtons = [
   },
   {
   name: 'image',
-  title: '插入图片',
+  title: t("插入图片"),
   icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
   action: () => {
-  const url = window.prompt('输入图片地址:', 'https://');
+  const url = window.prompt(t("输入图片地址:"), 'https://');
   if (url) {
   editor.value?.chain().focus().setImage({ src: url }).run();
   }
