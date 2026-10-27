@@ -4,7 +4,7 @@
 
 **自托管多邮箱客户端（飞牛 fnOS）——本仓库是 1.0.7 Python 版的社区 fork**
 
-[![Version](https://img.shields.io/badge/version-1.0.7--community.2-blue?style=flat-square)](VERSION)
+[![Version](https://img.shields.io/badge/version-1.0.7--community.3-blue?style=flat-square)](VERSION)
 [![License](https://img.shields.io/badge/license-GPL--3.0-green?style=flat-square)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-yellow?style=flat-square&logo=python)](https://www.python.org/)
 [![Vue](https://img.shields.io/badge/Vue-3-brightgreen?style=flat-square&logo=vue.js)](https://vuejs.org/)
