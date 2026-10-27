@@ -537,8 +537,13 @@ class BaseIMAPReceiver(MailReceiver):
             return []
         return [int(uid) for uid in data[0].split()]
 
+    # 单次 UID SEARCH 的响应行有 1MB 上限（imaplib 限制），
+    # 18 万封的邮箱一次 UID SEARCH 会直接报 "got more than 1000000 bytes"，
+    # 因此按 UID 区间分段查询，每段最多 2 万个 UID（约 140KB 响应）。
+    UID_SEARCH_CHUNK = 20000
+
     def _fetch_new_uids_sync(self, folder: str, since_uid: int) -> List[int]:
-        """获取大于 since_uid 的新邮件 UID 列表
+        """获取大于 since_uid 的新邮件 UID 列表（按 UID 区间分段，避免响应超 1MB）
 
         用于增量同步：只获取比上次同步的最大的 UID 更大的新邮件，
         避免每次都全量拉取所有邮件 UID。
@@ -547,10 +552,38 @@ class BaseIMAPReceiver(MailReceiver):
         if status != 'OK':
             # SELECT 失败（文件夹不存在等），返回空列表避免 SEARCH 报错
             return []
-        status, data = self._conn.uid('SEARCH', None, f'UID {since_uid + 1}:*')
-        if status != 'OK' or not data[0]:
-            return []
-        return [int(uid) for uid in data[0].split()]
+
+        # 先用 STATUS 拿 UIDNEXT（下一次分配的 UID），据此确定分段上界
+        uidnext = 0
+        try:
+            st, dat = self._conn.status(self._quote_mailbox(self._normalize_folder(folder)), '(UIDNEXT)')
+            if st == 'OK' and dat and dat[0]:
+                text = dat[0].decode('utf-8', 'replace') if isinstance(dat[0], bytes) else str(dat[0])
+                import re as _re
+                m = _re.search(r'UIDNEXT\s+(\d+)', text)
+                if m:
+                    uidnext = int(m.group(1))
+        except Exception:
+            uidnext = 0
+
+        if uidnext <= 0:
+            # 拿不到 UIDNEXT 时退回单次查询（小文件夹仍然可用）
+            status, data = self._conn.uid('SEARCH', None, f'UID {since_uid + 1}:*')
+            if status != 'OK' or not data[0]:
+                return []
+            return [int(uid) for uid in data[0].split()]
+
+        uids: List[int] = []
+        start = since_uid + 1
+        while start < uidnext:
+            end = min(start + self.UID_SEARCH_CHUNK - 1, uidnext - 1)
+            status, data = self._conn.uid('SEARCH', None, f'UID {start}:{end}')
+            if status != 'OK':
+                break
+            if data and data[0]:
+                uids.extend(int(uid) for uid in data[0].split())
+            start = end + 1
+        return uids
 
     async def fetch_messages_by_uids(self, folder: str, uids: List[int]) -> List[Message]:
         """异步根据 UID 列表批量获取邮件摘要（增量同步用）"""
