@@ -121,6 +121,7 @@
   <h1 class="topbar-title">{{ currentTitle }}</h1>
   </div>
   <div class="topbar-right">
+  <GlobalSearch @open="onGlobalOpen" />
   <!-- 列表搜索：铃铛左侧，避免列表工具栏拥挤（飞牛 iframe 更合适） -->
   <div v-if="listSearch.visible" class="topbar-search">
   <div class="topbar-search-box">
@@ -346,6 +347,7 @@ import About from './views/About.vue';
 import ComposeEmail from './views/ComposeEmail.vue';
 import ContactList from './views/ContactList.vue';
 import Backup from './views/Backup.vue';
+import GlobalSearch from './components/GlobalSearch.vue';
 
 const mailStore = useMailStore();
 const backupStore = useBackupStore();
@@ -362,6 +364,19 @@ const showNotificationPanel = ref(false);
 const showOtherMenu = ref(false);
 // "其他"菜单激活状态：当前视图为写信/设置/关于时高亮
 const isOtherActive = computed(() => ['compose', 'contacts', 'backup', 'settings', 'about'].includes(currentView.value));
+
+/** 全局搜索结果点击：切到对应账号/文件夹并打开该邮件 */
+function onGlobalOpen(payload: { account_id: string; folder: string; uid: number; id: string }) {
+  const cacheId = `${payload.account_id}:${payload.folder}:${payload.uid}`;
+  mailStore.setAccount(payload.account_id);
+  mailStore.setFolder(payload.folder);
+  currentView.value = 'mail';
+  mailStore.requestOpenMessage({
+    accountId: payload.account_id,
+    folder: payload.folder,
+    messageCacheId: cacheId,
+  });
+}
 
 // 移动端底部导航图标（独立于桌面端 navItems，避免耦合）
 const mobileNavIcons = {
