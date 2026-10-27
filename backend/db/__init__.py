@@ -953,11 +953,14 @@ async def search_cached_messages(
             try:
                 where = " AND ".join(["cached_messages_fts MATCH ?"] + base_filters)
                 params = [expr] + base_params
+                # 注意：不要写成 COUNT(*) FROM fts JOIN cached_messages —— 查询计划会扫 m
+                # 再逐行求 MATCH（10 万行时 16 秒）；rowid IN (子查询) 只算一次命中集。
+                count_where = " AND ".join([f for f in base_filters])
                 cursor = await db.execute(
-                    "SELECT COUNT(*) FROM cached_messages_fts "
-                    "JOIN cached_messages m ON m.rowid = cached_messages_fts.rowid "
-                    f"WHERE {where}",
-                    params,
+                    f"SELECT COUNT(*) FROM cached_messages m WHERE {count_where} "
+                    "AND m.rowid IN (SELECT rowid FROM cached_messages_fts "
+                    "WHERE cached_messages_fts MATCH ?)",
+                    base_params + [expr],
                 )
                 total = (await cursor.fetchone())[0]
                 order = (
@@ -2247,11 +2250,12 @@ async def get_archived_messages(
             try:
                 match_where = " AND ".join(["message_archive_fts MATCH ?"] + where)
                 match_params = [expr] + params
+                archive_where = " AND ".join(where)
                 cursor = await db.execute(
-                    "SELECT COUNT(*) FROM message_archive_fts "
-                    f"JOIN message_archive a ON a.rowid = message_archive_fts.rowid "
-                    f"WHERE {match_where}",
-                    match_params,
+                    f"SELECT COUNT(*) FROM message_archive a WHERE {archive_where} "
+                    "AND a.rowid IN (SELECT rowid FROM message_archive_fts "
+                    "WHERE message_archive_fts MATCH ?)",
+                    params + [expr],
                 )
                 total = (await cursor.fetchone())[0]
                 order = (
