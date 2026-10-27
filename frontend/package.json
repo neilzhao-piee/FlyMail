@@ -1,6 +1,6 @@
 {
   "name": "flymail-frontend",
-  "version": "1.0.7-community.1",
+  "version": "1.0.7-community.2",
   "private": true,
   "scripts": {
     "dev": "vite",
