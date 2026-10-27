@@ -273,7 +273,10 @@ if __name__ == "__main__":
         ]
         if http_port > 0:
             # 自建部署：主应用额外监听 TCP（不带飞牛网关鉴权，请放在反代/内网后）
-            http_server = Server(Config(app, host=http_host, port=http_port, log_level="warning", ws=ws_protocol))
+            # lifespan="off"：主应用的 lifespan 已由 Unix Socket 服务实例负责，
+            # 两个实例同时跑 lifespan 会并发执行 init_db（曾触发 ALTER TABLE 竞态）
+            http_server = Server(Config(app, host=http_host, port=http_port, log_level="warning",
+                                        ws=ws_protocol, lifespan="off"))
             servers.append(http_server.serve())
             logger.info("额外监听 HTTP %s:%d（自建部署）", http_host, http_port)
         logger.info("同时启动 Unix Socket + TCP IPv4/IPv6 端口服务")
