@@ -9,6 +9,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11%2B-yellow?style=flat-square&logo=python)](https://www.python.org/)
 [![Vue](https://img.shields.io/badge/Vue-3-brightgreen?style=flat-square&logo=vue.js)](https://vuejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-self--host-2496ED?style=flat-square&logo=docker)](SELFHOST.md)
+[![CI](https://github.com/neilzhao-piee/FlyMail/actions/workflows/ci.yml/badge.svg)](https://github.com/neilzhao-piee/FlyMail/actions/workflows/ci.yml)
 
 [中文](#中文) · [English](#english) · [自建部署](SELFHOST.md) · [改动清单](#相对上游-107-的改动)
 

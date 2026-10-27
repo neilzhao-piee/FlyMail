@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 自建部署文档 / Self-host guide
+    url: https://github.com/neilzhao-piee/FlyMail/blob/main/SELFHOST.md
+    about: Docker 部署、环境变量与反代配置
