@@ -526,6 +526,7 @@ const en: LocaleMessages = {
   "请先选择邮箱": "Select a mailbox first",
   "还没有联系人": "No contacts yet",
   "隐藏": "Hide",
+  "标记中...": "Marking...",
 }
 
 export default en

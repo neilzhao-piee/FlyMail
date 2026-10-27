@@ -66,7 +66,12 @@
   <div class="card-actions">
   <button v-if="mailStore.reauthAccountIds.has(account.id)" class="btn-reauth-card" @click.stop="reauthorizeAccount(account)" :title='$t("重新授权")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>{{  $t("重新授权")  }}</button>
-  <button class="mark-read-btn" @click.stop="markAccountAllRead(account)" :title='$t("把该邮箱所有文件夹的未读邮件标记为已读")'>{{  $t("全部已读")  }}</button>
+  <button
+  class="mark-read-btn"
+  :disabled="markingIds.includes(account.id)"
+  @click.stop="markAccountAllRead(account)"
+  :title='$t("把该邮箱所有文件夹的未读邮件标记为已读")'
+  >{{ markingIds.includes(account.id) ? $t("标记中...") : $t("全部已读") }}</button>
   <button class="edit-btn" @click.stop="openEditDialog(account)" :title='$t("编辑")'>
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -755,7 +760,10 @@ async function reauthorizeAccount(account: any) {
 }
 
 /** 整个邮箱全部已读：遍历该账号所有文件夹，服务端 SEARCH UNSEEN + STORE \Seen */
+const markingIds = ref<string[]>([])
+
 async function markAccountAllRead(account: any) {
+  if (markingIds.value.includes(account.id)) return
   const ok = await ui.showConfirm({
     title: t("整个邮箱全部已读"),
     message: t("将把 {0} 下所有文件夹的未读邮件标记为已读，并同步到邮件服务器。确定吗？", [account.email]),
@@ -763,8 +771,14 @@ async function markAccountAllRead(account: any) {
     danger: true,
   });
   if (!ok) return;
+  markingIds.value.push(account.id);
   try {
-    const data = await api.post('/messages/mark-all-read-account', { account_id: account.id }) as any;
+    // 整个邮箱可能要处理十几万封，给足 5 分钟，避免 30s 默认超时误报失败
+    const data = await api.post(
+      '/messages/mark-all-read-account',
+      { account_id: account.id },
+      { timeout: 300000 },
+    ) as any;
     const n = Number(data?.total_marked || 0);
     const failed = (data?.folders || []).filter((f: any) => f.error);
     if (n > 0) ui.success(t("已标记 {0} 封邮件为已读", [n]));
@@ -775,6 +789,8 @@ async function markAccountAllRead(account: any) {
     mailStore.loadFolderCounts();
   } catch (e: any) {
     ui.error(e?.response?.data?.detail || e?.message || t("操作失败"));
+  } finally {
+    markingIds.value = markingIds.value.filter((id) => id !== account.id);
   }
 }
 

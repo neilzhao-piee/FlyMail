@@ -788,10 +788,15 @@ async def _mark_account_all_read(account, user_uid: str) -> dict:
             if _is_virtual_all_folder(f):
                 continue
             try:
-                uids = await receiver.fetch_unseen_uids(f.path)
-                marked = 0
-                if uids:
-                    marked = await receiver.mark_as_read_batch([str(u) for u in uids], f.path)
+                if hasattr(receiver, "mark_all_seen"):
+                    # 快速路径：STATUS UNSEEN + 区间 STORE，大邮箱只需几条 IMAP 命令
+                    marked = await receiver.mark_all_seen(f.path)
+                    uids = []
+                else:
+                    uids = await receiver.fetch_unseen_uids(f.path)
+                    marked = 0
+                    if uids:
+                        marked = await receiver.mark_as_read_batch([str(u) for u in uids], f.path)
                 await mark_all_cached_messages_read(account.id, f.path)
                 stats = await get_folder_stats(account.id, f.path)
                 await upsert_folder_stats(account.id, f.path, stats.get("total_count", 0), 0)
