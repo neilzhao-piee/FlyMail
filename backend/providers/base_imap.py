@@ -520,57 +520,20 @@ class BaseIMAPReceiver(MailReceiver):
     async def mark_all_seen(self, folder: str) -> int:
         """把整个文件夹标记为已读（服务端 STORE \\Seen），返回原本未读的数量
 
-        比「SEARCH UNSEEN + 逐批 STORE」快得多：先用 STATUS 拿 UNSEEN 数量，
-        再按 UID 区间（每段 2 万）批量 STORE，一次大邮箱只需几条命令。
-        对已经不存在的 UID 区间 STORE 是幂等的，不会报错。
+        实现：SEARCH UNSEEN 拿到未读 UID，再按 500 个一批 STORE \\Seen。
+        不直接 STORE 1:*：Gmail 对 18 万封的范围 STORE 要 60~80 秒，
+        而「先搜未读再只标记未读」在未读数不多时快得多。
         """
         if not self._conn:
             raise ConnectionError("Not connected")
         return await asyncio.to_thread(self._mark_all_seen_sync, folder)
 
     def _mark_all_seen_sync(self, folder: str) -> int:
-        import re as _re
-
-        normalized = self._normalize_folder(folder)
-        quoted = self._quote_mailbox(normalized)
-        status, _ = self._conn.select(quoted, readonly=False)
-        if status != 'OK':
+        uids = self._fetch_unseen_uids_sync(folder)
+        if not uids:
             return 0
-
-        unseen = 0
-        uidnext = 0
-        try:
-            st, dat = self._conn.status(quoted, '(UNSEEN UIDNEXT)')
-            if st == 'OK' and dat and dat[0]:
-                text = dat[0].decode('utf-8', 'replace') if isinstance(dat[0], bytes) else str(dat[0])
-                m = _re.search(r'UNSEEN\s+(\d+)', text)
-                if m:
-                    unseen = int(m.group(1))
-                m2 = _re.search(r'UIDNEXT\s+(\d+)', text)
-                if m2:
-                    uidnext = int(m2.group(1))
-        except Exception:
-            unseen = 0
-
-        if unseen <= 0:
-            return 0
-        if uidnext <= 1:
-            # 拿不到 UIDNEXT 时退回 SEARCH UNSEEN + 批量 STORE
-            uids = self._fetch_unseen_uids_sync(normalized)
-            if not uids:
-                return 0
-            self._mark_read_batch_sync([str(u) for u in uids], normalized)
-            return len(uids)
-
-        chunk = 20000
-        for lo in range(1, uidnext, chunk):
-            hi = min(lo + chunk - 1, uidnext - 1)
-            self._conn.uid('STORE', f'{lo}:{hi}', '+FLAGS.SILENT', r'(\Seen)')
-        return unseen
-
-    def _mark_read_batch_sync(self, message_ids, folder: str) -> int:
-        """标记一批 UID 为已读（内部同步实现）"""
-        return self._mark_seen_batch_sync(message_ids, folder, True)
+        self._mark_seen_batch_sync([str(u) for u in uids], folder, True)
+        return len(uids)
 
     async def fetch_unseen_uids(self, folder: str) -> List[int]:
         """异步获取文件夹中未读邮件的 UID 列表（用于校正 is_read 状态）
