@@ -10,6 +10,7 @@
 [![Vue](https://img.shields.io/badge/Vue-3-brightgreen?style=flat-square&logo=vue.js)](https://vuejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-self--host-2496ED?style=flat-square&logo=docker)](SELFHOST.md)
 [![CI](https://github.com/neilzhao-piee/FlyMail/actions/workflows/ci.yml/badge.svg)](https://github.com/neilzhao-piee/FlyMail/actions/workflows/ci.yml)
+[![GHCR](https://img.shields.io/badge/ghcr.io-neilzhao--piee%2Fflymail-2496ED?style=flat-square&logo=github)](https://github.com/neilzhao-piee/FlyMail/pkgs/container/flymail)
 
 [中文](#中文) · [English](#english) · [自建部署](SELFHOST.md) · [改动清单](#相对上游-107-的改动)
 
@@ -113,6 +114,17 @@ FlyMail（飞邮）是一个自托管邮件客户端：把 Gmail、Outlook、QQ/
 适合只想开箱即用的用户；本仓库的改动不会出现在商店版里。
 
 **方式二：Docker 自建（推荐，跑的是本仓库代码）**
+
+直接使用预构建镜像（GitHub Actions 自动构建，amd64/arm64）：
+
+```bash
+docker run -d --name flymail --restart unless-stopped \
+  -p 8080:8080 -p 51010:51010 \
+  -v ./data:/data -e FLYMAIL_DATA_DIR=/data \
+  ghcr.io/neilzhao-piee/flymail:latest
+```
+
+或从源码构建：
 
 ```bash
 git clone https://github.com/neilzhao-piee/FlyMail.git
@@ -238,7 +250,8 @@ This fork does not imply endorsement by, or affiliation with, the original autho
 ### Deployment
 
 - **fnOS app store**: the 2.0.2 Go build, *not* this repository's code.
-- **Docker (recommended)**: `docker compose up -d --build`, ports `8080` / `51010`, data in `./data`.
+- **Docker (recommended)**: pull `ghcr.io/neilzhao-piee/flymail:latest` (amd64/arm64, built by CI) or
+  `docker compose up -d --build`; ports `8080` / `51010`, data in `./data`.
   See [`SELFHOST.md`](SELFHOST.md). No fnOS gateway means a single `default` user — keep it behind a
   reverse proxy / private network.
 - **Local dev**: `cd backend && pip install -r requirements.txt && FLYMAIL_DATA_DIR=./data HTTP_PORT=8080 python main.py`;
