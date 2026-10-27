@@ -22,6 +22,19 @@
 
   <!-- 邮件列表视图（未选中邮件时显示） -->
   <div v-if="!selectedMessage" class="archive-list">
+  <!-- 归档任务进度：运行中/暂停时显示，可暂停恢复 -->
+  <div v-if="progress.running || progress.paused" class="archive-progress">
+  <div class="ap-row">
+  <span class="ap-text">
+  <template v-if="progress.paused">已暂停 · </template>
+  {{ progress.account_email }} / {{ progress.folder }} · {{ progress.done }} / {{ progress.total }}（{{ progress.percent }}%）
+  · {{ progress.per_minute }} 封/分
+  <template v-if="progress.eta_seconds"> · 剩余 {{ formatEta(progress.eta_seconds) }}</template>
+  </span>
+  <button class="ap-btn" type="button" @click="togglePause">{{ progress.paused ? '继续' : '暂停' }}</button>
+  </div>
+  <div class="ap-bar"><span :style="{ width: Math.min(progress.percent, 100) + '%' }"></span></div>
+  </div>
   <!-- 筛选栏：文件夹名+数量 | 全部/存活/已删除 | 立即备份（参照 MailList 风格） -->
   <div v-if="accounts.length > 0" class="list-toolbar">
   <div class="toolbar-left">
@@ -105,7 +118,7 @@
   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
   <p>{{ searchQuery ? '未找到匹配的备份邮件' : '暂无备份邮件' }}</p>
-  <p class="empty-hint">{{ searchQuery ? '仅搜索当前备份账号与文件夹的归档元数据' : '点击右上角"立即备份"，将当前邮箱邮件归档到本地' }}</p>
+  <p class="empty-hint">{{ searchQuery ? '搜索归档邮件（主题/收发件人/正文；中文 ≥3 字走全文索引）' : '点击右上角"立即备份"，将当前邮箱邮件归档到本地' }}</p>
   </div>
 
   <!-- 列表项：单行水平布局，与 MailList 视觉一致 -->
@@ -321,6 +334,53 @@ const detailLoading = ref(false);
 // UI 状态
 const backingUp = ref(false);
 
+// 归档任务进度（轮询 /backup/progress）
+const progress = ref<any>({ running: false, paused: false, folder: '', done: 0, total: 0, percent: 0, per_minute: 0, eta_seconds: 0 });
+let progressTimer: ReturnType<typeof setInterval> | null = null;
+
+async function loadProgress() {
+  try {
+    progress.value = await api.get('/backup/progress') as any;
+  } catch {
+    // 进度查询失败不影响主流程
+  }
+}
+
+function startProgressPolling() {
+  if (progressTimer) return;
+  loadProgress();
+  progressTimer = setInterval(loadProgress, 3000);
+}
+
+function stopProgressPolling() {
+  if (progressTimer) {
+    clearInterval(progressTimer);
+    progressTimer = null;
+  }
+}
+
+async function togglePause() {
+  try {
+    if (progress.value.paused) {
+      await api.post('/backup/resume');
+      uiStore.success('已恢复归档');
+    } else {
+      await api.post('/backup/pause');
+      uiStore.success('已暂停，将在当前邮件归档后停下');
+    }
+    await loadProgress();
+  } catch (e: any) {
+    uiStore.error(e?.message || '操作失败');
+  }
+}
+
+function formatEta(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds));
+  if (s < 60) return s + ' 秒';
+  if (s < 3600) return Math.round(s / 60) + ' 分钟';
+  return (s / 3600).toFixed(1) + ' 小时';
+}
+
 // 移动端状态
 const isMobile = ref(window.innerWidth <= 768);
 const showFolderSheet = ref(false);  // 底部弹出文件夹选择
@@ -352,6 +412,7 @@ const metaCc = computed(() => detailData.value?.cc || selectedMessage.value?.cc 
 
 onMounted(async () => {
   await loadStatus();
+  startProgressPolling();
   // 加载联系人映射表（模块级单例，已加载则跳过，不重复请求）
   loadContactMap();
   // 默认选中第一个账号（无"全部"选项，必须选择具体账号）
@@ -363,6 +424,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  stopProgressPolling();
   window.removeEventListener('resize', onResize);
 });
 
@@ -474,6 +536,7 @@ async function triggerBackup() {
   const data = await api.post('/backup/run', null, { params: { account_id: selectedAccount.value } }) as any;
   if (data.success) {
   uiStore.success('备份任务已启动，请稍后刷新查看');
+  startProgressPolling();
   setTimeout(() => { loadStatus(); backupStore.loadFolders(selectedAccount.value); loadList(); }, 3000);
   } else {
   uiStore.error(data.message || '备份启动失败');
@@ -1371,4 +1434,51 @@ function downloadAttachment(att: BackupAttachment) {
   .mobile-only-inline { display: inline-flex; }
 }
 
+
+/* ==================== 归档任务进度 ==================== */
+.archive-progress {
+  margin: 8px 12px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(61, 126, 255, 0.08);
+  border: 1px solid rgba(61, 126, 255, 0.22);
+}
+.ap-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ap-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ap-btn {
+  flex: none;
+  border: 1px solid rgba(61, 126, 255, 0.45);
+  background: transparent;
+  color: inherit;
+  border-radius: 7px;
+  padding: 3px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.ap-btn:hover { background: rgba(61, 126, 255, 0.12); }
+.ap-bar {
+  margin-top: 6px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(127, 127, 127, 0.2);
+  overflow: hidden;
+}
+.ap-bar > span {
+  display: block;
+  height: 100%;
+  background: #3d7eff;
+  transition: width 0.4s ease;
+}
 </style>

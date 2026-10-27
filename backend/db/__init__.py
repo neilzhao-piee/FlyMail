@@ -19,6 +19,9 @@ _fts_enabled = False
 # trigram 至少需要 3 个字符才能命中（中文同理），更短的查询走 LIKE 回退
 FTS_MIN_QUERY_CHARS = 3
 
+# 归档库（message_archive）的正文全文索引是否可用
+_archive_fts_enabled = False
+
 # 全局单例数据库连接，避免每次操作都新建连接（连接创建开销大，且每次设置 WAL 是冗余操作）
 _db_instance: Optional[aiosqlite.Connection] = None
 # 保护单例创建的锁，防止并发 get_db() 创建多个连接
@@ -342,6 +345,59 @@ async def init_db():
         )
     """)
     await db.execute("CREATE INDEX IF NOT EXISTS idx_failed_messages_account ON failed_messages(account_id, folder)")
+
+    # 归档正文列（老库缺列时补上）：归档时写入，供归档全文检索
+    cursor = await db.execute("PRAGMA table_info(message_archive)")
+    archive_cols = {row[1] for row in await cursor.fetchall()}
+    if "body_text" not in archive_cols:
+        await db.execute("ALTER TABLE message_archive ADD COLUMN body_text TEXT DEFAULT ''")
+
+    # 归档全文索引（FTS5 trigram）：直接检索 .eml 正文
+    global _archive_fts_enabled
+    try:
+        await db.execute("""
+            CREATE VIRTUAL TABLE IF NOT EXISTS message_archive_fts USING fts5(
+                subject, from_addr, to_addr, body_text,
+                account_id UNINDEXED, folder UNINDEXED, uid UNINDEXED,
+                tokenize='trigram'
+            )
+        """)
+        await db.execute("""
+            CREATE TRIGGER IF NOT EXISTS trg_message_archive_fts_ai AFTER INSERT ON message_archive BEGIN
+                INSERT INTO message_archive_fts(rowid, subject, from_addr, to_addr, body_text, account_id, folder, uid)
+                VALUES (new.rowid, IFNULL(new.subject,''), IFNULL(new.from_addr,''), IFNULL(new.to_addr,''),
+                        IFNULL(new.body_text,''), new.account_id, new.folder, new.uid);
+            END
+        """)
+        await db.execute("""
+            CREATE TRIGGER IF NOT EXISTS trg_message_archive_fts_au
+            AFTER UPDATE OF subject, from_addr, to_addr, body_text ON message_archive BEGIN
+                DELETE FROM message_archive_fts WHERE rowid = old.rowid;
+                INSERT INTO message_archive_fts(rowid, subject, from_addr, to_addr, body_text, account_id, folder, uid)
+                VALUES (new.rowid, IFNULL(new.subject,''), IFNULL(new.from_addr,''), IFNULL(new.to_addr,''),
+                        IFNULL(new.body_text,''), new.account_id, new.folder, new.uid);
+            END
+        """)
+        await db.execute("""
+            CREATE TRIGGER IF NOT EXISTS trg_message_archive_fts_ad AFTER DELETE ON message_archive BEGIN
+                DELETE FROM message_archive_fts WHERE rowid = old.rowid;
+            END
+        """)
+        await db.execute("""
+            INSERT INTO message_archive_fts(rowid, subject, from_addr, to_addr, body_text, account_id, folder, uid)
+            SELECT a.rowid, IFNULL(a.subject,''), IFNULL(a.from_addr,''), IFNULL(a.to_addr,''),
+                   IFNULL(a.body_text,''), a.account_id, a.folder, a.uid
+            FROM message_archive a
+            WHERE a.rowid NOT IN (SELECT rowid FROM message_archive_fts)
+        """)
+        await db.execute(
+            "DELETE FROM message_archive_fts WHERE rowid NOT IN (SELECT rowid FROM message_archive)"
+        )
+        _archive_fts_enabled = True
+        logger.info("归档全文索引就绪")
+    except Exception as e:
+        _archive_fts_enabled = False
+        logger.warning("归档 FTS5 不可用，归档检索回退 LIKE: %s", e)
 
     # 全文索引（FTS5 + trigram）：trigram 比 unicode61 更适合中文（中文没有空格分词），
     # 代价是最少 3 个字符才能命中；更短的查询在 search_cached_messages 里回退 LIKE。
@@ -787,6 +843,11 @@ def _append_message_search_conditions(
 def fts_available() -> bool:
     """FTS5 全文索引是否可用（启动时探测，失败则回退 LIKE）。"""
     return _fts_enabled
+
+
+def archive_fts_available() -> bool:
+    """归档库全文索引是否可用。"""
+    return _archive_fts_enabled
 
 
 def _fts_match_expr(q: str) -> str:
@@ -2080,8 +2141,8 @@ async def upsert_message_archive(archive: dict) -> bool:
         """INSERT INTO message_archive
            (user_uid, account_id, folder, uid, message_id, subject,
             from_addr, to_addr, cc, date, size, eml_path, flags,
-            has_attachments, archived_at, is_deleted_on_server, deleted_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            has_attachments, archived_at, is_deleted_on_server, deleted_at, body_text)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(account_id, folder, uid) DO UPDATE SET
                message_id = excluded.message_id,
                subject = excluded.subject,
@@ -2093,7 +2154,9 @@ async def upsert_message_archive(archive: dict) -> bool:
                eml_path = excluded.eml_path,
                flags = excluded.flags,
                has_attachments = excluded.has_attachments,
-               archived_at = excluded.archived_at""",
+               archived_at = excluded.archived_at,
+               -- 只在有正文时覆盖，避免重新归档时用空值抹掉已索引的正文
+               body_text = COALESCE(NULLIF(excluded.body_text, ''), message_archive.body_text)""",
         (
             archive["user_uid"], archive["account_id"], archive["folder"],
             archive["uid"], archive.get("message_id", ""),
@@ -2104,6 +2167,7 @@ async def upsert_message_archive(archive: dict) -> bool:
             archive.get("has_attachments", 0), now,
             archive.get("is_deleted_on_server", 0),
             archive.get("deleted_at", 0),
+            archive.get("body_text", ""),
         ),
     )
     await db.commit()
@@ -2118,28 +2182,33 @@ async def get_archived_messages(
     page_size: int = 40,
     deleted_filter: str = "",
     q: str = "",
+    sort: str = "date",
 ) -> dict:
-    """分页查询归档邮件列表（按 date 倒序）
+    """分页查询归档邮件列表（默认按 date 倒序）
 
     folder 参数支持核心类别路径（INBOX/Sent/Drafts/Junk/Trash），
     会自动匹配所有映射到该类别的 IMAP 路径（含网易 Modified UTF-7 编码）。
     deleted_filter: ""=全部, "deleted"=仅服务器已删除, "alive"=仅存活
-    q: 搜索关键词（主题/发件人/收件人/抄送；不扫 .eml 正文）
+    q: 关键词。>=3 字符走归档 FTS5（含 .eml 正文），否则回退头部 LIKE
+    sort: date=按时间, relevance=按相关度（仅 FTS 模式生效）
     """
     db = await get_db()
     q = _normalize_search_query(q)
-    where = ["user_uid = ?"]
+    page = max(1, int(page or 1))
+    page_size = max(1, min(int(page_size or 40), 100))
+    offset = (page - 1) * page_size
+
+    where = ["a.user_uid = ?"]
     params: list = [user_uid]
 
     if account_id:
-        where.append("account_id = ?")
+        where.append("a.account_id = ?")
         params.append(account_id)
     if folder:
         # 核心类别文件夹：查询所有映射到该类别的 IMAP 路径
         from services.backup import classify_folder_category
         target_category = classify_folder_category(folder)
         if target_category != 'other':
-            # 先查询该用户所有不同的 folder 值
             if account_id:
                 cursor = await db.execute(
                     "SELECT DISTINCT folder FROM message_archive WHERE user_uid = ? AND account_id = ?",
@@ -2151,51 +2220,84 @@ async def get_archived_messages(
                     (user_uid,),
                 )
             all_folders = [r[0] for r in await cursor.fetchall()]
-            # 筛选出匹配该类别的 IMAP 路径
             matching = [f for f in all_folders if classify_folder_category(f) == target_category]
             if matching:
                 placeholders = ",".join("?" * len(matching))
-                where.append(f"folder IN ({placeholders})")
+                where.append(f"a.folder IN ({placeholders})")
                 params.extend(matching)
             else:
-                # 没有匹配的路径，返回空结果
                 where.append("1=0")
         else:
-            where.append("folder = ?")
+            where.append("a.folder = ?")
             params.append(folder)
     if deleted_filter == "deleted":
-        where.append("is_deleted_on_server = 1")
+        where.append("a.is_deleted_on_server = 1")
     elif deleted_filter == "alive":
-        where.append("is_deleted_on_server = 0")
+        where.append("a.is_deleted_on_server = 0")
 
-    # 备份归档元数据搜索（范围由上方 account_id/folder/user_uid 锁定）
+    # 优先走归档 FTS（正文可搜）；失败或查询过短时回退头部 LIKE
+    if q and _archive_fts_enabled and len(re.sub(r"\s+", "", q)) >= FTS_MIN_QUERY_CHARS:
+        expr = _fts_match_expr(q)
+        if expr:
+            try:
+                match_where = " AND ".join(["message_archive_fts MATCH ?"] + where)
+                match_params = [expr] + params
+                cursor = await db.execute(
+                    "SELECT COUNT(*) FROM message_archive_fts "
+                    f"JOIN message_archive a ON a.rowid = message_archive_fts.rowid "
+                    f"WHERE {match_where}",
+                    match_params,
+                )
+                total = (await cursor.fetchone())[0]
+                order = (
+                    "bm25(message_archive_fts) ASC"
+                    if sort == "relevance"
+                    else "a.date DESC"
+                )
+                cursor = await db.execute(
+                    f"""SELECT a.*,
+                               snippet(message_archive_fts, 3, '<mark>', '</mark>', '…', 24) AS snippet
+                        FROM message_archive_fts
+                        JOIN message_archive a ON a.rowid = message_archive_fts.rowid
+                        WHERE {match_where}
+                        ORDER BY {order}
+                        LIMIT ? OFFSET ?""",
+                    match_params + [page_size, offset],
+                )
+                rows = await cursor.fetchall()
+                columns = [d[0] for d in cursor.description]
+                return {
+                    "messages": [dict(zip(columns, row)) for row in rows],
+                    "total": total,
+                    "page": page,
+                    "page_size": page_size,
+                    "search_query": q,
+                    "search_mode": "archive_fts",
+                }
+            except Exception as e:
+                logger.warning("归档 FTS 检索失败，回退 LIKE: %s", e)
+
     _append_message_search_conditions(
         where, params, q, include_cc=True, include_body=False
     )
-
     where_clause = " AND ".join(where)
 
-    # 查总数
     cursor = await db.execute(
-        f"SELECT COUNT(*) FROM message_archive WHERE {where_clause}", params
+        f"SELECT COUNT(*) FROM message_archive a WHERE {where_clause}", params
     )
     total = (await cursor.fetchone())[0]
 
-    # 分页查询（按 date 倒序，ISO 格式字符串排序等价于时间排序）
-    offset = (page - 1) * page_size
     cursor = await db.execute(
-        f"""SELECT * FROM message_archive
+        f"""SELECT a.* FROM message_archive a
             WHERE {where_clause}
-            ORDER BY date DESC
+            ORDER BY a.date DESC
             LIMIT ? OFFSET ?""",
         params + [page_size, offset],
     )
     rows = await cursor.fetchall()
     columns = [d[0] for d in cursor.description]
-    messages = [dict(zip(columns, row)) for row in rows]
-
     result = {
-        "messages": messages,
+        "messages": [dict(zip(columns, row)) for row in rows],
         "total": total,
         "page": page,
         "page_size": page_size,
