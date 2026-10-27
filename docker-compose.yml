@@ -1,0 +1,22 @@
+services:
+  flymail:
+    build: .
+    image: flymail:selfhost
+    container_name: flymail
+    restart: unless-stopped
+    ports:
+      # 主界面/API（请放在反代或内网之后，不要直接暴露公网：自建模式没有飞牛网关鉴权）
+      - "8080:8080"
+      # OAuth 回调端口（Google / Microsoft 登录回调，可选）
+      - "51010:51010"
+    volumes:
+      - ./data:/data
+    environment:
+      FLYMAIL_DATA_DIR: /data
+      HTTP_PORT: "8080"
+      OAUTH_PORT: "51010"
+      # 同步节奏调优（按需打开）
+      # FLYMAIL_FULL_SYNC_PAGE_SIZE: "500"
+      # FLYMAIL_FULL_SYNC_MAX_PAGES: "40"
+      # FLYMAIL_FETCH_BATCH_PAUSE_MS: "0"
+      # FLYMAIL_MAX_FETCH_ATTEMPTS: "3"

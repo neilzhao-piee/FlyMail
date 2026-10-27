@@ -17,6 +17,7 @@ from db import (
 )
 from deps import get_uid
 from services.backup import (
+    archive_control,
     get_backup_root_async,
     archive_all_accounts,
     archive_single_account,
@@ -234,6 +235,30 @@ async def get_backup_status(request: Request):
     return stats
 
 
+@router.get("/api/backup/progress", summary="获取当前归档进度")
+async def get_backup_progress(request: Request):
+    """返回正在进行的归档任务：文件夹、总数/已完成/失败、速率与预计剩余时间。"""
+    await get_uid(request)  # 保持与其他接口一致的鉴权语义
+    return archive_control.snapshot()
+
+
+@router.post("/api/backup/pause", summary="暂停归档任务")
+async def pause_backup(request: Request):
+    """在下一封邮件开始前暂停归档（不会中断正在进行的 FETCH）。"""
+    await get_uid(request)
+    if not archive_control.running:
+        return {"success": False, "message": "当前没有正在运行的归档任务"}
+    archive_control.pause()
+    return {"success": True, "message": "已暂停，将在当前邮件归档后停下"}
+
+
+@router.post("/api/backup/resume", summary="恢复归档任务")
+async def resume_backup(request: Request):
+    await get_uid(request)
+    archive_control.resume()
+    return {"success": True, "message": "已恢复"}
+
+
 @router.get("/api/backup/folders", summary="获取归档文件夹列表")
 async def list_archive_folders(
     request: Request,
@@ -258,11 +283,13 @@ async def list_archived_messages(
         default="",
         description="删除筛选：deleted=仅已删除, alive=仅存活, 空=全部",
     ),
-    q: str = Query(default="", description="搜索关键词（当前备份账号/文件夹元数据）"),
+    q: str = Query(default="", description="搜索关键词（>=3 字走归档全文索引，含 .eml 正文）"),
+    sort: str = Query(default="date", pattern="^(date|relevance)$", description="排序：date=时间，relevance=相关度"),
 ):
-    """分页查询归档邮件列表（按 date 倒序）
+    """分页查询归档邮件列表（默认按 date 倒序）
 
-    搜索仅命中 message_archive 元数据（主题/发件人/收件人/抄送），不解析 .eml 正文。
+    搜索命中归档全文索引（主题/发件人/收件人/抄送/正文）；中文 <3 字或索引不可用时
+    回退到头部字段模糊匹配。
     """
     uid = await get_uid(request)
     result = await get_archived_messages(
@@ -273,6 +300,7 @@ async def list_archived_messages(
         page_size=page_size,
         deleted_filter=deleted_filter,
         q=q,
+        sort=sort,
     )
     return result
 

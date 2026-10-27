@@ -38,6 +38,96 @@ from utils.paths import get_accessible_paths, is_path_authorized
 logger = get_logger("backup")
 
 
+class ArchiveControl:
+    """归档任务的暂停/恢复与进度状态（进程内，单实例）。
+
+    归档是长任务（大邮箱可能跑几天），需要能暂停、恢复并对外报告进度。
+    暂停时在每封邮件之间等待 Event，不会强行中断正在进行的 FETCH。
+    """
+
+    def __init__(self) -> None:
+        self._resume = asyncio.Event()
+        self._resume.set()
+        self.running = False
+        self.paused = False
+        self.account_email = ""
+        self.folder = ""
+        self.total = 0
+        self.done = 0
+        self.archived = 0
+        self.failed = 0
+        self.started_at = 0.0
+        self.finished_at = 0.0
+
+    def start(self) -> None:
+        if not self.running:
+            self.running = True
+            self.paused = False
+            self.started_at = time.time()
+            self.finished_at = 0.0
+            self.total = self.done = self.archived = self.failed = 0
+
+    def begin_folder(self, email: str, folder: str, total: int) -> None:
+        self.start()
+        self.account_email = email
+        self.folder = folder
+        self.total = int(total)
+
+    def tick(self, ok: bool) -> None:
+        self.done += 1
+        if ok:
+            self.archived += 1
+        else:
+            self.failed += 1
+
+    async def wait_if_paused(self) -> None:
+        if self.paused:
+            await self._resume.wait()
+
+    def pause(self) -> None:
+        self.paused = True
+        self._resume.clear()
+
+    def resume(self) -> None:
+        self.paused = False
+        self._resume.set()
+
+    def finish(self) -> None:
+        self.running = False
+        self.paused = False
+        self.finished_at = time.time()
+        self._resume.set()
+
+    def snapshot(self) -> dict:
+        elapsed = 0.0
+        if self.started_at:
+            end = self.finished_at or time.time()
+            elapsed = max(0.0, end - self.started_at)
+        rate = (self.archived / elapsed) if elapsed > 0 else 0.0
+        eta = 0.0
+        if self.running and rate > 0 and self.total > self.done:
+            eta = (self.total - self.done) / rate
+        return {
+            "running": self.running,
+            "paused": self.paused,
+            "account_email": self.account_email,
+            "folder": self.folder,
+            "total": self.total,
+            "done": self.done,
+            "archived": self.archived,
+            "failed": self.failed,
+            "percent": round(self.done * 100.0 / self.total, 2) if self.total else 0.0,
+            "elapsed_seconds": int(elapsed),
+            "per_minute": round(rate * 60, 2),
+            "eta_seconds": int(eta),
+            "started_at": self.started_at,
+            "finished_at": self.finished_at,
+        }
+
+
+archive_control = ArchiveControl()
+
+
 # ==================== 备份目录管理 ====================
 
 def get_backup_root() -> Optional[Path]:
@@ -390,6 +480,34 @@ def _has_attachments(msg) -> bool:
     return False
 
 
+def _extract_plain_body(msg, max_len: int = 200_000) -> str:
+    """从解析后的邮件对象提取纯文本正文（用于归档全文检索）。
+
+    优先取 text/plain 非附件部分；失败返回空串，不影响归档本身。
+    """
+    try:
+        parts = msg.walk() if msg.is_multipart() else [msg]
+        for part in parts:
+            if part.get_content_maintype() != "text":
+                continue
+            if part.get("Content-Disposition"):
+                continue
+            if part.get_content_type() != "text/plain":
+                continue
+            payload = part.get_payload(decode=True)
+            if not payload:
+                continue
+            charset = part.get_content_charset() or "utf-8"
+            try:
+                text = payload.decode(charset, "replace")
+            except LookupError:
+                text = payload.decode("utf-8", "replace")
+            return text[:max_len]
+    except Exception:
+        return ""
+    return ""
+
+
 async def _archive_one_email(
     account: Account,
     folder: str,
@@ -441,6 +559,7 @@ async def _archive_one_email(
             "flags": "",
             "has_attachments": 1 if _has_attachments(msg) else 0,
             "is_deleted_on_server": 0,
+            "body_text": _extract_plain_body(msg),
         }
         await upsert_message_archive(archive_data)
         return True
@@ -548,9 +667,11 @@ async def archive_messages_batch(account: Account, folder: str, uids: list[int])
         await receiver.connect(credentials)
 
         for uid in to_archive:
+            await archive_control.wait_if_paused()
             raw_email = await receiver.fetch_raw_email(folder, uid)
             if not raw_email:
                 logger.warning("批量归档: 无法获取邮件源码 uid=%s folder=%s", uid, folder)
+                archive_control.tick(False)
                 continue
             # 调用公共函数完成解析+规范化+写入+入库
             if await _archive_one_email(account, folder, uid, raw_email, backup_root):
@@ -619,15 +740,20 @@ async def archive_folder(account: Account, folder: str, max_count: int = 0) -> i
 
         logger.info("开始归档文件夹: %s/%s, 待归档 %d 封", account.email, folder, len(to_archive))
 
-        # 4. 逐封归档（顺序执行，避免 IMAP 并发压力）
+        # 4. 逐封归档（顺序执行，避免 IMAP 并发压力）；每封之间响应暂停
         archived_count = 0
+        archive_control.begin_folder(account.email, folder, len(to_archive))
         for uid in to_archive:
+            await archive_control.wait_if_paused()
             raw_email = await receiver.fetch_raw_email(folder, uid)
             if not raw_email:
+                archive_control.tick(False)
                 continue
             # 调用公共函数完成解析+规范化+写入+入库
-            if await _archive_one_email(account, folder, uid, raw_email, backup_root):
+            ok = await _archive_one_email(account, folder, uid, raw_email, backup_root)
+            if ok:
                 archived_count += 1
+            archive_control.tick(ok)
 
         logger.info("文件夹归档完成: %s/%s, 新增 %d 封", account.email, folder, archived_count)
         return archived_count
@@ -737,10 +863,14 @@ async def archive_all_accounts(user_uid: str, notify: bool = False) -> dict:
         logger.error("全量备份失败: 无飞牛授权目录，请先在飞牛应用设置中授权目录")
         return result
 
-    for account in target_accounts:
-        result[account.id] = await _archive_one_account(
-            account, backup_root, user_uid, notify
-        )
+    try:
+        for account in target_accounts:
+            await archive_control.wait_if_paused()
+            result[account.id] = await _archive_one_account(
+                account, backup_root, user_uid, notify
+            )
+    finally:
+        archive_control.finish()
 
     return result
 
@@ -777,9 +907,12 @@ async def archive_single_account(
     if backup_root is None:
         logger.error("备份失败: 无飞牛授权目录，请先在飞牛应用设置中授权目录")
         return result
-    result[account.id] = await _archive_one_account(
-        account, backup_root, user_uid, notify
-    )
+    try:
+        result[account.id] = await _archive_one_account(
+            account, backup_root, user_uid, notify
+        )
+    finally:
+        archive_control.finish()
 
     return result
 

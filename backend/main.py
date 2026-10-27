@@ -46,6 +46,8 @@ from routes.notifications import router as notifications_router
 from routes.notify_settings import router as notify_settings_router
 from routes.settings import router as settings_router
 from routes.signatures import router as signatures_router
+from routes.search import router as search_router
+from routes.sync import router as sync_router
 from routes.websocket import router as websocket_router
 
 
@@ -103,7 +105,7 @@ app = FastAPI(
     description="飞邮 - 飞牛OS自托管邮件客户端，让您的邮件数据安全存储在本地 NAS。",
     version=VERSION,
     lifespan=lifespan,
-    tags_metadata=[
+    openapi_tags=[
         {"name": "通用", "description": "健康检查、用户信息"},
         {"name": "设置", "description": "应用配置（代理、聚合收件箱等）"},
         {"name": "账号", "description": "邮箱账号的增删改查、授权认证"},
@@ -163,6 +165,8 @@ app.include_router(messages_router)
 app.include_router(notifications_router)
 app.include_router(notify_settings_router)
 app.include_router(settings_router)
+app.include_router(search_router)
+app.include_router(sync_router)
 app.include_router(signatures_router)
 app.include_router(websocket_router)
 
@@ -227,13 +231,17 @@ async def serve_spa(full_path: str):
 
 if __name__ == "__main__":
     socket_path = os.environ.get("SOCKET_PATH", "flymail.sock")
+    # 自建部署（Docker / 直接 python 运行）可额外监听一个 HTTP 端口；
+    # 飞牛应用内运行走 Unix Socket + 网关，不需要设置。
+    http_port = int(os.environ.get("HTTP_PORT", "0"))
+    http_host = os.environ.get("HTTP_HOST", "0.0.0.0")
     # OAuth 回调专用 TCP 端口（绕过飞牛网关认证，Google/Microsoft 回调是浏览器重定向不带 token）
     oauth_port = int(os.environ.get("OAUTH_PORT", "51010"))
     oauth_host = os.environ.get("OAUTH_HOST", "0.0.0.0")
     oauth_ipv6_host = os.environ.get("OAUTH_IPV6_HOST", "::")
     logger.info(
-        "启动服务，socket: %s, OAuth端口: %d, IPv4监听: %s, IPv6监听: %s",
-        socket_path, oauth_port, oauth_host, oauth_ipv6_host,
+        "启动服务，socket: %s, HTTP端口: %d, OAuth端口: %d, IPv4监听: %s, IPv6监听: %s",
+        socket_path, http_port, oauth_port, oauth_host, oauth_ipv6_host,
     )
 
     from uvicorn import Config, Server
@@ -258,11 +266,20 @@ if __name__ == "__main__":
             except OSError as e:
                 logger.error("TCP %s:%d 绑定失败: %s，OAuth回调该地址族将不可用", host, oauth_port, e)
 
-        logger.info("同时启动 Unix Socket + TCP IPv4/IPv6 端口服务")
-        await asyncio.gather(
+        servers = [
             socket_server.serve(),
             safe_tcp_serve(tcp_v4_server, oauth_host),
             safe_tcp_serve(tcp_v6_server, oauth_ipv6_host),
-        )
+        ]
+        if http_port > 0:
+            # 自建部署：主应用额外监听 TCP（不带飞牛网关鉴权，请放在反代/内网后）
+            # lifespan="off"：主应用的 lifespan 已由 Unix Socket 服务实例负责，
+            # 两个实例同时跑 lifespan 会并发执行 init_db（曾触发 ALTER TABLE 竞态）
+            http_server = Server(Config(app, host=http_host, port=http_port, log_level="warning",
+                                        ws=ws_protocol, lifespan="off"))
+            servers.append(http_server.serve())
+            logger.info("额外监听 HTTP %s:%d（自建部署）", http_host, http_port)
+        logger.info("同时启动 Unix Socket + TCP IPv4/IPv6 端口服务")
+        await asyncio.gather(*servers)
 
     asyncio.run(run_dual_servers())
