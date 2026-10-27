@@ -350,7 +350,12 @@ async def init_db():
     cursor = await db.execute("PRAGMA table_info(message_archive)")
     archive_cols = {row[1] for row in await cursor.fetchall()}
     if "body_text" not in archive_cols:
-        await db.execute("ALTER TABLE message_archive ADD COLUMN body_text TEXT DEFAULT ''")
+        try:
+            await db.execute("ALTER TABLE message_archive ADD COLUMN body_text TEXT DEFAULT ''")
+        except Exception as e:
+            # 并发启动时两个 init_db 可能同时通过上面的检查，重复 ALTER 会报 duplicate column
+            if "duplicate column" not in str(e).lower():
+                raise
 
     # 归档全文索引（FTS5 trigram）：直接检索 .eml 正文
     global _archive_fts_enabled
