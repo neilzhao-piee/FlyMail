@@ -46,6 +46,7 @@ from routes.notifications import router as notifications_router
 from routes.notify_settings import router as notify_settings_router
 from routes.settings import router as settings_router
 from routes.signatures import router as signatures_router
+from routes.search import router as search_router
 from routes.websocket import router as websocket_router
 
 
@@ -163,6 +164,7 @@ app.include_router(messages_router)
 app.include_router(notifications_router)
 app.include_router(notify_settings_router)
 app.include_router(settings_router)
+app.include_router(search_router)
 app.include_router(signatures_router)
 app.include_router(websocket_router)
 

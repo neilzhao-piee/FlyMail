@@ -1,6 +1,7 @@
 import asyncio
 import os
 import json
+import re
 import time
 import aiosqlite
 from typing import Any, List, Optional
@@ -10,6 +11,13 @@ from utils.logger import get_logger
 logger = get_logger("db")
 
 DB_PATH = os.environ.get("FLYMAIL_DATA_DIR", ".") + "/flymail.db"
+
+# FTS5 全文索引是否可用。trigram 分词器对中文友好（>=3 字符命中），
+# 不可用或查询过短时，搜索自动回退到 LIKE（保持老版本行为）。
+_fts_enabled = False
+
+# trigram 至少需要 3 个字符才能命中（中文同理），更短的查询走 LIKE 回退
+FTS_MIN_QUERY_CHARS = 3
 
 # 全局单例数据库连接，避免每次操作都新建连接（连接创建开销大，且每次设置 WAL 是冗余操作）
 _db_instance: Optional[aiosqlite.Connection] = None
@@ -318,6 +326,62 @@ async def init_db():
     await db.execute("CREATE INDEX IF NOT EXISTS idx_archive_account_folder ON message_archive(account_id, folder)")
     await db.execute("CREATE INDEX IF NOT EXISTS idx_archive_date ON message_archive(date)")
     await db.execute("CREATE INDEX IF NOT EXISTS idx_archive_deleted ON message_archive(user_uid, is_deleted_on_server)")
+
+    # 全文索引（FTS5 + trigram）：trigram 比 unicode61 更适合中文（中文没有空格分词），
+    # 代价是最少 3 个字符才能命中；更短的查询在 search_cached_messages 里回退 LIKE。
+    global _fts_enabled
+    try:
+        await db.execute("""
+            CREATE VIRTUAL TABLE IF NOT EXISTS cached_messages_fts USING fts5(
+                subject,
+                from_addr,
+                to_addr,
+                body_text,
+                account_id UNINDEXED,
+                folder UNINDEXED,
+                msg_id UNINDEXED,
+                tokenize='trigram'
+            )
+        """)
+        # 缓存表行变化时同步维护 FTS（rowid 与 cached_messages 对齐）
+        await db.execute("""
+            CREATE TRIGGER IF NOT EXISTS trg_cached_messages_fts_ai AFTER INSERT ON cached_messages BEGIN
+                INSERT INTO cached_messages_fts(rowid, subject, from_addr, to_addr, body_text, account_id, folder, msg_id)
+                VALUES (new.rowid, IFNULL(new.subject,''), IFNULL(new.from_addr,''), IFNULL(new.to_addr,''),
+                        IFNULL(new.body_text,''), new.account_id, new.folder, new.id);
+            END
+        """)
+        # 只在检索相关列变化时重建该行，避免标记已读等高频 UPDATE 反复写索引
+        await db.execute("""
+            CREATE TRIGGER IF NOT EXISTS trg_cached_messages_fts_au
+            AFTER UPDATE OF subject, from_addr, to_addr, body_text ON cached_messages BEGIN
+                DELETE FROM cached_messages_fts WHERE rowid = old.rowid;
+                INSERT INTO cached_messages_fts(rowid, subject, from_addr, to_addr, body_text, account_id, folder, msg_id)
+                VALUES (new.rowid, IFNULL(new.subject,''), IFNULL(new.from_addr,''), IFNULL(new.to_addr,''),
+                        IFNULL(new.body_text,''), new.account_id, new.folder, new.id);
+            END
+        """)
+        await db.execute("""
+            CREATE TRIGGER IF NOT EXISTS trg_cached_messages_fts_ad AFTER DELETE ON cached_messages BEGIN
+                DELETE FROM cached_messages_fts WHERE rowid = old.rowid;
+            END
+        """)
+        # 增量回填：只补索引里缺失的行，并清理已删除行的残留（首次启动会全量建索引）
+        await db.execute("""
+            INSERT INTO cached_messages_fts(rowid, subject, from_addr, to_addr, body_text, account_id, folder, msg_id)
+            SELECT m.rowid, IFNULL(m.subject,''), IFNULL(m.from_addr,''), IFNULL(m.to_addr,''),
+                   IFNULL(m.body_text,''), m.account_id, m.folder, m.id
+            FROM cached_messages m
+            WHERE m.rowid NOT IN (SELECT rowid FROM cached_messages_fts)
+        """)
+        await db.execute(
+            "DELETE FROM cached_messages_fts WHERE rowid NOT IN (SELECT rowid FROM cached_messages)"
+        )
+        _fts_enabled = True
+        logger.info("FTS5 全文索引就绪")
+    except Exception as e:
+        _fts_enabled = False
+        logger.warning("FTS5 索引不可用，搜索自动回退 LIKE: %s", e)
 
     await db.commit()
 
@@ -702,6 +766,191 @@ def _append_message_search_conditions(
         parts.append("IFNULL(body_text,'') LIKE ?" + esc)
         params.append(like)
     conditions.append("(" + " OR ".join(parts) + ")")
+
+
+def fts_available() -> bool:
+    """FTS5 全文索引是否可用（启动时探测，失败则回退 LIKE）。"""
+    return _fts_enabled
+
+
+def _fts_match_expr(q: str) -> str:
+    """把用户输入转成安全的 FTS5 MATCH 表达式。
+
+    - 空白分隔的多个词是 AND 关系
+    - 双引号包裹的按短语处理
+    - trigram 分词器下，短语匹配等价于子串匹配
+    """
+    tokens = re.findall(r'"[^"]*"|\S+', q or "")
+    parts = []
+    for raw in tokens:
+        token = raw.strip('"').strip()
+        if not token:
+            continue
+        token = token.replace('"', '""')
+        parts.append(f'"{token}"')
+    return " ".join(parts)
+
+
+def _row_to_search_item(row) -> dict:
+    """把检索 SQL 的结果行转成 API 结构（两套查询列顺序一致）。"""
+    return {
+        "id": str(row[1]),
+        "uid": row[1],
+        "subject": row[2] or "",
+        "from_addr": row[3] or "",
+        "to_addr": row[4] or "",
+        "date": row[5] or "",
+        "is_read": bool(row[6]),
+        "is_starred": bool(row[7]),
+        "folder": row[8] or "",
+        "has_attachments": bool(row[9]),
+        "account_id": row[10] or "",
+        "account_email": row[11] or "",
+        "snippet": row[12] or "",
+        "rank": float(row[13] or 0.0),
+    }
+
+
+async def search_cached_messages(
+    user_uid: str,
+    q: str,
+    *,
+    account_id: str = "",
+    folder: str = "",
+    page: int = 1,
+    page_size: int = 40,
+    date_from: str = "",
+    date_to: str = "",
+    sort: str = "date",
+) -> dict:
+    """跨账号、跨文件夹检索本地缓存。
+
+    优先 FTS5（trigram，中文友好）；索引不可用或查询短于 3 个字符时回退 LIKE，
+    保证老库和短关键词（如"发票"）也能搜到。
+    date_from / date_to 使用 ISO 日期前缀（YYYY-MM-DD），与缓存里 date 的存储格式一致。
+    """
+    started = time.time()
+    q = _normalize_search_query(q, max_len=200)
+    page = max(1, int(page or 1))
+    page_size = max(1, min(int(page_size or 40), 100))
+    offset = (page - 1) * page_size
+    result = {
+        "messages": [],
+        "total": 0,
+        "page": page,
+        "page_size": page_size,
+        "query": q,
+        "mode": "",
+        "took_ms": 0,
+    }
+    if not q:
+        return result
+
+    db = await get_db()
+    compact_len = len(re.sub(r"\s+", "", q))
+    use_fts = _fts_enabled and compact_len >= FTS_MIN_QUERY_CHARS
+
+    base_filters = ["m.user_uid = ?"]
+    base_params: list = [user_uid]
+    if account_id:
+        base_filters.append("m.account_id = ?")
+        base_params.append(account_id)
+    if folder:
+        base_filters.append("m.folder = ?")
+        base_params.append(folder)
+    if date_from:
+        base_filters.append("m.date >= ?")
+        base_params.append(date_from)
+    if date_to:
+        base_filters.append("m.date <= ?")
+        base_params.append(date_to + "T23:59:59Z" if len(date_to) == 10 else date_to)
+
+    if use_fts:
+        expr = _fts_match_expr(q)
+        if expr:
+            try:
+                where = " AND ".join(["cached_messages_fts MATCH ?"] + base_filters)
+                params = [expr] + base_params
+                cursor = await db.execute(
+                    "SELECT COUNT(*) FROM cached_messages_fts "
+                    "JOIN cached_messages m ON m.rowid = cached_messages_fts.rowid "
+                    f"WHERE {where}",
+                    params,
+                )
+                total = (await cursor.fetchone())[0]
+                order = (
+                    "bm25(cached_messages_fts) ASC"
+                    if sort == "relevance"
+                    else "m.date DESC, m.uid DESC"
+                )
+                cursor = await db.execute(
+                    f"""SELECT m.id, m.uid, m.subject, m.from_addr, m.to_addr, m.date,
+                               m.is_read, m.is_starred, m.folder, m.has_attachments, m.account_id,
+                               IFNULL(a.email, ''),
+                               snippet(cached_messages_fts, 3, '<mark>', '</mark>', '…', 20),
+                               bm25(cached_messages_fts)
+                        FROM cached_messages_fts
+                        JOIN cached_messages m ON m.rowid = cached_messages_fts.rowid
+                        LEFT JOIN accounts a ON a.id = m.account_id
+                        WHERE {where}
+                        ORDER BY {order}
+                        LIMIT ? OFFSET ?""",
+                    params + [page_size, offset],
+                )
+                rows = await cursor.fetchall()
+                result["messages"] = [_row_to_search_item(r) for r in rows]
+                result["total"] = total
+                result["mode"] = "fts"
+            except Exception as e:
+                logger.warning("FTS 检索失败，回退 LIKE: %s", e)
+                use_fts = False
+
+    if not use_fts:
+        conditions = list(base_filters)
+        params = list(base_params)
+        _append_message_search_conditions(conditions, params, q, include_cc=True, include_body=True)
+        where = " AND ".join(conditions)
+        cursor = await db.execute(
+            "SELECT COUNT(*) FROM cached_messages m "
+            "LEFT JOIN accounts a ON a.id = m.account_id "
+            f"WHERE {where}",
+            params,
+        )
+        total = (await cursor.fetchone())[0]
+        cursor = await db.execute(
+            f"""SELECT m.id, m.uid, m.subject, m.from_addr, m.to_addr, m.date,
+                       m.is_read, m.is_starred, m.folder, m.has_attachments, m.account_id,
+                       IFNULL(a.email, ''), '', 0.0
+                FROM cached_messages m
+                LEFT JOIN accounts a ON a.id = m.account_id
+                WHERE {where}
+                ORDER BY m.date DESC, m.uid DESC
+                LIMIT ? OFFSET ?""",
+            params + [page_size, offset],
+        )
+        rows = await cursor.fetchall()
+        result["messages"] = [_row_to_search_item(r) for r in rows]
+        result["total"] = total
+        result["mode"] = "like"
+
+    result["took_ms"] = int((time.time() - started) * 1000)
+    return result
+
+
+async def rebuild_fts_index() -> int:
+    """重建全文索引（维护/迁移用）。返回写入索引的行数；FTS 不可用时返回 0。"""
+    if not _fts_enabled:
+        return 0
+    db = await get_db()
+    await db.execute("DELETE FROM cached_messages_fts")
+    cursor = await db.execute(
+        """INSERT INTO cached_messages_fts(rowid, subject, from_addr, to_addr, body_text, account_id, folder, msg_id)
+           SELECT m.rowid, IFNULL(m.subject,''), IFNULL(m.from_addr,''), IFNULL(m.to_addr,''),
+                  IFNULL(m.body_text,''), m.account_id, m.folder, m.id
+           FROM cached_messages m"""
+    )
+    await db.commit()
+    return cursor.rowcount or 0
 
 
 async def get_cached_messages_by_folder(

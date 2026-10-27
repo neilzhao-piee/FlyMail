@@ -173,6 +173,34 @@ class MessageItem(BaseModel):
   account_provider: str = Field(default="", description="邮箱平台，聚合收件箱返回")
 
 
+class SearchResultItem(BaseModel):
+  """跨账号搜索结果项：在 MessageItem 摘要基础上多了高亮片段和账号信息。"""
+  id: str = Field(description="邮件ID（IMAP UID 字符串）")
+  uid: int = Field(description="IMAP UID")
+  subject: str = Field(default="", description="邮件主题")
+  from_addr: str = Field(default="", description="发件人")
+  to_addr: str = Field(default="", description="收件人")
+  date: str = Field(default="", description="邮件日期")
+  is_read: bool = Field(default=False, description="是否已读")
+  is_starred: bool = Field(default=False, description="是否星标")
+  folder: str = Field(default="INBOX", description="文件夹路径")
+  has_attachments: bool = Field(default=False, description="是否包含附件")
+  account_id: str = Field(default="", description="账号ID")
+  account_email: str = Field(default="", description="账号邮箱")
+  snippet: str = Field(default="", description="正文命中片段，命中词用 <mark> 包裹")
+  rank: float = Field(default=0.0, description="bm25 相关度（越小越相关，仅 FTS 模式有值）")
+
+
+class SearchResponse(BaseModel):
+  messages: List[SearchResultItem] = Field(description="搜索结果")
+  total: int = Field(description="命中总数")
+  page: int = Field(description="当前页码")
+  page_size: int = Field(description="每页数量")
+  query: str = Field(default="", description="规范化后的查询词")
+  mode: str = Field(default="", description="检索模式：fts=全文索引, like=回退模糊匹配")
+  took_ms: int = Field(default=0, description="查询耗时（毫秒）")
+
+
 class MessageListResponse(BaseModel):
   messages: List[MessageItem] = Field(description="邮件列表")
   total: int = Field(description="邮件总数")
