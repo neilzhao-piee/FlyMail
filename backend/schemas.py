@@ -62,10 +62,10 @@ class CustomAccountRequest(BaseModel):
   """自定义邮箱添加请求（标准 IMAP/SMTP，用户填写服务器配置）"""
   email: str = Field(..., description="邮箱地址")
   auth_code: str = Field(..., description="授权码或登录密码")
-  imap_host: str = Field(..., description="IMAP 服务器地址")
+  imap_host: str = Field(default="", description="IMAP 服务器地址（命中预设域名时可留空自动补全）")
   imap_port: int = Field(default=993, description="IMAP 端口（SSL 默认 993，不加密/STARTTLS 默认 143）")
   imap_ssl: str = Field(default="ssl", description="IMAP 加密方式: ssl（直连）| starttls | none（不加密）")
-  smtp_host: str = Field(..., description="SMTP 服务器地址")
+  smtp_host: str = Field(default="", description="SMTP 服务器地址（命中预设域名时可留空自动补全）")
   smtp_port: int = Field(default=465, description="SMTP 端口（SSL 默认 465，STARTTLS 默认 587）")
   smtp_ssl: str = Field(default="ssl", description="SMTP 加密方式: ssl（直连）| starttls")
 

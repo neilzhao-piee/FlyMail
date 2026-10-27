@@ -306,6 +306,16 @@ async def add_sina_account(request: Request, body: AuthCodeAccountRequest = Body
     return await _add_auth_code_account(request, "sina", body)
 
 
+@router.get("/presets", summary="获取内置邮箱服务商预设")
+async def list_provider_presets():
+    """返回内置的国内邮箱预设（139 / 189 / 搜狐 / 阿里云）。
+
+    这些域名在添加账号时可只填邮箱 + 授权码，IMAP/SMTP 参数自动补全。
+    """
+    from providers.presets import list_presets
+    return {"presets": list_presets()}
+
+
 @router.post("/add-custom", response_model=AccountAddResponse, summary="添加自定义邮箱账号")
 async def add_custom_account(request: Request, body: CustomAccountRequest = Body(description="自定义邮箱配置信息")):
     """添加自定义 IMAP/SMTP 邮箱账号
@@ -318,6 +328,21 @@ async def add_custom_account(request: Request, body: CustomAccountRequest = Body
     auth_code = body.auth_code.strip()
     imap_host = body.imap_host.strip()
     smtp_host = body.smtp_host.strip()
+    imap_port = body.imap_port
+    smtp_port = body.smtp_port
+    imap_ssl = body.imap_ssl
+    smtp_ssl = body.smtp_ssl
+
+    # 命中国内常见邮箱预设时，服务器参数可留空自动补全（139/189/搜狐/阿里云）
+    from providers.presets import detect_preset
+    preset = detect_preset(email_addr)
+    if preset:
+        imap_host = imap_host or preset["imap_host"]
+        smtp_host = smtp_host or preset["smtp_host"]
+        imap_port = imap_port or preset["imap_port"]
+        smtp_port = smtp_port or preset["smtp_port"]
+        imap_ssl = imap_ssl or preset["imap_ssl"]
+        smtp_ssl = smtp_ssl or preset["smtp_ssl"]
 
     # 参数校验：邮箱地址、授权码、IMAP/SMTP 服务器地址均不能为空
     if not email_addr or not auth_code or not imap_host or not smtp_host:
@@ -336,11 +361,11 @@ async def add_custom_account(request: Request, body: CustomAccountRequest = Body
         from providers.custom.auth import CustomAuthProvider
         server_config = {
             "imap_host": imap_host,
-            "imap_port": body.imap_port,
-            "imap_ssl": body.imap_ssl,
+            "imap_port": imap_port,
+            "imap_ssl": imap_ssl,
             "smtp_host": smtp_host,
-            "smtp_port": body.smtp_port,
-            "smtp_ssl": body.smtp_ssl,
+            "smtp_port": smtp_port,
+            "smtp_ssl": smtp_ssl,
         }
         credentials = CustomAuthProvider.create_credentials(email_addr, auth_code, server_config)
 
