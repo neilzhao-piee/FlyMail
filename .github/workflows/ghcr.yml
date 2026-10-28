@@ -16,6 +16,8 @@ jobs:
   build:
     name: build amd64/arm64
     runs-on: ubuntu-latest
+    # 正常 5~8 分钟；超过 45 分钟必然卡住，直接失败而不是挂 6 小时
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -43,9 +45,15 @@ jobs:
             type=sha,format=short
 
       - uses: docker/build-push-action@v6
+        timeout-minutes: 40
         with:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # 复用上一次的层缓存：pip/npm 依赖层命中后通常 2~3 分钟出镜像
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # 不生成 attestation 清单，减少推送体积与失败面
+          provenance: false

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---------- 前端构建 ----------
-FROM node:22-alpine AS ui
+FROM --platform=$BUILDPLATFORM node:22-alpine AS ui
 WORKDIR /build
 COPY VERSION /VERSION
 COPY frontend/package.json ./
