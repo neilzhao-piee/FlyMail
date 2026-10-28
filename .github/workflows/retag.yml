@@ -14,6 +14,8 @@ on:
         description: 目标标签（如 1.0.7-community.3）
         required: true
   push:
+    # 只响应 main 上的 .retag 变更；tag push 不评估 paths 过滤，会把 retag 误触发
+    branches: [main]
     paths:
       - .retag
 
