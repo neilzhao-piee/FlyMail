@@ -52,10 +52,15 @@ class ArchiveControl:
         self.paused = False
         self.account_email = ""
         self.folder = ""
+        # 当前文件夹的计数（前端进度条用；每切文件夹重置）
         self.total = 0
         self.done = 0
         self.archived = 0
         self.failed = 0
+        # 整个归档任务（跨文件夹）的累计计数
+        self.total_done = 0
+        self.total_archived = 0
+        self.total_failed = 0
         self.started_at = 0.0
         self.finished_at = 0.0
 
@@ -66,19 +71,27 @@ class ArchiveControl:
             self.started_at = time.time()
             self.finished_at = 0.0
             self.total = self.done = self.archived = self.failed = 0
+            self.total_done = self.total_archived = self.total_failed = 0
 
     def begin_folder(self, email: str, folder: str, total: int) -> None:
         self.start()
         self.account_email = email
         self.folder = folder
         self.total = int(total)
+        # 切文件夹时重置当前文件夹计数，否则 done 会跨文件夹累加，percent 超过 100%
+        self.done = 0
+        self.archived = 0
+        self.failed = 0
 
     def tick(self, ok: bool) -> None:
         self.done += 1
+        self.total_done += 1
         if ok:
             self.archived += 1
+            self.total_archived += 1
         else:
             self.failed += 1
+            self.total_failed += 1
 
     async def wait_if_paused(self) -> None:
         if self.paused:
@@ -103,7 +116,8 @@ class ArchiveControl:
         if self.started_at:
             end = self.finished_at or time.time()
             elapsed = max(0.0, end - self.started_at)
-        rate = (self.archived / elapsed) if elapsed > 0 else 0.0
+        # 速率用「整个任务累计归档数 / 任务耗时」，比按单文件夹算更稳定
+        rate = (self.total_archived / elapsed) if elapsed > 0 else 0.0
         eta = 0.0
         if self.running and rate > 0 and self.total > self.done:
             eta = (self.total - self.done) / rate
@@ -116,7 +130,10 @@ class ArchiveControl:
             "done": self.done,
             "archived": self.archived,
             "failed": self.failed,
-            "percent": round(self.done * 100.0 / self.total, 2) if self.total else 0.0,
+            "overall_done": self.total_done,
+            "overall_archived": self.total_archived,
+            "overall_failed": self.total_failed,
+            "percent": round(min(self.done * 100.0 / self.total, 100.0), 2) if self.total else 0.0,
             "elapsed_seconds": int(elapsed),
             "per_minute": round(rate * 60, 2),
             "eta_seconds": int(eta),
