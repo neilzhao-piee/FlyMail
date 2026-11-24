@@ -177,6 +177,9 @@ def sanitize_filename(text: str, max_len: int = 30) -> str:
     去除首尾空格和点，截断到最大长度。
     """
     safe = re.sub(r'[\\/:*?"<>|]', '_', text)
+    # 控制字符（\r \n \t 等）在 SMB/NFS 目标上会导致 rsync mkstemp 失败，一律转空格
+    safe = re.sub(r'[\x00-\x1f\x7f]', ' ', safe)
+    safe = re.sub(r'\s+', ' ', safe)
     safe = safe.strip(' .')
     if len(safe) > max_len:
         safe = safe[:max_len]
