@@ -46,7 +46,6 @@ Thumbs.db
 *.log
 
 # 本地临时/补丁残留与 auto-sync 凭据保护
-README鏃?md
 *.db
 *.db-journal
 backend/tests/
