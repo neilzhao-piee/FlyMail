@@ -1,31 +1,31 @@
-﻿# 渚濊禆
+# 依赖
 node_modules/
 package-lock.json
 __pycache__/
 *.pyc
 *.pyo
 
-# 鏋勫缓浜х墿
+# 构建产物
 dist/
 build/
 *.spec
 
-# 鍚庣鏈湴寮€鍙戞暟鎹?
+# 后端本地开发数据
 backend/data/
 backend/ui/
 
-# Cloudflare OAuth Broker锛堟湰鍦伴儴缃查厤缃紝涓嶄笂浼狅級
+# Cloudflare OAuth Broker（本地部署配置，不上传）
 cloudflare/
 
-# 椤圭洰涓婚〉锛圕loudflare Pages 閮ㄧ讲鐢紝涓嶄笂浼狅級
+# 项目主页（Cloudflare Pages 部署用，不上传）
 pages/
 
-# 椤圭洰鏂囨。涓?CI锛堟湰鍦颁娇鐢紝涓嶄笂浼?GitHub锛?
-README鏃?md
+# 项目文档与 CI（本地使用，不上传 GitHub）
+README.md
 doc/
 .github/
 
-# 椋炵墰OS 搴旂敤鍖咃紙鏈湴鏋勫缓浜х墿锛屼笉涓婁紶锛?
+# 飞牛OS 应用包（本地构建产物，不上传）
 flymail/
 
 # IDE
@@ -35,38 +35,33 @@ flymail/
 *.swo
 .trae/
 
-# 绯荤粺鏂囦欢
+# 系统文件
 .DS_Store
 Thumbs.db
 
-# fnpack 鐢熸垚鐨?fpk 鏂囦欢
+# fnpack 生成的 fpk 文件
 *.fpk
 
-# 鏃ュ織
+# 日志
 *.log
 
-# 杩愯鏃舵暟鎹簱鏂囦欢锛堜笉搴旂撼鍏ョ増鏈帶鍒讹級
+# 本地临时/补丁残留与 auto-sync 凭据保护
+README鏃?md
 *.db
 *.db-journal
-
-# 鏈湴涓存椂娴嬭瘯 / 琛ヤ竵鑴氭湰锛堜笉涓婁紶 GitHub锛?
 backend/tests/
 backend/tools/
-
-# 鏍圭洰褰曚竴娆℃€цˉ涓?/ 棰勮 / 楠岃瘉娈嬬暀锛堜笉涓婁紶锛?
 /_*.py
 /_*.txt
 docs-temp-*.png
 frontend/scripts/test-*.mjs
-
-# FnDepot 构建模板（仅本地/手动复制，不进 FlyMail 仓库）
 build-flymail.yml
-
-
-# auto-sync safety net: never let credentials reach this repo
 .env
 .env.*
 *.pw
 *.pem
 *.key
 credentials*
+
+# 临时调试脚本（i18n-wrap.mjs 保留，其它不进仓库）
+frontend/tools/probe.mjs
